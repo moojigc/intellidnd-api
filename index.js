@@ -1,3 +1,5 @@
+use: 'strict';
+
 const fs = require('fs');
 const inventoryDataDir = './inventory.json';
 const inventoryData = require(inventoryDataDir);
@@ -23,90 +25,177 @@ client.on('message', async message => {
     if(message.channel.type === 'dm') return;
 
     let messageArr = message.content.split(" ");
-    let command = messageArr[0];
-    let args = messageArr.slice(1);
-
-    // console.log(messageArr);
-    // console.log(command);
-    // console.log(args);
+    let command = messageArr[0].toLowerCase();
 
     if(!command.startsWith(prefix)) return;
 
     try {
-        // Show inventory. If no inventory, create inventory with username, potions, armor, weapons, set to 'empty' by default
-        if(command === `${prefix}inventory`) {
-            let sender = message.author;
-            // let toShow = message.mentions.members.first().displayName || message.member.displayName;
-            let toShow = message.member.displayName;
-            
-            fs.writeFile(inventoryDataDir, JSON.stringify(inventoryData, null, 2), function writeJSON(err) {
-                if (err) return console.log(err);
-                console.log(`writing to ${inventoryDataDir}`);
-            })
-            // Equate the displayName with the playerName holding the data
-            var thisPlayer;
-            console.log(typeof(thisPlayer));
-
+        let sender = message.author;
+        // let toShow = message.mentions.members.first().displayName || message.member.displayName;
+        let toShow = message.member.displayName;
+        
+        let thisPlayer;
+        let platinum;
+        let gold;
+        let electrum;
+        let silver;
+        let copper;
+        let potions; 
+        let weapons;
+        let backpack;
+        let lastUpdated;
+        
+        // Equate the displayName with the playerName holding the data
+        function getPlayerData() {
             inventoryData.players.forEach(player => {
-                if (toShow === player.name) {
-                    thisPlayer = player;
-                } else {
-                    console.log(player.name);
-                    console.log("No player found.");
-                }
+                console.log(player.name)
+                if (toShow === player.name) thisPlayer = player;
+                platinum = player.inventory.platinum;
+                gold = player.inventory.gold;
+                electrum = player.inventory.electrum;
+                silver = player.inventory.silver;
+                copper = player.inventory.copper;
+                potions = player.inventory.potions;
+                weapons = player.inventory.weapons;
+                backpack = player.inventory.backpack;
+                allOtherItems = player.inventory.allOtherItems;
+                lastUpdated = player.inventory.lastUpdated;
+
+                console.log(copper, electrum, platinum);
             });
-
-            let embed = new Discord.MessageEmbed()
-                .setAuthor(inventoryData.campaignName)
-                .setDescription(`Showing ${toShow}'s inventory:`)
-                .addFields(
-                    { name: 'Gold', value: thisPlayer.inventory.gold },
-                    { name: 'Silver', value: thisPlayer.inventory.silver },
-                    { name: 'Backpack', value: thisPlayer.inventory.backpack },
-                    { name: 'Potions', value: thisPlayer.inventory.potions },
-                    { name: 'Weapons', value: thisPlayer.inventory.weapons },
-                    { name: 'All other items', value: thisPlayer.inventory.allOtherItems },
-                    { name: 'Last updated', value: thisPlayer.inventory.lastUpdated }
-                )
-                .setColor("#9B59B6");
-
-            message.channel.send(embed);
-
-            console.log(thisPlayer);
+            if (thisPlayer === undefined) return message.channel.send("No player found.");
         }
-        // 
 
+        // create embed
+        async function createInventoryEmbed(send, type) {
+            getPlayerData();
+            // Create user wallet or full inventory
+            let embed;
+            if (type === 'wallet') {         
+                console.log(thisPlayer.inventory);
+                embed = await new Discord.MessageEmbed()
+                    .setTitle(`${thisPlayer.name}'s wallet`)
+                    .addFields(
+                        { name: 'Platinum', value: platinum, inline: true },
+                        { name: 'Gold', value: gold, inline: true },
+                        { name: 'Electrum', value: electrum, inline: true },
+                        { name: 'Silver', value: silver, inline: true },
+                        { name: 'Copper', value: copper, inline: true }
+                    )
+                    .setColor("#9B59B6")
+                    .setFooter(`Campaign: ${message.guild.name}`);
+            } else {
+                // add the coins together, formatted into silver
+                let money = parseInt(platinum)*100 + parseInt(gold)*10 + parseInt(electrum)*5 + (parseInt(silver)) + parseInt(copper)/10;
 
+                embed = await new Discord.MessageEmbed()
+                    .setTitle(`${thisPlayer.name}'s inventory`)
+                    .addFields(
+                        { name: 'Coins', value: `${money} silver` },
+                        { name: 'Potions', value: potions, inline: true },
+                        { name: 'Weapons', value: weapons, inline: true },
+                        { name: 'Backpack', value: backpack, inline: true },
+                        { name: 'Misc.', value: allOtherItems, inline: true },
+                        { name: 'Last updated', value: lastUpdated }
+                    )
+                    .setColor("#9B59B6")
+                    .setFooter(`Campaign: ${message.guild.name}`);
+        }
+        // Sends it to the channel
+        if (send === "send") message.channel.send(embed);
+    }
 
-        if(command === `${prefix}editinventory`) {
-            let sender = message.author;
-            let toShow = message.member.displayName;
+        // Show inventory. If no inventory, create inventory with username, potions, armor, weapons, set to 'empty' by default
+        if(command === `${prefix}inventory`) {       
+            let cat = messageArr.slice(1)[0]; 
+            if (cat) cat.toLowerCase(); // Sets category of inventory
+            let cat2 = messageArr.slice(1)[1]; // Additional category options
+            let newItemArr = messageArr.slice(2);
+            let newItem = newItemArr.join(' ');
 
-            // Equate the displayName with the playerName holding the data
-            var players = inventoryData.players;
-            // var thisPlayerStringified = JSON.stringify(`${players}.${toShow}`);
-            var thisPlayer = players + '.' + toShow;
+            console.log(`cat = ${cat}, cat2 = ${cat2}, new item = ${newItem}`)
+
+            getPlayerData();
+
+            // Adding and modifying items
+            if (cat) {
+                if (cat === "gold") {
+                    gold = newItem;
+                } else if (cat === "silver") {
+                    silver = newItem;
+                } else if (cat === "electrum") {
+                    electrum = newItem;
+                } else if (cat === "platinum") {
+                    platinum = newItem;
+                } else if (cat === "copper") {
+                    copper = newItem;
+                } 
+                // Non-money items
+                else if (cat === "potions") {
+                    potions.push(newItem);
+                    if (potions.includes("none")) potions.shift();
+                } else if (cat === "weapons") {
+                    weapons.push(newItem);
+                    if (weapons.includes("none")) weapons.shift();
+                } else if (cat === "backpack") {
+                    backpack.push(newItem);
+                    if (backpack.includes("none")) backpack.shift();
+                } else if (cat === "misc") {
+                    allOtherItems.push(newItem);
+                    if (allOtherItems.includes("none")) thisPlayer.inventory.allOtherItems.shift();
+                } 
+                thisPlayer.inventory.lastUpdated = moment().format('MMMM Do, hh:mm a');
+                fs.writeFile(inventoryDataDir, JSON.stringify(inventoryData, null, 2), function writeJSON(err) {
+                    if (err) return console.log(err);
+                    console.log(`writing to ${inventoryDataDir}`);
+                });
+            }
             
+            createInventoryEmbed('send');
+
+        } 
+        else if(command === `${prefix}create`) { // Used only for initial creation of inventory
+            let cat = messageArr.slice(1)[0]; 
+            if (cat) cat.toLowerCase(); // Sets category of inventory
+            let cat2 = messageArr.slice(1)[1]; // Additional category options
+            let newItemArr = messageArr.slice(2);
+            let newItem = newItemArr.join(' ');
+            
+            getPlayerData();
+            if (cat === "gold") {
+                thisPlayer.inventory.gold = newItem;
+            } else if (cat === "silver") {
+                thisPlayer.inventory.silver = newItem;
+            } else if (cat === "electrum") {
+                thisPlayer.inventory.electrum = newItem;
+            } else if (cat === "platinum") {
+                thisPlayer.inventory.platinum = newItem;
+            } else if (cat === "copper") {
+                thisPlayer.inventory.copper = newItem;
+            } else if (cat === "new") {
+                let newPlayer = message.guild.member(message.mentions.members.first().displayName) || newItem;
+                thisPlayer = newPlayer;
+                inventoryData.players.push(newPlayer);
+                inventoryData.players.forEach(player => {
+                    if (newPlayer === player.name) return message.channel.send(`This player already has an inventory set up.
+                    Use the /inventory or /wallet commands to edit their inventory.`);
+                })   
+            }
+
             fs.writeFile(inventoryDataDir, JSON.stringify(inventoryData, null, 2), function writeJSON(err) {
                 if (err) return console.log(err);
                 console.log(`writing to ${inventoryDataDir}`);
-            })
+            });
+            createInventoryEmbed('send');
 
-            let embed = new Discord.MessageEmbed()
-                .setAuthor(`Showing ${toShow}'s inventory:`)
-                .addFields(
-                    { name: 'Gold', value: thisPlayer.gold },
-                    { name: 'Silver', value: thisPlayer.silver },
-                    { name: 'Backpack', value: thisPlayer.backpack },
-                    { name: 'Potions', value: thisPlayer.potions },
-                    { name: 'Weapons', value: thisPlayer.weapons },
-                    { name: 'All other items', value: thisPlayer.allOtherItems },
-                    { name: 'Last updated', value: thisPlayer.lastUpdated }
-                )
-                .setColor("#9B59B6");
-
-            message.channel.send(embed);
         }
+        else if(command === `${prefix}wallet`) {
+            getPlayerData();
+
+            createInventoryEmbed('send', 'wallet');
+        }
+
+
     } catch(e) {
         console.log(e.stack);
     }
@@ -157,12 +246,6 @@ client.on('message', async message => {
         }
     } catch(e) {console.log(e.stack)}
 
-    // if(message.content.startsWith(`${prefix}kick`)) {
-    //     message.channel.send('kick');
-
-    //     let member = message.mentions.members.first();
-    //     message.channel.send(":wave: " + member.displayName);
-    // }
 });
 
 
