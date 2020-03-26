@@ -1,0 +1,37 @@
+{
+  "campaignName": "An Ivarian Carriage Ride",
+  "players": [
+    {
+      "name": "Dub",
+      "inventory": {
+        "gold": "86",
+        "silver": "458",
+        "backpack": [
+          "crowbar, hammer, pitons, torches, tinderbox, rations, waterskin"
+        ],
+        "potions": "none",
+        "weapons": "none",
+        "allOtherItems": [
+          "none"
+        ],
+        "lastUpdated": "March 3, 6:51"
+      }
+    },
+    {
+      "name": "Subaru",
+      "inventory": {
+        "gold": "86",
+        "silver": "458",
+        "backpack": [
+          "crowbar, hammer, pitons, torches, tinderbox, rations, waterskin"
+        ],
+        "potions": "none",
+        "weapons": "none",
+        "allOtherItems": [
+          "none"
+        ],
+        "lastUpdated": "March 3, 6:51"
+      }
+    }
+  ]
+}
