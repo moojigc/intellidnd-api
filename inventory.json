@@ -4,7 +4,7 @@
     {
       "name": "Dub",
       "inventory": {
-        "gold": "86",
+        "gold": "200",
         "silver": "458",
         "backpack": [
           "crowbar, hammer, pitons, torches, tinderbox, rations, waterskin"
@@ -14,7 +14,7 @@
         "allOtherItems": [
           "none"
         ],
-        "lastUpdated": "March 26th, 02:09 am",
+        "lastUpdated": "March 27th, 01:17 pm",
         "platinum": "0",
         "electrum": "0",
         "copper": "0"
