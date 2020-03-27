@@ -35,40 +35,20 @@ client.on('message', async message => {
         let toShow = message.member.displayName;
         
         let thisPlayer;
-        let platinum;
-        let gold;
-        let electrum;
-        let silver;
-        let copper;
-        let potions; 
-        let weapons;
-        let backpack;
-        let lastUpdated;
         
         // Equate the displayName with the playerName holding the data
-        function getPlayerData() {
-            inventoryData.players.forEach(player => {
-                console.log(player.name)
-                if (toShow === player.name) thisPlayer = player;
-                platinum = player.inventory.platinum;
-                gold = player.inventory.gold;
-                electrum = player.inventory.electrum;
-                silver = player.inventory.silver;
-                copper = player.inventory.copper;
-                potions = player.inventory.potions;
-                weapons = player.inventory.weapons;
-                backpack = player.inventory.backpack;
-                allOtherItems = player.inventory.allOtherItems;
-                lastUpdated = player.inventory.lastUpdated;
-
-                console.log(copper, electrum, platinum);
-            });
-            if (thisPlayer === undefined) return message.channel.send("No player found.");
-        }
+        inventoryData.players.forEach(player => {
+            if (toShow === player.name) {
+                thisPlayer = player;
+            } else {
+                console.log("No player found.");
+                message.channel.send("This user does not have an inventory set up.")
+            }
+        });
+        if (thisPlayer === undefined) return message.channel.send("No player found.");
 
         // create embed
-        async function createInventoryEmbed(send, type) {
-            getPlayerData();
+        async function createInventoryEmbed(thisPlayer, send, type) {
             // Create user wallet or full inventory
             let embed;
             if (type === 'wallet') {         
@@ -76,27 +56,27 @@ client.on('message', async message => {
                 embed = await new Discord.MessageEmbed()
                     .setTitle(`${thisPlayer.name}'s wallet`)
                     .addFields(
-                        { name: 'Platinum', value: platinum, inline: true },
-                        { name: 'Gold', value: gold, inline: true },
-                        { name: 'Electrum', value: electrum, inline: true },
-                        { name: 'Silver', value: silver, inline: true },
-                        { name: 'Copper', value: copper, inline: true }
+                        { name: 'Platinum', value: thisPlayer.inventory.thisPlayer.inventory.platinum, inline: true },
+                        { name: 'Gold', value: thisPlayer.inventory.gold, inline: true },
+                        { name: 'Electrum', value: thisPlayer.inventory.electrum, inline: true },
+                        { name: 'Silver', value: thisPlayer.inventory.silver, inline: true },
+                        { name: 'Copper', value: thisPlayer.inventory.copper, inline: true }
                     )
                     .setColor("#9B59B6")
                     .setFooter(`Campaign: ${message.guild.name}`);
             } else {
                 // add the coins together, formatted into silver
-                let money = parseInt(platinum)*100 + parseInt(gold)*10 + parseInt(electrum)*5 + (parseInt(silver)) + parseInt(copper)/10;
+                let money = parseInt(thisPlayer.inventory.platinum)*100 + parseInt(thisPlayer.inventory.gold)*10 + parseInt(thisPlayer.inventory.electrum)*5 + (parseInt(thisPlayer.inventory.silver)) + parseInt(thisPlayer.inventory.copper)/10;
 
                 embed = await new Discord.MessageEmbed()
                     .setTitle(`${thisPlayer.name}'s inventory`)
                     .addFields(
                         { name: 'Coins', value: `${money} silver` },
-                        { name: 'Potions', value: potions, inline: true },
-                        { name: 'Weapons', value: weapons, inline: true },
-                        { name: 'Backpack', value: backpack, inline: true },
-                        { name: 'Misc.', value: allOtherItems, inline: true },
-                        { name: 'Last updated', value: lastUpdated }
+                        { name: 'Potions', value: thisPlayer.inventory.potions, inline: true },
+                        { name: 'Weapons', value: thisPlayer.inventory.weapons, inline: true },
+                        { name: 'Backpack', value: thisPlayer.inventory.backpack, inline: true },
+                        { name: 'Misc.', value: thisPlayer.inventory.allOtherItems, inline: true },
+                        { name: 'Last updated', value: thisPlayer.inventory.lastUpdated }
                     )
                     .setColor("#9B59B6")
                     .setFooter(`Campaign: ${message.guild.name}`);
@@ -115,7 +95,19 @@ client.on('message', async message => {
 
             console.log(`cat = ${cat}, cat2 = ${cat2}, new item = ${newItem}`)
 
-            getPlayerData();
+            fs.writeFile(inventoryDataDir, JSON.stringify(inventoryData, null, 2), function writeJSON(err) {
+                if (err) return console.log(err);
+                console.log(`writing to ${inventoryDataDir}`);
+            })
+            // Equate the displayName with the playerName holding the data
+            inventoryData.players.forEach(player => {
+                if (toShow === player.name) {
+                    thisPlayer = player;
+                } else {
+                    console.log(player.name);
+                    console.log("No player found.");
+                }
+            });
 
             // Adding and modifying items
             if (cat) {
@@ -151,8 +143,7 @@ client.on('message', async message => {
                 });
             }
             
-            createInventoryEmbed('send');
-
+            createInventoryEmbed(thisPlayer, 'send');
         } 
         else if(command === `${prefix}create`) { // Used only for initial creation of inventory
             let cat = messageArr.slice(1)[0]; 
@@ -160,6 +151,11 @@ client.on('message', async message => {
             let cat2 = messageArr.slice(1)[1]; // Additional category options
             let newItemArr = messageArr.slice(2);
             let newItem = newItemArr.join(' ');
+
+            fs.writeFile(inventoryDataDir, JSON.stringify(inventoryData, null, 2), function writeJSON(err) {
+                if (err) return console.log(err);
+                console.log(`writing to ${inventoryDataDir}`);
+            });
             
             getPlayerData();
             if (cat === "gold") {
@@ -186,68 +182,22 @@ client.on('message', async message => {
                 if (err) return console.log(err);
                 console.log(`writing to ${inventoryDataDir}`);
             });
-            createInventoryEmbed('send');
+            createInventoryEmbed(thisPlayer, 'send');
 
         }
         else if(command === `${prefix}wallet`) {
-            getPlayerData();
-
-            createInventoryEmbed('send', 'wallet');
+            fs.writeFile(inventoryDataDir, JSON.stringify(inventoryData, null, 2), function writeJSON(err) {
+                if (err) return console.log(err);
+                console.log(`writing to ${inventoryDataDir}`);
+            });
+            createInventoryEmbed(thisPlayer, 'send', 'wallet');
         }
+        else if (command === `${prefix}thisplayer`) message.channel.send("You are " + thisPlayer);
 
 
     } catch(e) {
         console.log(e.stack);
     }
-
-    try {
-        if(command === `${prefix}mute`) {
-            if(!message.member.hasPermission("ADMINISTRATOR")) return message.channel.send("You do not have admin privilges.")
-
-            let toMute = message.guild.member(message.mentions.users.first());
-            if (!toMute) return message.channel.send("You did not specify a user mention.");
-            
-            let role = message.guild.roles.fetch()
-                .then(role => {
-                    role.name === "SADB Muted"
-                })
-                .catch(console.error);
-            console.log(role);
-            if(role === undefined) {
-                try {
-                    role = await message.guild.roles.create({
-                        data: {
-                            name: "SADB Muted",
-                            color: "#000000",
-                            permissions: [],
-                        }
-                    });
-                    // console.log(message.guild);
-                    message.guild.channels.cache.each(async (channel, id) => {
-                        await channel.updateOverwrite(role, {
-                            SEND_MESSAGES: false,
-                            ADD_REACTIONS: false,
-                        });
-                        console.log("Hi I ran");
-                    })
-                } catch(e) {
-                    console.log(e.stack)
-                }
-            }
-            // console.log(role); 
-            return;
-
-            if(toMute.roles.member.guild.id.includes(role.id)) return message.channel.send("This user is already muted.");
-            
-            // await toMute.roles.add(role);
-            // message.channel.send("I have muted them.");
-            
-            return;
-        }
-    } catch(e) {console.log(e.stack)}
-
 });
-
-
 
 client.login(token);
