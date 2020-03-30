@@ -5,7 +5,7 @@
       "name": "Dubhshláine",
       "notificationsToDM": false,
       "inventory": {
-        "gold": 463,
+        "gold": 1463,
         "silver": 110,
         "copper": 1000,
         "platinum": 0,
@@ -19,7 +19,7 @@
         "misc": [
           "none"
         ],
-        "lastUpdated": "March 30th, 03:55 pm"
+        "lastUpdated": "March 30th, 04:58 pm"
       },
       "changelog": [
         {
@@ -57,6 +57,10 @@
         {
           "on": "03:55 pm, on March 30th, 2020",
           "command": "/add gold 50"
+        },
+        {
+          "on": "04:58 pm, on March 30th, 2020",
+          "command": "/add gold 1000"
         }
       ]
     },
@@ -78,11 +82,11 @@
         "misc": [
           "none"
         ],
-        "lastUpdated": "March 30th, 04:23 pm"
+        "lastUpdated": "March 30th, 04:31 pm"
       },
       "changelog": [
         {
-          "on": "30/03/2020, 04:23 pm",
+          "on": "at 04:31 pm on March 30th 2020",
           "command": "/create <@!692254621070131202>"
         }
       ]
