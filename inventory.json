@@ -1,43 +1,60 @@
 {
-  "campaignName": "An Ivarian Carriage Ride",
+  "campaignName": "Bot Testing",
   "players": [
     {
-      "name": "Dub",
+      "name": "Dubhshláine",
+      "notificationsToDM": false,
       "inventory": {
-        "gold": "200",
-        "silver": "458",
-        "backpack": [
-          "crowbar, hammer, pitons, torches, tinderbox, rations, waterskin"
-        ],
-        "potions": "none",
-        "weapons": "none",
-        "allOtherItems": [
+        "gold": 413,
+        "silver": 110,
+        "copper": 1000,
+        "platinum": 0,
+        "electrum": 0,
+        "potions": [
           "none"
         ],
-        "lastUpdated": "March 27th, 01:17 pm",
-        "platinum": "0",
-        "electrum": "0",
-        "copper": "0"
-      }
-    },
-    {
-      "name": "Subaru",
-      "inventory": {
-        "gold": "86",
-        "silver": "458",
-        "backpack": [
-          "crowbar, hammer, pitons, torches, tinderbox, rations, waterskin"
-        ],
-        "potions": "none",
-        "weapons": "none",
-        "allOtherItems": [
+        "weapons": [
           "none"
         ],
-        "lastUpdated": "March 26th, 02:09 am",
-        "platinum": "0",
-        "electrum": "0",
-        "copper": "0"
-      }
+        "misc": [
+          "none"
+        ],
+        "lastUpdated": "March 30th, 02:16 am"
+      },
+      "changelog": [
+        {
+          "on": "30/03/2020, 02:06 am",
+          "command": "/add gold 50"
+        },
+        {
+          "on": "30/03/2020, 02:07 am",
+          "command": "/add silver 100"
+        },
+        {
+          "on": "30/03/2020, 02:07 am",
+          "command": "/add gold 50"
+        },
+        {
+          "on": "30/03/2020, 02:07 am",
+          "command": "/add copper 1000"
+        },
+        {
+          "on": "30/03/2020, 02:08 am",
+          "command": "/add gold 1"
+        },
+        {
+          "on": "30/03/2020, 02:08 am",
+          "command": "/add gold 2"
+        },
+        {
+          "on": "30/03/2020, 02:09 am",
+          "command": "/add gold 90"
+        },
+        {
+          "on": "02:16 am, on March 30th, 2020",
+          "command": "/add gold 20"
+        }
+      ]
     }
   ]
 }
