@@ -5,7 +5,7 @@
       "name": "Dubhshláine",
       "notificationsToDM": false,
       "inventory": {
-        "gold": 413,
+        "gold": 1463,
         "silver": 110,
         "copper": 1000,
         "platinum": 0,
@@ -19,7 +19,7 @@
         "misc": [
           "none"
         ],
-        "lastUpdated": "March 30th, 02:16 am"
+        "lastUpdated": "March 30th, 04:58 pm"
       },
       "changelog": [
         {
@@ -53,6 +53,41 @@
         {
           "on": "02:16 am, on March 30th, 2020",
           "command": "/add gold 20"
+        },
+        {
+          "on": "03:55 pm, on March 30th, 2020",
+          "command": "/add gold 50"
+        },
+        {
+          "on": "04:58 pm, on March 30th, 2020",
+          "command": "/add gold 1000"
+        }
+      ]
+    },
+    {
+      "name": "Subaru",
+      "notificationsToDM": false,
+      "inventory": {
+        "gold": 0,
+        "silver": 0,
+        "copper": 0,
+        "platinum": 0,
+        "electrum": 0,
+        "potions": [
+          "none"
+        ],
+        "weapons": [
+          "none"
+        ],
+        "misc": [
+          "none"
+        ],
+        "lastUpdated": "March 30th, 04:31 pm"
+      },
+      "changelog": [
+        {
+          "on": "at 04:31 pm on March 30th 2020",
+          "command": "/create <@!692254621070131202>"
         }
       ]
     }

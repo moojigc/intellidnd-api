@@ -25,98 +25,9 @@ client.on('message', async message => {
     let messageArr = message.content.split(" ");
     let command = messageArr[0];
     let args = messageArr.slice(1)[0];
-    let toShow = message.member.displayName;
 
-    // let toShow; 
-    //     if (message.guild.member(message.mentions) === null) {
-    //         toShow = message.member.displayName;
-    //     } else {
-    //         toShow = message.guild.member(message.mentions.members.first().displayName);
-    //     }
     if(!command.startsWith(prefix)) return;
-    function writeToJSON() {
-        fs.writeFile(inventoryDataDir, JSON.stringify(inventoryData, null, 2), function writeJSON(err) {
-            if (err) return console.log(err);
-            console.log(`writing to ${inventoryDataDir}`);
-        });
-    }
-    function writeChangelog() {
-        let change = {
-            on: moment().format('hh:mm a, on MMMM Do, YYYY'),
-            command: message.content,
-        }
-        if (thisPlayer.changelog.length > 9) {
-            thisPlayer.changelog.shift();
-            thisPlayer.changelog.push(change);
-        } else {
-            thisPlayer.changelog.push(change);
-        }
-    }
-
-    let thisPlayer;
-    let thisPlayerInv;
-    function getPlayerData(victimPlayer) { // Equate the displayName with the playerName holding the data
-        inventoryData.players.forEach(player => {
-            if (victimPlayer === player.name) {
-                thisPlayer = player;
-                thisPlayerInv = player.inventory;
-            }
-        });
-
-        if(!thisPlayer) {
-            if(command === `${prefix}/create`) {
-                return;
-            } else {
-                createResponseEmbed('channel', 'invalid', "No player was found. Create an inventory using /create myinventory or /create @[username].");
-            }
-        }
-        // console.log(`プレヤー発見！ あなたは${inventoryData.campaignName}の${thisPlayer.name}という冒険者です！`);
-    }
-    function channelOrDM(botMessageContents) { // sends message to either channel or DMs
-        if (thisPlayer.notificationsToDM === true) {
-            message.author.send(botMessageContents);
-        } else {
-            message.channel.send(botMessageContents);
-        }
-    }
-
-    function createInventoryEmbed(send, type) {
-        // Create user wallet or full inventory
-        let embed;
-        if (type === 'wallet') {         
-            embed = new Discord.MessageEmbed()
-                .setTitle(`${thisPlayer.name}'s wallet`)
-                .addFields(
-                    { name: 'Platinum', value: thisPlayerInv.platinum, inline: true },
-                    { name: 'Gold', value: thisPlayerInv.gold, inline: true },
-                    { name: 'Electrum', value: thisPlayerInv.electrum, inline: true },
-                    { name: 'Silver', value: thisPlayerInv.silver, inline: true },
-                    { name: 'Copper', value: thisPlayerInv.copper, inline: true }
-                )
-                .setColor("#9B59B6")
-                .setFooter(`Campaign: ${message.guild.name}`);
-        } else {
-            // add the coins together, formatted into silver
-            let money = parseInt(thisPlayerInv.platinum)*10 + parseInt(thisPlayerInv.gold) + parseInt(thisPlayerInv.electrum)/2 + parseInt(thisPlayerInv.silver)/10 + parseInt(thisPlayerInv.copper)/100;
-
-            embed = new Discord.MessageEmbed()
-                .setTitle(`${thisPlayer.name}'s inventory`)
-                .addFields(
-                    { name: 'Coins', value: `${money} gold` },
-                    { name: 'Potions', value: thisPlayerInv.potions, inline: true },
-                    { name: 'Weapons', value: thisPlayerInv.weapons, inline: true },
-                    { name: 'Misc.', value: thisPlayerInv.misc, inline: true },
-                    { name: 'Last updated', value: thisPlayerInv.lastUpdated }
-                )
-                .setColor("#9B59B6")
-                .setFooter(`Campaign: ${message.guild.name}`);
-        };  
-        if (send === "send") {
-            channelOrDM(embed);
-        } else if (send === "DM") {
-            message.author.send(embed);
-        }
-    }
+    
     function createResponseEmbed(send, type, contents) {
         let embed;
         if (type === 'invalid') {
@@ -137,18 +48,57 @@ client.on('message', async message => {
         }
     }
 
+    let thisPlayer;
+    let thisPlayerInv;
+    function getPlayerData(victimPlayer) { // Equate the displayName with the playerName holding the data
+        inventoryData.players.forEach(player => {
+            if (victimPlayer === player.name) {
+                thisPlayer = player;
+                thisPlayerInv = player.inventory;
+            }
+        });
 
-    let cat = messageArr.slice(1)[0];
-    let cat2 = messageArr.slice(1)[1]; // Additional category options
-    let newItemArr = messageArr.slice(2);
-    let newItem = newItemArr.join(' ');  
-    let removedItemArr = messageArr.slice(2);
-    let removedItem = removedItemArr.join(' ');  
-    let victimPlayer = message.member.displayName;
-    getPlayerData(victimPlayer);
-    literallyEverything(thisPlayer, thisPlayerInv, cat, cat2, newItem, removedItem);
+        if(!thisPlayer) {
+            if(command === `${prefix}create`) {
+                return;
+            } else {
+                createResponseEmbed('channel', 'invalid', "No player was found. Create an inventory using /create myinventory or /create @[username].");
+            }
+        }
+        // console.log(`プレヤー発見！ あなたは${inventoryData.campaignName}の${thisPlayer.name}という冒険者です！`);
+    }
+    function channelOrDM(botMessageContents) { // sends message to either channel or DMs
+        if (thisPlayer.notificationsToDM === true) {
+            message.author.send(botMessageContents);
+        } else {
+            message.channel.send(botMessageContents);
+        }
+    }
 
-    function literallyEverything(thisPlayer, thisPlayerInv, cat, cat2, newItem, removedItem) { // Contains literally all the commands.
+    if (message.mentions.users.array().length > 0) {
+        if (!message.member.hasPermission('BAN_MEMBERS') || !message.member.hasPermission('KICK_MEMBERS')) return createResponseEmbed('channel', 'invalid', `You do not have sufficient privileges for this action.`);
+        let cat = messageArr.slice(2)[0]; // cat as in category
+        let cat2 = messageArr.slice(2)[1]; // Additional category options
+        let newItemArr = messageArr.slice(3);
+        let newItem = newItemArr.join(' ');  
+        let removedItemArr = messageArr.slice(3);
+        let removedItem = removedItemArr.join(' ');  
+        let victimPlayer = message.mentions.members.first().nickname;
+        getPlayerData(victimPlayer);
+        literallyEverything(thisPlayer, thisPlayerInv, victimPlayer, cat, cat2, newItem, removedItem);
+    } else {
+        let cat = messageArr.slice(1)[0];
+        let cat2 = messageArr.slice(1)[1]; // Additional category options
+        let newItemArr = messageArr.slice(2);
+        let newItem = newItemArr.join(' ');  
+        let removedItemArr = messageArr.slice(2);
+        let removedItem = removedItemArr.join(' ');  
+        let victimPlayer = message.member.displayName;
+        getPlayerData(victimPlayer);
+        literallyEverything(thisPlayer, thisPlayerInv, victimPlayer, cat, cat2, newItem, removedItem);
+    }
+
+    function literallyEverything(thisPlayer, thisPlayerInv, victimPlayer, cat, cat2, newItem, removedItem) { // Contains literally all the commands.
         try {
             var validEntry = {
                 array: ['gold','silver','electrum','platinum','copper','potions','potion','weapons','weapon','backpack','misc'],
@@ -170,6 +120,62 @@ client.on('message', async message => {
                     }
                 },
             };
+            function writeToJSON() {
+                fs.writeFile(inventoryDataDir, JSON.stringify(inventoryData, null, 2), function writeJSON(err) {
+                    if (err) return console.log(err);
+                    console.log(`writing to ${inventoryDataDir}`);
+                });
+            }
+            function writeChangelog() {
+                let change = {
+                    on: moment().format('hh:mm a, on MMMM Do, YYYY'),
+                    command: message.content,
+                }
+                if (thisPlayer.changelog.length > 9) {
+                    thisPlayer.changelog.shift();
+                    thisPlayer.changelog.push(change);
+                } else {
+                    thisPlayer.changelog.push(change);
+                }
+            }
+        
+            function createInventoryEmbed(send, type) {
+                // Create user wallet or full inventory
+                let embed;
+                if (type === 'wallet') {         
+                    embed = new Discord.MessageEmbed()
+                        .setTitle(`${thisPlayer.name}'s wallet`)
+                        .addFields(
+                            { name: 'Platinum', value: thisPlayerInv.platinum, inline: true },
+                            { name: 'Gold', value: thisPlayerInv.gold, inline: true },
+                            { name: 'Electrum', value: thisPlayerInv.electrum, inline: true },
+                            { name: 'Silver', value: thisPlayerInv.silver, inline: true },
+                            { name: 'Copper', value: thisPlayerInv.copper, inline: true }
+                        )
+                        .setColor("#9B59B6")
+                        .setFooter(`Campaign: ${message.guild.name}`);
+                } else {
+                    // add the coins together, formatted into silver
+                    let money = parseInt(thisPlayerInv.platinum)*10 + parseInt(thisPlayerInv.gold) + parseInt(thisPlayerInv.electrum)/2 + parseInt(thisPlayerInv.silver)/10 + parseInt(thisPlayerInv.copper)/100;
+        
+                    embed = new Discord.MessageEmbed()
+                        .setTitle(`${thisPlayer.name}'s inventory`)
+                        .addFields(
+                            { name: 'Coins', value: `${money} gold` },
+                            { name: 'Potions', value: thisPlayerInv.potions, inline: true },
+                            { name: 'Weapons', value: thisPlayerInv.weapons, inline: true },
+                            { name: 'Misc.', value: thisPlayerInv.misc, inline: true },
+                            { name: 'Last updated', value: thisPlayerInv.lastUpdated }
+                        )
+                        .setColor("#9B59B6")
+                        .setFooter(`Campaign: ${message.guild.name}`);
+                };  
+                if (send === "send") {
+                    channelOrDM(embed);
+                } else if (send === "DM") {
+                    message.author.send(embed);
+                }
+            }
             if (message.content.includes(prefix)) console.log(command);
             // Show inventory.
             if(command === `${prefix}inventory`) {
@@ -424,7 +430,7 @@ client.on('message', async message => {
                     let newPlayer;
                     if (prepack === 'prepack') {
                         newPlayer = {
-                            name: toShow,
+                            name: victimPlayer,
                             notificationsToDM: false,
                             inventory: {
                                 gold: parseInt(goldCoins),
@@ -445,14 +451,14 @@ client.on('message', async message => {
                                 lastUpdated: moment().format("MMMM Do, hh:mm a")
                             },
                             changelog: [{
-                                on: moment().format("DD/MM/YYYY, hh:mm a"),
+                                on: `at ${moment().format("hh:mm a on MMMM Do YYYY")}`,
                                 command: message.content,
                             }]
                         }
                         if (DMsetting === "DM") newPlayer.notificationsToDM = true;
                     } else {
                         newPlayer = {
-                            'name': toShow,
+                            'name': victimPlayer,
                             'notificationsToDM': false,
                             'inventory': {
                                 gold: 0,
@@ -466,7 +472,7 @@ client.on('message', async message => {
                                 lastUpdated: moment().format("MMMM Do, hh:mm a")
                             },
                             changelog: [{
-                                on: moment().format("DD/MM/YYYY, hh:mm a"),
+                                on: `at ${moment().format("hh:mm a on MMMM Do YYYY")}`,
                                 command: message.content,
                             }]
                         }
@@ -474,13 +480,13 @@ client.on('message', async message => {
                     return newPlayer;
                 } 
                 inventoryData.players.forEach(player => {
-                    if (toShow === player.name) {
+                    if (victimPlayer === player.name) {
                         thisPlayer = player;
                         thisPlayerInv = player.inventory;
                     }
                 });
                 if (thisPlayer) { 
-                    return message.channel.send("This user already has an inventory set up!");
+                    return createResponseEmbed('channel', 'invalid', `This user already has an inventory set up!`);
                 } else {
                     let userDMSetting = messageArr.slice(2)[0];
                     let userGoldCoins = messageArr.slice(2)[1];
@@ -491,6 +497,7 @@ client.on('message', async message => {
                         inventoryData.players.push(createNewPlayer()); 
                     }
                     inventoryData.campaignName = message.guild.name;
+                    createResponseEmbed('channel', 'success', `Created ${victimPlayer}'s inventory!`)
                     // Write to inventory.json
                     writeToJSON();
                 };
@@ -538,7 +545,7 @@ client.on('message', async message => {
             else if (command === `${prefix}deleteme`) {
                 // getPlayerData();
                 inventoryData.players.splice(inventoryData.players.indexOf(thisPlayer), 1);
-                createResponseEmbed('channel', 'success', `Player ${toShow}'s inventory successfully deleted.`)
+                createResponseEmbed('channel', 'success', `Player ${victimPlayer}'s inventory successfully deleted.`)
                 writeToJSON();
             }
             // End of /deleteme command
