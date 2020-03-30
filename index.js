@@ -67,11 +67,16 @@ client.on('message', async message => {
         }
         // console.log(`プレヤー発見！ あなたは${inventoryData.campaignName}の${thisPlayer.name}という冒険者です！`);
     }
+    function channelOrDM(botMessageContents) { // sends message to either channel or DMs
+        if (thisPlayer.notificationsToDM === true) {
+            message.author.send(botMessageContents);
+        } else {
+            message.channel.send(botMessageContents);
+        }
+    }
 
     if (message.mentions.users.array().length > 0) {
-        message.channel.send('ran first condition.')
-        console.log(message.mentions.users.array());
-        console.log(message.mentions.members.first().nickname);
+        if (!message.member.hasPermission('BAN_MEMBERS') || !message.member.hasPermission('KICK_MEMBERS')) return createResponseEmbed('channel', 'invalid', `You do not have sufficient privileges for this action.`);
         let cat = messageArr.slice(2)[0]; // cat as in category
         let cat2 = messageArr.slice(2)[1]; // Additional category options
         let newItemArr = messageArr.slice(3);
@@ -82,7 +87,6 @@ client.on('message', async message => {
         getPlayerData(victimPlayer);
         literallyEverything(thisPlayer, thisPlayerInv, victimPlayer, cat, cat2, newItem, removedItem);
     } else {
-        message.channel.send('Ran second condition.');
         let cat = messageArr.slice(1)[0];
         let cat2 = messageArr.slice(1)[1]; // Additional category options
         let newItemArr = messageArr.slice(2);
@@ -132,14 +136,6 @@ client.on('message', async message => {
                     thisPlayer.changelog.push(change);
                 } else {
                     thisPlayer.changelog.push(change);
-                }
-            }
-        
-            function channelOrDM(botMessageContents) { // sends message to either channel or DMs
-                if (thisPlayer.notificationsToDM === true) {
-                    message.author.send(botMessageContents);
-                } else {
-                    message.channel.send(botMessageContents);
                 }
             }
         
@@ -455,7 +451,7 @@ client.on('message', async message => {
                                 lastUpdated: moment().format("MMMM Do, hh:mm a")
                             },
                             changelog: [{
-                                on: moment().format("DD/MM/YYYY, hh:mm a"),
+                                on: `at ${moment().format("hh:mm a on MMMM Do YYYY")}`,
                                 command: message.content,
                             }]
                         }
@@ -476,7 +472,7 @@ client.on('message', async message => {
                                 lastUpdated: moment().format("MMMM Do, hh:mm a")
                             },
                             changelog: [{
-                                on: moment().format("DD/MM/YYYY, hh:mm a"),
+                                on: `at ${moment().format("hh:mm a on MMMM Do YYYY")}`,
                                 command: message.content,
                             }]
                         }
@@ -490,7 +486,7 @@ client.on('message', async message => {
                     }
                 });
                 if (thisPlayer) { 
-                    return message.channel.send("This user already has an inventory set up!");
+                    return createResponseEmbed('channel', 'invalid', `This user already has an inventory set up!`);
                 } else {
                     let userDMSetting = messageArr.slice(2)[0];
                     let userGoldCoins = messageArr.slice(2)[1];
@@ -501,6 +497,7 @@ client.on('message', async message => {
                         inventoryData.players.push(createNewPlayer()); 
                     }
                     inventoryData.campaignName = message.guild.name;
+                    createResponseEmbed('channel', 'success', `Created ${victimPlayer}'s inventory!`)
                     // Write to inventory.json
                     writeToJSON();
                 };
