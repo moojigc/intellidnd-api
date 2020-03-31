@@ -628,7 +628,7 @@ client.on('message', async message => {
                         "/remove gold 50" will subtract from the current amount.`},
                         { name: 'Support', value: `If you find a bug or have any suggestions for additional features, please submit a ticket at https://github.com/moojigc/DiscordBot/issues.`},
                     )
-                    .setURL('https://github.com/moojigc/DiscordBot/')
+                    .setURL('https://github.com/moojigc/DiscordBot')
                     .setColor("#9B59B6")
                     .setFooter('Both author: Moojig Battsogt');
                 message.channel.send(helpEmbed);
