@@ -11,7 +11,7 @@ client.once('ready', async () => {
     console.log(`${client.user.username} is ready!`);
     
     try {
-        let link = await client.generateInvite(['ADMINISTRATOR']);
+        let link = await client.generateInvite(['MANAGE_MESSAGES', 'MANAGE_NICKNAMES', 'SEND_MESSAGES', 'READ_MESSAGE_HISTORY', 'EMBED_LINKS']);
         console.log(link);
     } catch(e) {
         console.log(e.stack);
@@ -84,8 +84,12 @@ client.on('message', async message => {
         let removedItemArr = messageArr.slice(3);
         let removedItem = removedItemArr.join(' ');  
         let victimPlayer = message.mentions.members.first().nickname;
+
+        let userDMSetting = messageArr.slice(3)[0];
+        let userGoldCoins = messageArr.slice(3)[1];
+        let userSilverCoins = messageArr.slice(3)[2];
         getPlayerData(victimPlayer);
-        literallyEverything(thisPlayer, thisPlayerInv, victimPlayer, cat, cat2, newItem, removedItem);
+        literallyEverything(thisPlayer, thisPlayerInv, victimPlayer, cat, cat2, newItemArr, newItem, removedItemArr, removedItem, userDMSetting, userGoldCoins, userSilverCoins);
     } else {
         let cat = messageArr.slice(1)[0];
         let cat2 = messageArr.slice(1)[1]; // Additional category options
@@ -94,11 +98,15 @@ client.on('message', async message => {
         let removedItemArr = messageArr.slice(2);
         let removedItem = removedItemArr.join(' ');  
         let victimPlayer = message.member.displayName;
+
+        let userDMSetting = messageArr.slice(2)[0];
+        let userGoldCoins = messageArr.slice(2)[1];
+        let userSilverCoins = messageArr.slice(2)[2];
         getPlayerData(victimPlayer);
-        literallyEverything(thisPlayer, thisPlayerInv, victimPlayer, cat, cat2, newItem, removedItem);
+        literallyEverything(thisPlayer, thisPlayerInv, victimPlayer, cat, cat2, newItemArr, newItem, removedItemArr, removedItem, userDMSetting, userGoldCoins, userSilverCoins);
     }
 
-    function literallyEverything(thisPlayer, thisPlayerInv, victimPlayer, cat, cat2, newItem, removedItem) { // Contains literally all the commands.
+    function literallyEverything(thisPlayer, thisPlayerInv, victimPlayer, cat, cat2, newItemArr, newItem, removedItemArr, removedItem, userDMSetting, userGoldCoins, userSilverCoins) {
         try {
             var validEntry = {
                 array: ['gold','silver','electrum','platinum','copper','potions','potion','weapons','weapon','backpack','misc'],
@@ -157,14 +165,46 @@ client.on('message', async message => {
                 } else {
                     // add the coins together, formatted into silver
                     let money = parseInt(thisPlayerInv.platinum)*10 + parseInt(thisPlayerInv.gold) + parseInt(thisPlayerInv.electrum)/2 + parseInt(thisPlayerInv.silver)/10 + parseInt(thisPlayerInv.copper)/100;
-        
+                    let potionsList = {
+                        potions: thisPlayerInv.potions,
+                        makeReadable: function() {
+                            let readableList = [];
+                            this.potions.forEach(potion => {
+                                let combined = `${potion.name} x${potion.quantity}`;
+                                readableList.push(combined);
+                            });
+                            return readableList;
+                        }
+                    }
+                    let weaponsList = {
+                        weapons: thisPlayerInv.weapons,
+                        makeReadable: function() {
+                            let readableList = [];
+                            this.weapons.forEach(weapon => {
+                                let combined = `${weapon.name} x${weapon.quantity}`;
+                                readableList.push(combined);
+                            });
+                            return readableList;
+                        }
+                    }
+                    let miscList = {
+                        misc: thisPlayerInv.misc,
+                        makeReadable: function() {
+                            let readableList = [];
+                            this.misc.forEach(miscItem => {
+                                let combined = `${miscItem.name} x${miscItem.quantity}`;
+                                readableList.push(combined);
+                            });
+                            return readableList;
+                        }
+                    }
                     embed = new Discord.MessageEmbed()
                         .setTitle(`${thisPlayer.name}'s inventory`)
                         .addFields(
                             { name: 'Coins', value: `${money} gold` },
-                            { name: 'Potions', value: thisPlayerInv.potions, inline: true },
-                            { name: 'Weapons', value: thisPlayerInv.weapons, inline: true },
-                            { name: 'Misc.', value: thisPlayerInv.misc, inline: true },
+                            { name: 'Potions', value: potionsList.makeReadable(), inline: true },
+                            { name: 'Weapons', value: weaponsList.makeReadable(), inline: true },
+                            { name: 'Misc.', value: miscList.makeReadable(), inline: true },
                             { name: 'Last updated', value: thisPlayerInv.lastUpdated }
                         )
                         .setColor("#9B59B6")
@@ -178,7 +218,7 @@ client.on('message', async message => {
             }
             if (message.content.includes(prefix)) console.log(command);
             // Show inventory.
-            if(command === `${prefix}inventory`) {
+            if(command === `${prefix}inventory` || command === `${prefix}inv`) {
                 if (cat === "everyone") {
                     inventoryData.players.forEach(player => {
                         thisPlayer = player;
@@ -204,17 +244,13 @@ client.on('message', async message => {
                 }
             }
             else if(command === `${prefix}add`) {
-                let cat2 = messageArr.slice(1)[1]; // Additional category options
-                let newItemArr = messageArr.slice(2);
-                let newItem = newItemArr.join(' ');  
-                // getPlayerData();
      
                 if (cat !== undefined) {
                     if (coins.true() && isNaN(cat2) || coins.true() && cat2 === undefined) { // Users fails to specify an amount
                         createResponseEmbed('send', 'invalid', `You didn't specify an amount to add to ${cat}.`);
                     } else if (coins.true()) { // Money items
                         function addCoins(thisCoin) {
-                            if (thisCoin === null) thisPlayerInv.gold = 0;
+                            if (thisCoin === null) thisCoin = 0;
                             let newTotal = parseInt(thisCoin) + parseInt(newItem);
                             return newTotal;
                         }
@@ -245,27 +281,52 @@ client.on('message', async message => {
                     } 
                     else { // Non-money items
                         function addToCategory(thisCategory) { // Adds to new items
-                            if (thisCategory.includes("none")) thisCategory.shift();
-                            
-                            if (newItem.includes(",")) {
-                                let itemsList = newItem.split(',');
-                                itemsList.forEach(item => thisCategory.push(item.trim()));
-                            } else {
-                                let number;
-                                let thisQuantity;
+                            let number;
+                            let thisQuantity;
+                            thisCategory.forEach(item => {
+                                if (item.name === "none") {
+                                    thisCategory.splice(thisCategory.indexOf(item), 1);
+                                }
+                            })
+
+                            if (newItem.includes(",")) { // Case that user adds a list of items
+                                let itemsList = newItem.split(', ');
+                                itemsList.forEach(item => {
+                                        let itemMap = {
+                                            name: item.trim(),
+                                            quantity: 1
+                                        }
+                                        thisCategory.push(itemMap);
+                                })
+                            } else { // Case that user adds single item
                                 newItemArr.forEach(item => {
                                     if (!isNaN(item)) {
                                         number = item;
                                     }
                                 })
-                                if (!number) {
-                                    thisCategory.push(newItem.trim());
-                                } else {
-                                    console.log(newItemArr.indexOf(number));
-                                    thisQuantity = newItemArr.splice(newItemArr.indexOf(number));
-                                    let thisItemName = newItemArr.join(' ');
-                                    thisCategory.push(`${thisItemName} x${thisQuantity}`);
-                                    console.log(newItemArr, thisItemName, thisQuantity);
+                                if (!number) { // Case that no quantity specified
+                                    newItemMap = {
+                                        name: newItem.trim(),
+                                        quantity: 1
+                                    }
+                                    thisCategory.push(newItemMap);
+                                } else { // Case that quantity is specified
+                                    thisQuantity = newItemArr.splice(newItemArr.indexOf(number), 1);
+                                    let thisItemName = newItemArr.join(' '); 
+                                    let thisItemMap = {
+                                        name: thisItemName,
+                                        quantity: parseInt(thisQuantity)
+                                    }
+                                    let foundExisiting = false;
+                                    thisCategory.forEach(item => {
+                                        if (item.name === thisItemName) {
+                                            foundExisiting = true;
+                                            item.quantity = parseInt(item.quantity) + parseInt(thisQuantity);
+                                        } else {
+                                            return;
+                                        }
+                                    }); 
+                                    if(foundExisiting === false) thisCategory.push(thisItemMap);
                                 }
                             }
                         }
@@ -286,7 +347,8 @@ client.on('message', async message => {
             }
             // End of /add command
             else if(command === `${prefix}remove`) {
-                // getPlayerData();
+                let foundExisiting = false;
+
                 if (cat !== undefined) {
                     if (coins.true() && isNaN(cat2) || coins.true() && cat2 === undefined) { // Users fails to specify an amount
                         createResponseEmbed('send', 'invalid', `You didn't specify an amount of ${cat} to remove.`);
@@ -313,66 +375,59 @@ client.on('message', async message => {
                         createResponseEmbed('send', 'invalid', `You didn't specify an item to remove from ${cat}.`);
                     } 
                     else { // Non-money items
+                        function removeFromCategory(thisCategory) {
+                            let number;
+                            let thisQuantity;
+                            
+                            removedItemArr.forEach(item => {
+                                if (!isNaN(item)) {
+                                    number = item;
+                                }
+                            })
+                            if (!number) { // Case that no quantity specified
+                                thisCategory.forEach(item => {
+                                    if (item.name === removedItem.trim()) {
+                                        thisCategory.splice(thisCategory.indexOf(item), 1);
+                                        foundExisiting = true;
+                                    }
+                                })
+                            } else { // Case that quantity is specified
+                                thisQuantity = removedItemArr.splice(newItemArr.indexOf(number), 1);
+                                let thisItemName = removedItemArr.join(' '); 
+                                
+                                thisCategory.forEach(item => {
+                                    if (item.name === thisItemName) {
+                                        foundExisiting = true;
+                                        item.quantity = parseInt(item.quantity) - parseInt(thisQuantity);
+                                    } else {
+                                        return;
+                                    }
+                                }); 
+                            }
+                            if (thisCategory.length < 1) {
+                                let emptyMap = {
+                                    name: 'none',
+                                    quantity: 0
+                                };
+                                thisCategory.push(emptyMap);
+                            }
+                        }
                         if (cat === "potions") {
-                            let playerCategory = thisPlayerInv.potions;
-                            if (removedItem.includes(',')) {
-                                let removedItemsList = removedItem.split(',');
-                                removedItemsList.forEach(item => {
-                                    for(var i=0; playerCategory.length; i++) {
-                                        if (playerCategory[i] === item.trim()) {
-                                            playerCategory.splice(playerCategory.indexOf(item.trim()));
-                                        }
-                                    }
-                                });
-                        
-                            } else {
-                                playerCategory.splice(playerCategory.indexOf(removedItem));
-                            }
-    
-                            if(playerCategory.length < 1) playerCategory.push("none");
+                            removeFromCategory(thisPlayerInv.potions);
                         } else if (cat === "weapons") {
-                            let playerCategory = thisPlayerInv.weapons;
-                            if (removedItem.includes(',')) {
-                                let removedItemsList = removedItem.split(',');
-                                removedItemsList.forEach(item => {
-                                    for(var i=0; playerCategory.length; i++) {
-                                        if (playerCategory[i] === item.trim()) {
-                                            playerCategory.splice(playerCategory.indexOf(item.trim()));
-                                        }
-                                    }
-                                });
-                        
-                            } else {
-                                playerCategory.splice(playerCategory.indexOf(removedItem));
-                            }
-    
-                            if(playerCategory.length < 1) playerCategory.push("none");
+                            removeFromCategory(thisPlayerInv.weapons);
                         } else if (cat === "misc") {
-                            let playerCategory = thisPlayerInv.misc;
-                            if (removedItem.includes(',')) {
-                                let removedItemsList = removedItem.split(',');
-                                removedItemsList.forEach(item => {
-                                    for(var i=0; playerCategory.length; i++) {
-                                        if (playerCategory[i] === item.trim()) {
-                                            playerCategory.splice(playerCategory.indexOf(item.trim()));
-                                        }
-                                    }
-                                });
-                        
-                            } else {
-                                playerCategory.splice(playerCategory.indexOf(removedItem));
-                            }
-    
-                            if(playerCategory.length < 1) playerCategory.push("none");
+                            removeFromCategory(thisPlayerInv.misc);
                         } 
-                        createResponseEmbed('send', 'success', `Removed ${removedItem} from ${thisPlayer.name}'s ${cat}.`);
+
+                        if(foundExisiting === false) {
+                            createResponseEmbed('send', 'invalid', `No such item found in ${cat}.`);
+                        } else {
+                            createResponseEmbed('send', 'success', `Removed ${removedItem} from ${thisPlayer.name}'s ${cat}.`);
+                        }
                     } 
                     thisPlayerInv.lastUpdated = moment().format('MMMM Do, hh:mm a');
                     writeToJSON();
-                } else if (!isNaN(cat)) {
-                    function removeByQuantity() {
-    
-                    }
                 }
                 else {
                     createResponseEmbed('send', 'invalid', "Remove what? Must specify /remove gold 10, /remove weapon staff, etc...");
@@ -433,20 +488,48 @@ client.on('message', async message => {
                             name: victimPlayer,
                             notificationsToDM: false,
                             inventory: {
-                                gold: parseInt(goldCoins),
-                                silver: parseInt(silverCoins),
+                                gold: 0 + parseInt(goldCoins),
+                                silver: 0 + parseInt(silverCoins),
                                 copper: 0,
                                 platinum: 0,
                                 electrum: 0,
-                                potions: ["none"],
-                                weapons: ["none"],
+                                potions: [
+                                    {
+                                        name: "none",
+                                        quantity: 0
+                                    }
+                                ],
+                                weapons: [
+                                    {
+                                        name: "none",
+                                        quantity: 0
+                                    }
+                                ],
                                 misc: [
-                                    "crowbar",
-                                    "hammer",
-                                    "pitons x10",
-                                    "torches x10",
-                                    "rations x10",
-                                    "feet of hempen rope x100"
+                                    {
+                                        name: "crowbar",
+                                        quantity: 1
+                                    },
+                                    {
+                                        name: "hammer",
+                                        quantity: 1
+                                    },
+                                    {
+                                        name: "pitons",
+                                        quantity: 10
+                                    },
+                                    {
+                                        name: "torches",
+                                        quantity: 10
+                                    },
+                                    {
+                                        name: "rations",
+                                        quantity: 10
+                                    },
+                                    {
+                                        name: "feet of hempen rope",
+                                        quantity: 100
+                                    }
                                 ],
                                 lastUpdated: moment().format("MMMM Do, hh:mm a")
                             },
@@ -466,9 +549,24 @@ client.on('message', async message => {
                                 copper: 0,
                                 platinum: 0,
                                 electrum: 0,
-                                potions: ["none"],
-                                weapons: ["none"],
-                                misc: ["none"],
+                                potions: [
+                                    {
+                                        name: "none",
+                                        quantity: 0
+                                    }
+                                ],
+                                weapons: [
+                                    {
+                                        name: "none",
+                                        quantity: 0
+                                    }
+                                ],
+                                misc: [
+                                    {
+                                        name: "none",
+                                        quantity: 0
+                                    }
+                                ],
                                 lastUpdated: moment().format("MMMM Do, hh:mm a")
                             },
                             changelog: [{
@@ -488,9 +586,6 @@ client.on('message', async message => {
                 if (thisPlayer) { 
                     return createResponseEmbed('channel', 'invalid', `This user already has an inventory set up!`);
                 } else {
-                    let userDMSetting = messageArr.slice(2)[0];
-                    let userGoldCoins = messageArr.slice(2)[1];
-                    let userSilverCoins = messageArr.slice(2)[2];
                     if (cat === 'prepack') {
                         inventoryData.players.push(createNewPlayer('prepack', userDMSetting, userGoldCoins, userSilverCoins));
                     } else {
@@ -506,16 +601,27 @@ client.on('message', async message => {
             else if(command === `${prefix}helpinventory`) {
                 let helpEmbed = new Discord.MessageEmbed()
                     .setTitle('DnD Inventory Bot Guide')
+                    .setDescription(`All commands are case sensitive.
+                    Members with kick/ban permission can run commands on other users by @mentions immediately after the command.
+                    For example, "/add @tomNook gold 1000" will add 1000 gold to @tomNook. This works for every command.`)
                     .addFields(
-                        { name: '/inventory', value: `Displays your own inventory. Adding a category
-                        plus a value (e.g. /inventory gold 100) will update your inventory.` },
-                        { name: '/inventory @member', value: `Only allowed to anyone with kick/ban permissions. This command works the same as the regular /inventory one.`},
+                        { name: '/inventory, /inv', value: `Displays your own inventory. Adding a category
+                        plus a value (e.g. /inventory gold 100) will update your inventory.
+                        Mods/admins can use /inventory everyone to see all inventories. Currently, @everyone does not work.` },
+                        { name: '/add [category]', value: `Adds new items to specified category. Supports lists of items, and quantity, but not both at the same time.
+                        e.g. "/add gold 50" adds 50 to gold, "/add potions Health 2" will add Health x2, and "/add potions Health, Poison" will add Health and Poison.`},
                         { name: '/create', value: `This command creates your inventory and all fields will be empty or 0 by default.
                         This bot uses nicknames as the player names, not the user's regular Discord username.` },
-                        { name: '/create @member', value: `This command allowed only to anyone with kick/ban permission.
-                        Creates an empty inventory for the specified user. `},
+                        { name: '/remove [category]', value: `Removes specified item or amount from the category.
+                        For example, "/remove weapons Net" will remove Net from weapons.`},
+                        { name: '/dm', value: `"/dm on" will send all notifications from the bot to your DMs. /dm off will send them to the channel.
+                        Set individually per user. DMs are off by default.`},
+                        { name: '/create prepack gold# silver# DM/channel', value: `This will prepack inventory with "crowbar, hammer, pitons x10, torches x10, rations x10, feet of hempen rope x100.
+                        "/create prepack 100 10 DM" set gold to 100, silver to 10, DMs on. If DM is not specified, they will be off by default.` }, 
                         { name: '/overwrite', value: `This command overwrites EVERYTHING in the specified category. For example, "/overwrite weapons Sword"
                         will delete all your weapons and set the Sword as your only weapon. Use with care.`},
+                        { name: '/deleteplayer', value: `Deletes your entire inventory and changelog.
+                        Use with care` },
                         { name: 'Money', value: `When dealing with money, there are 3 possible commands. 
                         "/overwrite gold 50" will overwrite any previous amount and hardcode your current gold to 50.
                         "/add gold 50" will add to the current amount.
@@ -542,7 +648,7 @@ client.on('message', async message => {
                 }
             }
             // End of /dm command
-            else if (command === `${prefix}deleteme`) {
+            else if (command === `${prefix}deleteplayer`) {
                 // getPlayerData();
                 inventoryData.players.splice(inventoryData.players.indexOf(thisPlayer), 1);
                 createResponseEmbed('channel', 'success', `Player ${victimPlayer}'s inventory successfully deleted.`)
@@ -552,7 +658,7 @@ client.on('message', async message => {
             else if (command === `${prefix}changelog`) {
                 let readableLog = [];
                 thisPlayer.changelog.forEach(change => {
-                    readableLog.push(`Ran ${change.command} on ${change.on}.`)
+                    readableLog.push(`Ran ${change.command} ${change.on}.`)
                 })
                 message.author.send(readableLog.join(`
                 `));
