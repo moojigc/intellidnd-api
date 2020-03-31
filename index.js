@@ -4,7 +4,7 @@ const inventoryData = require(inventoryDataDir);
 
 const Discord = require('discord.js');
 const moment = require('moment');
-const { prefix, token } = require('./config.json');
+const prefix = "/";
 const client = new Discord.Client({disableMentions: 'everyone'});
 
 client.once('ready', async () => {
@@ -679,4 +679,4 @@ client.on('message', async message => {
     }
 }); // End of script
 
-client.login(token);
+client.login(process.env.BOT_TOKEN);
