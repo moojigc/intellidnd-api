@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "A Discord bot for handling inventory in DnD campaigns.",
   "main": "index.js",
+  "engines": {
+    "node": "12.13.0",
+    "npm": "6.12.0"
+  },
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "author": "M. Moojig Battsogt",
   "license": "ISC",
