@@ -1,3 +1,3 @@
 {
-    "ignore": ["config.json", "package.json", "inventory.json"]
+    "ignore": ["config.json", "package.json", "inventory.json", "test.js"]
 }

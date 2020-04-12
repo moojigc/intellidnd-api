@@ -1,6 +1,8 @@
 /config.json
 /node_modules
 /start.bat
+/myFunctions.js
+/test.js
 
 # Logs
 logs

@@ -4,7 +4,7 @@ const inventoryData = require(inventoryDataDir);
 
 const Discord = require('discord.js');
 const moment = require('moment');
-const prefix = "/";
+const { prefix, BOT_TOKEN } = require('./config.json');
 const client = new Discord.Client({disableMentions: 'everyone'});
 
 client.once('ready', async () => {
@@ -26,7 +26,20 @@ client.on('message', async message => {
     let command = messageArr[0];
     let args = messageArr.slice(1)[0];
 
-    if(!command.startsWith(prefix)) return;
+    const validCommands = { 
+        commands: 'inventory inv wallet create deleteplayer helpinventory add remove overwrite',
+        isValid: function(input) {
+            let userInput;
+            this.commands.split(' ').forEach(command=> {
+                if (input === `${prefix}${command}`) userInput = input;
+                else return;
+            })
+            if (userInput !== undefined) return true;
+            else return false;
+        }
+    }
+
+    if(!validCommands.isValid(command)) return;
     
     function createResponseEmbed(send, type, contents) {
         let embed;
@@ -108,7 +121,7 @@ client.on('message', async message => {
 
     function literallyEverything(thisPlayer, thisPlayerInv, victimPlayer, cat, cat2, newItemArr, newItem, removedItemArr, removedItem, userDMSetting, userGoldCoins, userSilverCoins) {
         try {
-            var validEntry = {
+            const validEntry = {
                 array: ['gold','silver','electrum','platinum','copper','potions','potion','weapons','weapon','backpack','misc'],
                 true: function() {
                     if (this.array.includes(cat)) {
@@ -118,7 +131,7 @@ client.on('message', async message => {
                     }
                 },
             };
-            var coins = {
+            const coins = {
                 array: ['gold','silver','electrum','platinum','copper'],
                 true: function() {
                     if (this.array.includes(cat)) {
@@ -129,7 +142,7 @@ client.on('message', async message => {
                 },
             };
             function writeToJSON() {
-                fs.writeFile(inventoryDataDir, JSON.stringify(inventoryData, null, 2), function writeJSON(err) {
+                fs.writeFile(inventoryDataDir, JSON.stringify(inventoryData, null, 2), function(err) {
                     if (err) return console.log(err);
                     console.log(`writing to ${inventoryDataDir}`);
                 });
@@ -228,6 +241,7 @@ client.on('message', async message => {
                 } else {
                     // getPlayerData();
                     createInventoryEmbed('send');
+                    message.channel.send("`formatting test`");
                 }
             }
             // End of /inventory command
@@ -679,4 +693,4 @@ client.on('message', async message => {
     }
 }); // End of script
 
-client.login(process.env.BOT_TOKEN);
+client.login(BOT_TOKEN);
