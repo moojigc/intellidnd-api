@@ -59,17 +59,17 @@ function removeItem(message, args, player) {
             })
             if (!number) { // Case that no quantity specified
                 thisCategory.forEach(item => {
-                    if (item.name === removedItem.trim()) {
+                    if (item.name.toLowerCase() === removedItem.trim().toLowerCase()) {
                         thisCategory.splice(thisCategory.indexOf(item), 1);
                         foundExisiting = true;
                     }
                 })
             } else { // Case that quantity is specified
-                thisQuantity = removedItemArr.splice(newItemArr.indexOf(number), 1);
+                thisQuantity = removedItemArr.splice(removedItemArr.indexOf(number), 1);
                 let thisItemName = removedItemArr.join(' '); 
                 
                 thisCategory.forEach(item => {
-                    if (item.name === thisItemName) {
+                    if (item.name.toLowerCase() === thisItemName.toLowerCase()) {
                         foundExisiting = true;
                         item.quantity = parseInt(item.quantity) - parseInt(thisQuantity);
                     } else {
@@ -83,6 +83,12 @@ function removeItem(message, args, player) {
                     quantity: 0
                 };
                 thisCategory.push(emptyMap);
+            }
+            // Check if that player had removedItem in inventory at all
+            if (foundExisiting === false) {
+                createResponseEmbed('send', 'invalid', `No such item found in ${cat}.`, player);
+            } else {
+                createResponseEmbed('send', 'success', `Removed ${number} ${removedItem} from ${player.name}'s ${cat}.`, player);
             }
         }
         // Calling removal on each category
@@ -99,13 +105,6 @@ function removeItem(message, args, player) {
                 removeFromCategory(misc);
                 break;
         };
-
-        // Check if that player had removedItem in inventory at all
-        if (foundExisiting === false) {
-            createResponseEmbed('send', 'invalid', `No such item found in ${cat}.`, player);
-        } else {
-            createResponseEmbed('send', 'success', `Removed ${removedItem} from ${player.name}'s ${cat}.`, player);
-        }
     } 
     return player;
 }

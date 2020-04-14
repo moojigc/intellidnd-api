@@ -4,7 +4,6 @@ module.exports = {
         player.changelog.forEach(change => {
             readableLog.push(`Ran \`${change.command}\` at ${change.on}.`)
         })
-        console.log(readableLog);
         message.author.send(readableLog.join('\n\n'));
     }
 }

@@ -114,33 +114,13 @@
           "notificationsToDM": false,
           "changelog": [
             {
-              "on": "at 11:25 pm on April 11th 2020",
-              "command": "/create"
-            },
-            {
-              "on": "11:25 pm, on April 11th, 2020",
-              "command": "/add gold 10",
-              "gold": 0
-            },
-            {
-              "on": "11:25 pm, on April 11th, 2020",
-              "command": "/add gold 10",
-              "gold": 10
-            },
-            {
-              "on": "11:25 pm, on April 11th, 2020",
-              "command": "/remove gold 11",
-              "gold": 10
-            },
-            {
-              "on": "11:25 pm, on April 11th, 2020",
-              "command": "/remove gold 11",
-              "gold": 10
+              "on": "at 08:16 pm on April 13th 2020",
+              "command": "/create prepack 100 100"
             }
           ],
           "inventory": {
-            "gold": 10,
-            "silver": 0,
+            "gold": 100,
+            "silver": 100,
             "copper": 0,
             "platinum": 0,
             "electrum": 0,
@@ -148,92 +128,6 @@
               {
                 "name": "none",
                 "quantity": 0
-              }
-            ],
-            "weapons": [
-              {
-                "name": "none",
-                "quantity": 0
-              }
-            ],
-            "misc": [
-              {
-                "name": "none",
-                "quantity": 0
-              }
-            ],
-            "lastUpdated": "April 11th, 11:25 pm"
-          }
-        },
-        {
-          "name": "Inventory Test",
-          "notificationsToDM": false,
-          "changelog": [
-            {
-              "on": "11:29 pm, on April 11th, 2020",
-              "command": "/inv",
-              "gold": 100
-            },
-            {
-              "on": "11:29 pm, on April 11th, 2020",
-              "command": "/inventory",
-              "gold": 100
-            },
-            {
-              "on": "11:30 pm, on April 11th, 2020",
-              "command": "/wallet",
-              "gold": 100
-            },
-            {
-              "on": "11:30 pm, on April 11th, 2020",
-              "command": "/add potion Poison, Hangover Cure",
-              "gold": 100
-            },
-            {
-              "on": "11:30 pm, on April 11th, 2020",
-              "command": "/add potion Poison, Hangover Cure",
-              "gold": 100
-            },
-            {
-              "on": "11:30 pm, on April 11th, 2020",
-              "command": "/helpinventory",
-              "gold": 100
-            },
-            {
-              "on": "11:30 pm, on April 11th, 2020",
-              "command": "/add gold 10",
-              "gold": 100
-            },
-            {
-              "on": "11:30 pm, on April 11th, 2020",
-              "command": "/add gold 10",
-              "gold": 110
-            },
-            {
-              "on": "11:30 pm, on April 11th, 2020",
-              "command": "/remove gold 1",
-              "gold": 110
-            },
-            {
-              "on": "11:30 pm, on April 11th, 2020",
-              "command": "/remove gold 1",
-              "gold": 109
-            }
-          ],
-          "inventory": {
-            "gold": 109,
-            "silver": 50,
-            "copper": 0,
-            "platinum": 0,
-            "electrum": 0,
-            "potions": [
-              {
-                "name": "Potion of Healing",
-                "quantity": 10
-              },
-              {
-                "name": "Poison,",
-                "quantity": 1
               }
             ],
             "weapons": [
@@ -268,7 +162,7 @@
                 "quantity": 100
               }
             ],
-            "lastUpdated": "April 11th, 11:29 pm"
+            "lastUpdated": "April 13th, 08:16 pm"
           }
         }
       ]

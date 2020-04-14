@@ -1,5 +1,5 @@
 const { MongoClient } = require('mongodb');
-const { mongodbPassword } = require('./config.json');
+const { mongodbPassword } = require('../private.json');
 const uri = `mongodb+srv://moojigc:${mongodbPassword}@dnd-inventory-dzwpy.mongodb.net/test?retryWrites=true&w=majority`;
 const DnD = 'DnD-inventory'; // bc i'm too lazy to keep typing this out
 

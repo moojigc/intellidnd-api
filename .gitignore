@@ -1,6 +1,8 @@
-/config.json
 /node_modules
 /test.js
 /nodemon
 /3monitors.code-workspace
 /nodemon.json
+/private.json
+/index_old.js
+/utils/logger.js
