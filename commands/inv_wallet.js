@@ -11,7 +11,7 @@ module.exports = function(message) {
                 guild.players.forEach(player => createInventoryEmbed(player, 'DM'));
                 break;
             default: 
-                createInventoryEmbed(player, 'send')
+                return createInventoryEmbed(player, 'send')
         }
     }
     function showWallet(player, guild) {
@@ -20,7 +20,7 @@ module.exports = function(message) {
                 guild.players.forEach(player => createInventoryEmbed(player, 'DM'));
                 break;
             default:
-                createInventoryEmbed(player, 'send', 'wallet');
+                return createInventoryEmbed(player, 'send', 'wallet');
         }
     }
     return {

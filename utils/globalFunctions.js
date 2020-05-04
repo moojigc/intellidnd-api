@@ -1,7 +1,6 @@
 const moment = require('moment');
 const Discord = require('discord.js');
 const fs = require('fs');
-const build = require('../player');
 
 module.exports = function (message) {
     const userEntry = {
@@ -110,16 +109,16 @@ module.exports = function (message) {
                 .setFooter(`Campaign: ${message.guild.name}`)
             };  
         if (send === "send") {
-            channelOrDM(player, embed);
+            return channelOrDM(player, embed);
         } else if (send === "DM") {
-            message.author.send(embed);
+            return message.author.send(embed);
         }
     }
     function channelOrDM(player, botMessageContents) { // sends message to either channel or DMs
         if (player.notificationsToDM === true) {
-            message.author.send(botMessageContents);
+            return message.author.send(botMessageContents);
         } else {
-            message.channel.send(botMessageContents);
+            return message.channel.send(botMessageContents);
         }
     };
     function createResponseEmbed(send, type, contents, player) {
@@ -141,25 +140,6 @@ module.exports = function (message) {
             message.channel.send(embed);
         }
     };
-    function Guild(guildData) {
-        this.guildData = guildData;
-        this.name = guildData.campaignName;
-        this.players = guildData.players;
-        this.findPlayer = function(name) {
-            if (!this.guildData) return console.log('no campaign found.');
-            let currentPlayer;
-            this.players.forEach(function(player) {
-                if (player.name === name) currentPlayer = player;
-            });
-            let command = message.content.split(" ")[0];
-            if (!currentPlayer) return false;
-            else return currentPlayer; 
-        }
-        this.deletePlayer = function(name) {
-            const rP = this.findPlayer(name);
-            this.players.splice(this.players.indexOf(name), 1);
-        }
-    }
     return {
         userEntry: userEntry,
         coins: coins,
@@ -167,7 +147,6 @@ module.exports = function (message) {
         writeChangelog: writeChangelog,
         createInventoryEmbed: createInventoryEmbed,
         channelOrDM: channelOrDM,
-        createResponseEmbed: createResponseEmbed,
-        Guild: Guild
+        createResponseEmbed: createResponseEmbed
     }
 };
