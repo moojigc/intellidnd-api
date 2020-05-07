@@ -1,5 +1,5 @@
 const { MongoClient } = require("mongodb"),
-    uri = process.env.MONGO_URI ? process.env.MONGO_URI : require('../private.json').dev.MONGO_URI,
+    uri = process.env.MONGODB_URI ? process.env.MONGODB_URI : require('../private.json').production.MONGODB_URI,
     client = new MongoClient(uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
