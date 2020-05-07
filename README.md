@@ -6,6 +6,8 @@ Commands are *not* case sensitive, neither are inventory items. However, they wi
 Members with kick/ban permission can run commands on other users by *@mentions* immediately after the command.
 For example, **/add @tomNook gold 1000** will add 1000 gold to @tomNook. This works for every command.
 
+Invite to your server: https://discordapp.com/api/oauth2/authorize?client_id=692109220371365989&permissions=134309888&scope=bot.
+
 ## /create
 This command creates your inventory and all fields will be empty or 0 by default.
 This bot uses nicknames as the player names, not the user's regular Discord username.
