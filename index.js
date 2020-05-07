@@ -1,7 +1,5 @@
 const { Client, MessageEmbed } = require('discord.js'),
     moment = require('moment'),
-    Logger = require('./utils/logger'),
-    log = new Logger(),
     Table = require('./models/Table'),
     Player = require('./models/Player'),
     Guild = require('./models/Guild');
@@ -87,9 +85,6 @@ client.on('message', async message => {
         // The Discord server ID is used to all the Dungeon Master to see the inventory of every player at once.
         guildID: currentGuild._id
     })
-
-    log.green(`command was ${command}. recipient player is ${currentPlayer.name}. 
-    Args are ${args.join(' ')}.`);
 
     try {
         let dataIfExists = await currentPlayer.checkExisting();

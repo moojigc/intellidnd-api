@@ -9,10 +9,8 @@ module.exports = function(message) {
         switch (cat) {
             case '@everyone':
                 let allPlayers = guildMembers.map(p => new Player(message, { id: p }))
-                // console.log(allPlayers);
                 function validPlayers() {
                     return allPlayers.forEach(player => player.checkExisting().then(res => {
-                        console.log(res);
                         player.name = res.name;
                         if (res !== false) return createInventoryEmbed(player, 'DM');
                     }))

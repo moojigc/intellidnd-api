@@ -14,13 +14,6 @@ class Guild extends Table {
         const result = await this.dbRead();
         return result.players;
     }
-    async deletePlayer() {
-        const result = await this.dbRead();
-        const remaining = result.players.filter(p => p === this._id);
-        this.players = remaining;
-        const update = await this.dbUpdate(players);
-        return update.result.nModified;
-    }
 }
 
 module.exports = Guild;

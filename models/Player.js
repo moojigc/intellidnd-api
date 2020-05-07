@@ -5,8 +5,7 @@ const moment = require('moment'),
     
 class Player extends Table {
     constructor(message, params) {
-        let defaults = { collection: null, _id: null, guild: null };
-        let { id, name, guild, guildID } = params ? params : defaults;
+        let { id, name, guild, guildID } = params;
         super({
             collection: 'players', 
             id: id 
