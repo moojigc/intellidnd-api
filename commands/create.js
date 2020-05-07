@@ -1,7 +1,7 @@
 module.exports = function(message) {
     function create(name, arguments) { 
-        const build = require('../player')(message);
-        const newPlayer = new build.Player(name);
+        const { Player } = require('../utils/Player')(message);
+        const newPlayer = new Player(name);
         const [ prepack, addGold, addSilver, DMsetting ] = arguments;
 
         if (prepack === 'prepack') {

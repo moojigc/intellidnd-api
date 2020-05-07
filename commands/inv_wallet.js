@@ -1,26 +1,36 @@
-const inventoryData  = require('../utils/inventory.json');
+const Player = require('../models/Player');
 
 module.exports = function(message) {
     const { createInventoryEmbed } = require('../utils/globalFunctions')(message);
     let messageArr = message.content.split(" ");
     let cat = messageArr.slice(1)[0];
 
-    function showInventory(player, guild) {
+    async function showInventory(player, guildMembers) {
         switch (cat) {
-            case 'everyone':
-                guild.players.forEach(player => createInventoryEmbed(player, 'DM'));
+            case '@everyone':
+                let allPlayers = guildMembers.map(p => new Player(message, { id: p }))
+                // console.log(allPlayers);
+                function validPlayers() {
+                    return allPlayers.forEach(player => player.checkExisting().then(res => {
+                        console.log(res);
+                        player.name = res.name;
+                        if (res !== false) return createInventoryEmbed(player, 'DM');
+                    }))
+                }
+                validPlayers();
                 break;
             default: 
-                createInventoryEmbed(player, 'send')
+                return createInventoryEmbed(player, 'send')
         }
     }
-    function showWallet(player, guild) {
+    function showWallet(player, guildMembers) {
         switch (cat) {
-            case 'everyone':
-                guild.players.forEach(player => createInventoryEmbed(player, 'DM'));
+            case '@everyone':
+                let players = guildMembers.map(p => new Player(message, { id: p }))
+                players.forEach(player => createInventoryEmbed(player, 'DM', 'wallet'));
                 break;
             default:
-                createInventoryEmbed(player, 'send', 'wallet');
+                return createInventoryEmbed(player, 'send', 'wallet');
         }
     }
     return {

@@ -11,10 +11,9 @@ function removeItem(message, args, player) {
 
     // Users fails to specify an amount
     if (coins.isCoin(cat) && isNaN(removedItem) || coins.isCoin(cat) && removedItem === undefined) { 
-        createResponseEmbed('send', 'invalid', `You didn't specify an amount of ${cat} to remove.`);
+        createResponseEmbed('send', 'invalid', `You didn't specify an amount of ${cat} to remove.`, player);
     } else if (coins.isCoin(cat)) {
         const removeCoins = thisCoin => {
-            console.log(thisCoin);
             let newAmount = parseInt(thisCoin) - parseInt(removedItem);
             if (newAmount < 0) {
                 createResponseEmbed('send', 'invalid', `You don't have enough ${cat}!`, player);
@@ -49,7 +48,7 @@ function removeItem(message, args, player) {
         createResponseEmbed('send', 'invalid', `You didn't specify an item to remove from *${cat}*.`, player);
     } else { // Non-money items
         function removeFromCategory(thisCategory) {
-            let number;
+            let number = 1;
             let thisQuantity;
             
             removedItemArr.forEach(item => {
@@ -57,7 +56,7 @@ function removeItem(message, args, player) {
                     number = item;
                 }
             })
-            if (!number) { // Case that no quantity specified
+            if (number === 1) { // Case that no quantity specified
                 thisCategory.forEach(item => {
                     if (item.name.toLowerCase() === removedItem.trim().toLowerCase()) {
                         thisCategory.splice(thisCategory.indexOf(item), 1);
