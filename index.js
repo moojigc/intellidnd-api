@@ -30,7 +30,8 @@ client.on('message', async message => {
     if (message.author === client.user) return; 
 
     // Declare all constants
-    const messageArr = message.content.split(' '),
+    const messageContentLowerCase = message.content.toLowerCase(), 
+        messageArr = messageContentLowerCase.split(' '),
         command = messageArr[0].split('').slice(1).join(''),
         commandKeywords = messageArr.slice(1), // used by the if statement
         validCommands = { 

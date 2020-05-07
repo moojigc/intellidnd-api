@@ -1,6 +1,23 @@
 const moment = require('moment');
 const MessageEmbed = require('discord.js').MessageEmbed;
 
+function capitalize(input) {
+    let words = input.split(' ');
+    const caps = words.map(w => {
+        let englishKeywords = {
+            keywords: ['of', 'a', 'the', 'an', 'to'],
+            match: function() {
+                if (this.keywords.filter(keyword => keyword === w).length > 0) return true;
+                else return false;
+            }
+        };
+        
+        if (englishKeywords.match() === false) return w.slice()[0].toUpperCase() + w.substring(1).toLowerCase();
+        else return w.toLowerCase();
+    });
+    return caps.join(' ');
+}
+
 module.exports = function (message) {
     const userEntry = {
         array: ['gold','silver','electrum','platinum','copper','potions','potion','weapons','weapon','backpack','misc'],
@@ -84,7 +101,7 @@ module.exports = function (message) {
                 makeReadable: function() {
                     let readableList = [];
                     this.potions.forEach(potion => {
-                        let combined = `${potion.name} x${potion.quantity}`;
+                        let combined = `${capitalize(potion.name)} x${potion.quantity}`;
                         readableList.push(combined);
                     });
                     return readableList;
@@ -95,7 +112,7 @@ module.exports = function (message) {
                 makeReadable: function() {
                     let readableList = [];
                     this.weapons.forEach(weapon => {
-                        let combined = `${weapon.name} x${weapon.quantity}`;
+                        let combined = `${capitalize(weapon.name)} x${weapon.quantity}`;
                         readableList.push(combined);
                     });
                     return readableList;
@@ -106,7 +123,7 @@ module.exports = function (message) {
                 makeReadable: function() {
                     let readableList = [];
                     this.misc.forEach(miscItem => {
-                        let combined = `${miscItem.name} x${miscItem.quantity}`;
+                        let combined = `${capitalize(miscItem.name)} x${miscItem.quantity}`;
                         readableList.push(combined);
                     });
                     return readableList;
