@@ -14,7 +14,6 @@ function removeItem(message, args, player) {
         createResponseEmbed('send', 'invalid', `You didn't specify an amount of ${cat} to remove.`, player);
     } else if (coins.isCoin(cat)) {
         const removeCoins = thisCoin => {
-            console.log(thisCoin);
             let newAmount = parseInt(thisCoin) - parseInt(removedItem);
             if (newAmount < 0) {
                 createResponseEmbed('send', 'invalid', `You don't have enough ${cat}!`, player);

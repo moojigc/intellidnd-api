@@ -1,7 +1,8 @@
-const moment = require('moment');
-const Table = require('./Table');
-const Guild = require('./Guild');
-
+const moment = require('moment'),
+    Table = require('./Table'),
+    Guild = require('./Guild'),
+    { MessageEmbed } = require('discord.js');
+    
 class Player extends Table {
     constructor(message, params) {
         let defaults = { collection: null, _id: null, guild: null };
@@ -105,27 +106,29 @@ class Player extends Table {
         if (DMsetting === 'DM') this.notificationsToDM = true;
         return this;
     };
+    writeChangelog(command) {
+        let change = {
+            on: moment().format('hh:mm a, MMMM Do, YYYY'),
+            command: command,
+        }
+        if (this.changelog.length > 9) {
+            this.changelog.shift();
+            this.changelog.push(change);
+        } else {
+            this.changelog.push(change);
+        }
+    }
+    async checkExisting() {
+        let response = await this.dbRead()
+        if (response === null) return false;
+        else {
+            this.inventory = response.inventory;
+            this.changelog = response.changelog;
+            this.notificationsToDM = response.notificationsToDM;
+            return response
+        };
+    }
 }
-
-// async function test() {
-//     let message = {
-//         content: "/create"
-//     }
-//     let guild = new Guild({
-//         id: 2,
-//         name: 'Bot Testing'
-//     })
-//     let moojig = new Player(message, {
-//         id: 24,
-//         name: "DIO",
-//         guild: "Bot Testing",
-//         guildID: 2
-//     })
-//     console.log(await moojig.dbRead())
-//     // console.log(await moojig.prepack(0, 0, true).dbReplace())
-// }
-
-// test();
 
 module.exports = Player;
 

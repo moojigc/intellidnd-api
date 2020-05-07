@@ -97,7 +97,6 @@ function add(message, args, player) {
                         }
                         thisCategory.push(itemMap);
                 })
-                console.log(itemsList);
             } else { // Case that user adds single item
                addQuantity(newItemArr, thisCategory)
             }
@@ -120,7 +119,6 @@ function add(message, args, player) {
                 createResponseEmbed('send', 'invalid', response, player)
         }
     }
-    console.log(player);
     return player;
 }
 

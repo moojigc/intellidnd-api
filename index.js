@@ -1,14 +1,14 @@
-const Discord = require('discord.js');
-const moment = require('moment');
-const Logger = require('./utils/logger');
-const log = new Logger();
-const Table = require('./utils/Table');
-const Player = require('./utils/Player');
-const Guild = require('./utils/Guild');
+const { Client, MessageEmbed } = require('discord.js'),
+    moment = require('moment'),
+    Logger = require('./utils/logger'),
+    log = new Logger(),
+    Table = require('./models/Table'),
+    Player = require('./models/Player'),
+    Guild = require('./models/Guild');
 
-const client = new Discord.Client({disableMentions: 'everyone'});
-const BOT_TOKEN = process.env.BOT_TOKEN || require('./private.json').BOT_TOKEN;
-const prefix = "/";
+const client = new Client({disableMentions: 'everyone'}),
+    BOT_TOKEN = process.env.BOT_TOKEN || require('./private.json').BOT_TOKEN,
+    prefix = "/";
 
 client.once('ready', async () => {
     console.log(`${client.user.username} is ready!`);
@@ -22,38 +22,47 @@ client.once('ready', async () => {
 
 client.on('message', async message => {
     if(message.channel.type === 'dm' && !message.author.bot) {
-        const regexTest = /fuck|dick/.test(message.content); // Hidden easter egg lol
+        const regexTest = /fuck|dick|stupid/.test(message.content); // Hidden easter egg lol
         if (regexTest) return message.author.send(`:poop:僕は悪いボットではないよ！`).catch(console.error);
         else return message.author.send(`Messages to this bot are not monitored. If you have any issues or feature requests, please go to https://github.com/moojigc/DiscordBot/issues.`)
     };
-    if (message.author === client.user) return; // stops function if author is the bot itself
-    const messageArr = message.content.split(" ");
-    const command = messageArr[0];
-    const commandKeywords = messageArr.slice(1); // used by the if statement
-    
-    const validCommands = { 
-        commands: 'inventory inv wallet create deleteplayer helpinventory add remove overwrite changelog dm',
-        isValid: function(input) {
-            let userInput;
-            this.commands.split(' ').forEach(command=> {
-                if (input === `${prefix}${command}`) userInput = input;
-                else return;
-            })
-            if (userInput !== undefined) return true;
-            else return false;
-        }
-    }
+    // stops function if author is the bot itself
+    if (message.author === client.user) return; 
+
+    // Declare all constants
+    const messageArr = message.content.split(' '),
+        command = messageArr[0].split('').slice(1).join(''),
+        commandKeywords = messageArr.slice(1), // used by the if statement
+        validCommands = { 
+            commands: 'inventory inv wallet create deleteplayer helpinventory add remove overwrite changelog dm',
+            isValid: function(input) {
+                let userInput;
+                this.commands.split(' ').forEach(command=> {
+                    if (input === command) userInput = input;
+                    else return;
+                })
+                if (userInput !== undefined) return true;
+                else return false;
+            }
+        },
+        { createResponseEmbed } = require('./utils/globalFunctions.js')(message);
+
+    // End whole script if no valid command entered
     if(!validCommands.isValid(command)) return;
-    const { writeToJSON, writeChangelog, createResponseEmbed } = require('./utils/globalFunctions.js')(message);
 
-    let args; // modified by the if statement
-    let recipientPlayerName; // modified by the if statement
-    let recipientPlayerObject;
+    // Declare mutable variables
+    let args,
+        recipientPlayerName,
+        recipientPlayerObject;
 
-    if (message.mentions.users.array().length > 0) {
-        if (!message.member.hasPermission('BAN_MEMBERS') || !message.member.hasPermission('KICK_MEMBERS')) return createResponseEmbed('channel', 'invalid', `User <@${message.author.id}> does not have sufficient privileges for this action.`);
+    // Check whether acting upon author of the message or a mentioned user, or @ everyone
+    if (message.mentions.users.array().length > 0 || message.mentions.everyone) {
+        if (!message.member.hasPermission('BAN_MEMBERS') || !message.member.hasPermission('KICK_MEMBERS')) 
+            return createResponseEmbed('channel', 'invalid', `User <@${message.author.id}> does not have sufficient privileges for this action.`);
+
         args = commandKeywords.slice(1); // accounts for @mention being the 2nd word in the message
-        recipientPlayerObject = message.mentions.members.first();
+        nullObject = { id: null, displayName: '@everyone' }; // Prevents errors when getting the inventory of @everyone
+        recipientPlayerObject = (commandKeywords[0] === '@everyone') ? nullObject : message.mentions.members.first();
         recipientPlayerName = recipientPlayerObject.displayName; // all commands will be carried out on the @mentioned user
     } else {
         args = commandKeywords.slice(0);
@@ -61,92 +70,105 @@ client.on('message', async message => {
         recipientPlayerName = recipientPlayerObject.displayName;
     };
     
+    // Map Discord server into a Guild object to compare against Mongo database
     const currentGuild = new Guild({
         id: message.guild.id,
         name: message.guild.name,
-        players: message.guild.members.cache.map(m => m.id)
+        players: message.guild.members.cache.map(m => m.id + message.guild.id)
     });
-    console.log(currentGuild);
-    try {
-        await currentGuild.dbConnect();
-        console.log(await currentGuild.dbRead());
-    } catch (error) {
-        console.log(console.error);
-    } finally {
-        setTimeout(
-            async () => { await currentGuild.dbDisconnect() },
-            10000
-        )
-    }
-    return;
-    const { showInventory, showWallet } = require('./commands/inv_wallet')(message);
+    // Map recipient player into Player object to compare against Mongo database
+    const currentPlayer = new Player(message, {
+        // My database uses the user's Discord ID and Guild ID combined to map players.
+        // This allows players to use the bot in more than 1 Discord server at a time without worrying about overwriting their data.
+        id: recipientPlayerObject.id + currentGuild._id,
+        name: recipientPlayerName,
+        guild: currentGuild.name,
+        // The Discord server ID is used to all the Dungeon Master to see the inventory of every player at once.
+        guildID: currentGuild._id
+    })
 
-    log.green(`command was ${command}. recipient player is ${recipientPlayerName}. 
+    log.green(`command was ${command}. recipient player is ${currentPlayer.name}. 
     Args are ${args.join(' ')}.`);
 
     try {
-        // if (thisGuild.findPlayer(recipientPlayerName)) writeChangelog(currentPlayer);
+        let dataIfExists = await currentPlayer.checkExisting();
+        if (!dataIfExists && command !== 'create' && recipientPlayerName !== '@everyone') return createResponseEmbed('channel', 'invalid', `No data for ${recipientPlayerName}. Run /create to start an inventory for this player.`)
         switch (command) {
-            case `${prefix}inv`:
-            case `${prefix}inventory`:
-                showInventory(currentPlayer, thisGuildData);
+            case `inv`:
+            case `inventory`:
+                await currentGuild.dbUpsert();
+                const { showInventory } = require('./commands/inv_wallet')(message);
+
+                await showInventory(currentPlayer, currentGuild.players);
                 break;
-            case `${prefix}wallet`:
-                showWallet(currentPlayer, thisGuild);
+            case `wallet`:
+                const { showWallet } = require('./commands/inv_wallet')(message);
+                showWallet(currentPlayer, currentGuild.players);
                 break;
-            case `${prefix}add`:
+            case `add`:
                 const { add } = require('./commands/add');
                 add(message, args, currentPlayer);
-                writeChangelog(currentPlayer);
-                writeToJSON(inventoryData);
-                // update the guild
+                currentPlayer.writeChangelog(message.content);
+                currentPlayer.dbUpdate({ inventory: currentPlayer.inventory, changelog: currentPlayer.changelog });
+
                 break;
-            case `${prefix}remove`:
+            case `remove`:
                 const removeItem = require('./commands/remove');
                 removeItem(message, args, currentPlayer);
-                writeChangelog(currentPlayer);
-                writeToJSON(inventoryData);
+                currentPlayer.writeChangelog(message.content);
+                currentPlayer.dbUpdate({ inventory: currentPlayer.inventory, changelog: currentPlayer.changelog });
+
                 break;
-            case `${prefix}overwrite`:
+            case `overwrite`:
                 const overwrite = require('./commands/overwrite');
                 overwrite(message, args, currentPlayer);
-                writeChangelog(currentPlayer);
+                currentPlayer.writeChangelog(message.content);
+                currentPlayer.dbUpdate({ inventory: currentPlayer.inventory, changelog: currentPlayer.changelog });
+
                 break;
-            case `${prefix}create`:
-                // if (currentPlayer) return createResponseEmbed('channel', 'invalid', `This user already has an inventory set up!`);
-                const nP = new Player(message, {
-                    id: recipientPlayerObject.id,
-                    name: a,
-                })
-                if (args !== "") nP.prepack(args[0], args[1], args[2], args[3]);
-                console.log(await nP.add());
-                createResponseEmbed('channel', 'success', `Created ${recipientPlayerName}'s inventory!`);
+            case `create`:
+                if (!!await currentPlayer.checkExisting()) return createResponseEmbed('channel', 'invalid', `This user already has an inventory set up!`);
+                console.log('Creating player...');
+                let [prepack, gold, silver, DMsetting] = args;
+                if (prepack === "prepack") {
+                    currentPlayer.prepack(gold, silver, DMsetting);}
+                else {
+                    currentPlayer.createInventory();
+                }
+                let response = await currentPlayer.dbInsert()
+                if (response.insertedCount === 1) createResponseEmbed('channel', 'success', `Created ${recipientPlayerName}'s inventory!`, currentPlayer);
+                else createResponseEmbed('channel', 'invalid', 'Sorry, there was an error with the database server. Please try again.', currentPlayer);
+                
                 break;
-            case `${prefix}deleteplayer`:
+            case `deleteplayer`:
                 // deletePlayer is a method on the Guild constructor. Code can be found at utils/globalFunctions.
-                thisGuild.deletePlayer(currentPlayer);
-                writeToJSON(inventoryData); 
-                createResponseEmbed('channel', 'success', `Player ${recipientPlayerName}'s inventory successfully deleted.`)
+                let deletion = await currentPlayer.dbDelete()
+                if (deletion.deletedCount === 1) createResponseEmbed('channel', 'success', `Player ${recipientPlayerName}'s inventory successfully deleted.`);
+                else createResponseEmbed('channel', 'invalid', 'Sorry, there was an error with the database server. Please try again.', currentPlayer);
+
                 break;
-            case `${prefix}dm`:
-                const { dm } = require('./commands/dm');
+            case `dm`:
+                const dm = require('./commands/dm');
                 dm(message, currentPlayer);
-                writeChangelog(currentPlayer);
+                currentPlayer.writeChangelog(message.content);;
+                currentPlayer.dbUpdate({ notificationsToDM: currentPlayer.notificationsToDM, changelog: currentPlayer.changelog });
+
                 break;
-            case `${prefix}helpinventory`:
+            case `helpinventory`:
                 const help = require('./commands/help');
                 help(message);
                 break;
-            case `${prefix}changelog`:
+            case `changelog`:
                 const { changelog } = require('./commands/changelog');        
                 changelog(message, currentPlayer);
                 break;
             default: // Keep blank so the bot doesn't interfere with other bots
                 return;
         }
+        process.on('SIGINT', () => currentGuild.dbDisconnect());
     } catch (err) {
-        console.log(err.stack);
-        let errorEmbed = new Discord.MessageEmbed()
+        console.trace(err);
+        let errorEmbed = new MessageEmbed()
             .setColor('RED')
             .setTitle(`Something went wrong!`)
             .setDescription(`Hi **${message.author.username}**, 
@@ -156,13 +178,13 @@ client.on('message', async message => {
             .addField('At:', moment().format('MMMM Do, hh:mm a'));
 
         if (!message.author.bot) message.author.send(errorEmbed);
-    } finally {
-        currentGuild.dbDisconnect();
     }
-}); // end of client.on('message')
+}); 
+// end of client.on('message')
 
 client.on('error', (err) => {
     console.log(err);
 })
 
 client.login(BOT_TOKEN);
+

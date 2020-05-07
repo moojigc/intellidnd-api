@@ -5,7 +5,6 @@ function overwrite(message, args, player) {
     const cat = args[0];
     if (!userEntry.isValid(cat)) return createResponseEmbed('send', 'invalid', `Overwrite what? You must say, "/overwrite gold 90, /overwrite backpack rations," etc...`, player);
     
-    console.log(args.slice(1));
     const newItemArr = args.slice(1);
     const newItem = newItemArr.join(' ').trim();
 
