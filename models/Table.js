@@ -1,4 +1,5 @@
 const dbConnect = require('../utils/connection');
+const dnd = process.env.MONGODB_NAME ? process.env.MONGODB_NAME : 'dnd-inventory';
 
 class Table {
     constructor(params) {
@@ -17,34 +18,34 @@ class Table {
 
     async dbInsert() {
         let db = await dbConnect();
-        return await this.dbAction(db.db('dnd-inventory').collection(this.collection).insertOne(this));
+        return await this.dbAction(db.db(dnd).collection(this.collection).insertOne(this));
     }
 
     async dbUpdate(values) {
         let db = await dbConnect()
-        return await this.dbAction(db.db('dnd-inventory').collection(this.collection).updateOne({ _id: this._id }, { $set: values }));
+        return await this.dbAction(db.db(dnd).collection(this.collection).updateOne({ _id: this._id }, { $set: values }));
     }
 
     async dbReplace() {
         let db = await dbConnect();
-        return await this.dbAction(db.db('dnd-inventory').collection(this.collection).replaceOne({ _id: this._id }, this));
+        return await this.dbAction(db.db(dnd).collection(this.collection).replaceOne({ _id: this._id }, this));
     }
 
     async dbDelete() {
         let db = await dbConnect();
-        return await this.dbAction(db.db('dnd-inventory').collection(this.collection).deleteOne({ _id: this._id }));
+        return await this.dbAction(db.db(dnd).collection(this.collection).deleteOne({ _id: this._id }));
     }
 
     async dbRead(id) {
         let db = await dbConnect();
         if (!!id) 
-            return await this.dbAction(db.db('dnd-inventory').collection(this.collection).findOne({ _id: id }));
+            return await this.dbAction(db.db(dnd).collection(this.collection).findOne({ _id: id }));
         else 
-            return await this.dbAction(db.db('dnd-inventory').collection(this.collection).findOne({ _id: this._id }));
+            return await this.dbAction(db.db(dnd).collection(this.collection).findOne({ _id: this._id }));
     }
     async dbUpsert() {
         let db = await dbConnect();
-        return await this.dbAction(db.db('dnd-inventory').collection(this.collection).updateOne(
+        return await this.dbAction(db.db(dnd).collection(this.collection).updateOne(
             { _id: this._id },
             { $setOnInsert: this },
             { upsert: true }
