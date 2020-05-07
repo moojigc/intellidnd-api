@@ -20,6 +20,7 @@ async function dbConnect() {
             return db
         }
     } catch (error) {
+        console.log(`cannot connect to ${uri}`)
         console.trace(error);
         return 404
     }
