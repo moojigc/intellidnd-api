@@ -119,6 +119,7 @@ client.on('message', async message => {
                 const overwrite = require('./commands/overwrite');
                 overwrite(message, args, currentPlayer);
                 currentPlayer.writeChangelog(message.content);
+                console.log(currentPlayer.inventory);
                 currentPlayer.dbUpdate({ inventory: currentPlayer.inventory, changelog: currentPlayer.changelog });
 
                 break;

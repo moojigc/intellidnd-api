@@ -39,14 +39,14 @@ function overwrite(message, args, player) {
         switch (cat) {
             case 'potions':
             case 'potion':
-                addQuantity(newItemArr, player.inventory.potions, 'overwrite');
+                player.inventory.potions = addQuantity(newItemArr, player.inventory.potions, 'overwrite');
                 break;
             case 'weapons':
             case 'weapon':
-                addQuantity(newItemArr, player.inventory.weapons, 'overwrite');
+                player.inventory.weapons = addQuantity(newItemArr, player.inventory.weapons, 'overwrite');
                 break;
             case 'misc':
-                addQuantity(newItemArr, player.inventory.misc, 'overwrite');
+                player.inventory.misc = addQuantity(newItemArr, player.inventory.misc, 'overwrite');
                 break;
             default:
                 createResponseEmbed('send', 'invalid', `You didn't specify an item or amount for ${cat}.`, player);

@@ -1,40 +1,71 @@
-function addQuantity(newItemArr, thisCategory, addOrOverwriteQ) {
-    let thisQuantity;
-    let number;
-    let thisItemMap;
-    let newItem = newItemArr.join(', ');
+const moment = require('moment');
 
-    newItemArr.forEach(item => {
-        if (!isNaN(item)) {
-            number = item;
-        }
-    })
+class Item {
+    constructor(name, quantity) {
+        this.name = name
+        this.quantity = quantity
+    }
+    removeQuantity(quantity) {
+        this.quantity -= quantity;
+        return this;
+    }
+}
+
+function addQuantity(newItemArr, thisCategory, addOrOverwriteQ) {
+    let newItem = newItemArr.filter(item => item !== '').join(' ');
+    let category = thisCategory.slice().filter(item => item.name !== 'none');
+    let thisItemName = newItemArr.filter(item => isNaN(item) && item !== ' ').join(' '); // Filter out numbers and extra spaces
+    let number = parseInt(newItemArr.filter(item => !isNaN(item) && item !== '')[0])
+    let thisItemMap;
+
     if (!number) { // Case that no quantity specified
-        thisItemMap = {
-            name: newItem.trim(),
-            quantity: 1
-        }
-        if (addOrOverwriteQ === 'overwrite') thisCategory = [thisItemMap];
-        else thisCategory.push(thisItemMap);
+        let number = 1;
+        thisItemMap = new Item(newItem.trim(), 1);
+        if (addOrOverwriteQ === 'overwrite') {
+            return [thisItemMap];
+        } else {
+            console.log(category.length)
+            if (category.length === 0) {
+                category.push(thisItemMap)
+                return category;
+            } else {
+                let updated = category.map(item => {
+                    if (item.name === thisItemName) {
+                        foundExisiting = true;
+                        if (addOrOverwriteQ === 'overwrite') 
+                            item.quantity = number;
+                        else 
+                            item.quantity = parseInt(item.quantity) + number;
+                        return item;
+                    } else {
+                        return item;
+                    }
+                }); 
+                return updated;
+            }
+        } 
     } else { // Case that quantity is specified
-        thisQuantity = newItemArr.splice(newItemArr.indexOf(number), 1);
-        let thisItemName = newItemArr.join(' '); 
-        thisItemMap = {
-            name: thisItemName,
-            quantity: parseInt(thisQuantity)
-        }
         let foundExisiting = false;
-        thisCategory.forEach(item => {
+        thisItemMap = new Item(thisItemName, number);
+        console.log(category);
+        let updated = category.map(item => {
             if (item.name === thisItemName) {
                 foundExisiting = true;
-                if (addOrOverwriteQ === 'overwrite') item.quantity = parseInt(thisQuantity);
-                else item.quantity = parseInt(item.quantity) + parseInt(thisQuantity);
+                if (addOrOverwriteQ === 'overwrite') 
+                    item.quantity = number;
+                else 
+                    item.quantity = parseInt(item.quantity) + number;
+                return item;
             } else {
-                return;
+                return item;
             }
         }); 
-        if (foundExisiting === false && addOrOverwriteQ !== 'overwrite') thisCategory.push(thisItemMap);
-        else if (addOrOverwriteQ === 'overwrite') thisCategory = [thisItemMap];
+        if (foundExisiting === false && addOrOverwriteQ !== 'overwrite') {
+            category.push(thisItemMap)
+            return category;
+        } 
+        else if (foundExisiting && addOrOverwriteQ !== 'overwrite') return updated;
+        else if (addOrOverwriteQ === 'overwrite') return [thisItemMap];
     }
 }
 
@@ -45,18 +76,22 @@ function add(message, args, player) {
     let newItemArr = args.slice(1);
     let newItem = newItemArr.join(' ');
     let { gold, electrum, platinum, silver, copper, potions, weapons, misc } = player.inventory;
-    const addCoinsTo = thisCoin => {
-        let newTotal = parseInt(thisCoin) + parseInt(newItem);
-        return newTotal;
-    } 
-    if (coins.isCoin(cat) && isNaN(cat2) || coins.isCoin(cat) && cat2 === undefined) {
+    const addCoinsTo = thisCoin => parseInt(thisCoin) + parseInt(newItem);
+
+    if (coins.isCoin(cat) && isNaN(cat2) || coins.isCoin(cat) && cat2 === undefined) 
+    {
         let response = `You didn't specify an amount to add to ${cat}.`;
         createResponseEmbed('send', 'invalid', response, player);
-    } else if (!userEntry.isValid(cat) && newItem) {
-        let response = `Invalid syntax. The only valid categories are ${userEntry.array.join(' | ')}. 
-        Type of item must come first; e.g. /add gold 20, NOT /add 20 gold.`;
+    } 
+    else if (!userEntry.isValid(cat)) 
+    {
+        let response = `Invalid syntax. The only valid categories are **${userEntry.array.join(', ')}**. 
+        Type of item must come first; e.g. \`/add gold 20\`, NOT \`/add 20 gold.\``;
         createResponseEmbed('send', 'invalid', response, player);
-    } else if (coins.isCoin(cat)) {
+    } 
+    else if (coins.isCoin(cat)) 
+    {
+        player.inventory.lastUpdated = moment().format('MMMM Do, hh:mm a');
         if (newItem) createResponseEmbed('send', 'success', `Added ${newItem} ${cat} to ${player.name}'s wallet!`, player)
         switch (cat) {
             case 'gold': 
@@ -78,51 +113,47 @@ function add(message, args, player) {
                 let response = `You didn't specifiy an item or amount to add to ${cat}.`;
                 createResponseEmbed('send', 'invalid', response, player);
         }
-    } else if (userEntry.isValid(cat) && !coins.isCoin(cat) && !newItem) {
+    } 
+    else if (userEntry.isValid(cat) && !coins.isCoin(cat) && !newItem) 
+    {
         createResponseEmbed('send', 'invalid', `You didn't specify what to add to ${cat}.`, player)
-    } else { // Non-money items
+    } 
+    else 
+    { // Non-money items
         function addToCategory(thisCategory) { // Adds to new items
-            thisCategory.forEach(item => {
-                if (item.name === "none") {
-                    thisCategory.splice(thisCategory.indexOf(item), 1);
-                }
-            });
+            let category = thisCategory.slice().filter(item => item.name !== 'none');
+            
+            createResponseEmbed('send', 'success', `Added ${newItem} to ${player.name}'s ${cat}!`, player)
 
             if (newItem.includes(',')) { // Case that user adds a list of items
-                let itemsList = newItem.trim().split(',');
-                itemsList.forEach(item => {
-                        let itemMap = {
-                            name: item.trim(),
-                            quantity: 1
-                        }
-                        thisCategory.push(itemMap);
-                })
+                let itemsList = newItem.trim().split(',').filter(item => item !== ' ');
+                let itemMap = itemsList.map(item => new Item(item.toLowerCase().trim(), 1));
+                category.push(itemMap);
+                return category;
             } else { // Case that user adds single item
-               addQuantity(newItemArr, thisCategory)
+               return addQuantity(newItemArr, thisCategory)
             }
-            createResponseEmbed('send', 'success', `Added ${newItem} to ${player.name}'s ${cat}!`, player)
         }
         switch (cat) {
             case 'potion':
             case 'potions':
-                addToCategory(potions);
+                player.inventory.potions = addToCategory(potions);
                 break;
             case 'weapon':
             case 'weapons':
-                addToCategory(weapons);
+                player.inventory.weapons = addToCategory(weapons);
                 break;
             case 'misc': 
-                addToCategory(misc);
+                player.inventory.misc = addToCategory(misc);
                 break;
-            default:
-                let response = `Add what? You must say, "/add gold 90, /add backpack rations," etc...`;
-                createResponseEmbed('send', 'invalid', response, player)
         }
+        player.inventory.lastUpdated = moment().format('MMMM Do, hh:mm a');
     }
     return player;
 }
 
 module.exports = {
     addQuantity: addQuantity,
-    add: add
+    add: add,
+    Item: Item
 };

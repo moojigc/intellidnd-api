@@ -101,7 +101,13 @@ class Player extends Table {
         return this;
     };
     prepack(addGold, addSilver, DMsetting) {
-        this.createInventory('prepack', addGold, addSilver);
+        let gold, 
+            silver;
+        if (!addGold) gold = 0;
+        else gold = addGold;
+        if (!addSilver) silver = 0;
+        else silver = addSilver;
+        this.createInventory('prepack', gold, silver);
         if (DMsetting === 'DM') this.notificationsToDM = true;
         return this;
     };
@@ -116,6 +122,7 @@ class Player extends Table {
         } else {
             this.changelog.push(change);
         }
+        return this
     }
     async checkExisting() {
         let response = await this.dbRead()

@@ -1,13 +1,16 @@
-function removeItem(message, args, player) {
-    const { userEntry, coins, createResponseEmbed } = require('../utils/globalFunctions.js')(message);
-    let foundExisiting = false;
-    const cat = args[0];
-    let removedItemArr = args.slice(1);
-    let removedItem = removedItemArr[0];
-    let { gold, electrum, platinum, silver, copper, potions, weapons, misc } = player.inventory;
+const Item = require('./add').Item;
 
-    const errorMessage = "Remove what? Must specify /remove gold 10, /remove weapon staff, etc...";
-    if (!cat) return createResponseEmbed('send', 'invalid', errorMessage, player);
+function removeItem(message, args, player) {
+    const { userEntry, coins, createResponseEmbed } = require('../utils/globalFunctions.js')(message),
+        cat = args[0],
+        removedItemArr = args.slice(1),
+        removedItem = removedItemArr[0];
+    let foundExisiting = false,
+        { gold, electrum, platinum, silver, copper, potions, weapons, misc } = player.inventory;
+
+    let errorMessage = "Remove what? Must specify /remove gold 10, /remove weapon staff, etc...";
+    // End script here if no category specified
+    if (!cat) return createResponseEmbed('send', 'invalid', errorMessage, player); 
 
     // Users fails to specify an amount
     if (coins.isCoin(cat) && isNaN(removedItem) || coins.isCoin(cat) && removedItem === undefined) { 
@@ -47,62 +50,70 @@ function removeItem(message, args, player) {
     } else if (userEntry.isValid(cat) && removedItem === undefined) { // No item specified
         createResponseEmbed('send', 'invalid', `You didn't specify an item to remove from *${cat}*.`, player);
     } else { // Non-money items
-        function removeFromCategory(thisCategory) {
-            let number = 1;
-            let thisQuantity;
+        function removeFromCategory(thisCategory, inputString) {
+            // Split up input into arrays separated by any commas 
+            let inputArr = inputString.split(',').map(item => item.trim());
+            let oldCategory = thisCategory.slice().map(item => new Item(item.name, parseInt(item.quantity)));
+            // Map all input, separated by commas, to new Item objects
+            const removedItemMap = inputArr.map(input => {
+                let [ name ] = input.split(' ').filter(item => isNaN(item));
+                let [ quantity ] = input.split(' ').filter(item => !isNaN(item));
+                if (!quantity) return new Item(name, NaN)
+                else return new Item(name, parseInt(quantity));
+            }).filter(item => !!item);
+            console.log('-----removedItemMap----')
+            console.log(removedItemMap);
             
-            removedItemArr.forEach(item => {
-                if (!isNaN(item)) {
-                    number = item;
+            // Check against existing objects
+            let changedBoolean = false;
+            let remaining = oldCategory.map(old => {
+                // For every index of oldCategory, catch its .name property against each item in removedItemMap
+                let matches = removedItemMap.filter(removed => removed.name === old.name);
+                console.log('-----matches----')
+                console.log(matches)
+                // Return old if no matches found
+                if (matches.length === 0) return old;
+                else {
+                    changedBoolean = true;
+                    let [ reducedItem ] = matches.map(match => {
+                        return old.removeQuantity(match.quantity)
+                    })
+                    console.log('-----reducedItem----')
+                    console.log(reducedItem);
+                    // If item quantity is now zero (or null), i.e. totally gone, return null
+                    if (reducedItem.quantity === 0 || isNaN(reducedItem.quantity)) return null;
+                    else return reducedItem;
                 }
-            })
-            if (number === 1) { // Case that no quantity specified
-                thisCategory.forEach(item => {
-                    if (item.name.toLowerCase() === removedItem.trim().toLowerCase()) {
-                        thisCategory.splice(thisCategory.indexOf(item), 1);
-                        foundExisiting = true;
-                    }
-                })
-            } else { // Case that quantity is specified
-                thisQuantity = removedItemArr.splice(removedItemArr.indexOf(number), 1);
-                let thisItemName = removedItemArr.join(' '); 
-                
-                thisCategory.forEach(item => {
-                    if (item.name.toLowerCase() === thisItemName.toLowerCase()) {
-                        foundExisiting = true;
-                        item.quantity = parseInt(item.quantity) - parseInt(thisQuantity);
-                    } else {
-                        return;
-                    }
-                }); 
-            }
-            if (thisCategory.length < 1) {
-                let emptyMap = {
-                    name: 'none',
-                    quantity: 0
-                };
-                thisCategory.push(emptyMap);
-            }
-            // Check if that player had removedItem in inventory at all
-            if (foundExisiting === false) {
-                createResponseEmbed('send', 'invalid', `No such item found in ${cat}.`, player);
+            }).filter(item => !!item);
+            console.log('----remaining-----')
+            console.log(remaining)
+
+            if (remaining.length === oldCategory.length && !changedBoolean) {
+                createResponseEmbed('send', 'invalid', `Error: *${removedItemArr.join(' ')}* not found in ${cat}. Check spelling if your input should have matched an item.`, player)
+                return oldCategory;
+            } else if (remaining.length === 0) {
+                createResponseEmbed('send', 'success', `Removed **${removedItem}** from *${player.name}'s* ${cat}.`, player);
+                return [new Item('none', 0)];
             } else {
-                createResponseEmbed('send', 'success', `Removed ${number} ${removedItem} from ${player.name}'s ${cat}.`, player);
+                createResponseEmbed('send', 'success', `Removed **${removedItem}** from *${player.name}'s* ${cat}.`, player);
+                return remaining;
             }
         }
         // Calling removal on each category
         switch (cat) {
             case 'potion':
             case 'potions':
-                removeFromCategory(potions);
+                player.inventory.potions = removeFromCategory(potions, removedItemArr.join(' '));
                 break;
             case 'weapon':
             case 'weapons':
-                removeFromCategory(weapons);
+                player.inventory.weapons = removeFromCategory(weapons, removedItemArr.join(' '));
                 break;
             case 'misc':
-                removeFromCategory(misc);
+                player.inventory.misc = removeFromCategory(misc, removedItemArr.join(' '));
                 break;
+            default: 
+                createResponseEmbed('send', 'invalid', `The only valid categories are ${userEntry.array.join(', ')}.`, player)
         };
     } 
     return player;
