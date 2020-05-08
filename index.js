@@ -18,6 +18,14 @@ client.once('ready', async () => {
     }
 });
 
+client.on('guildCreate', async guild => {
+    try {
+        guild.channels.cache.find(c => c.name === 'general').send('Hello! To see a list of commands, run **/helpinventory**.')
+    } catch (error) {
+        console.log(error)
+    }
+})
+
 client.on('message', async message => {
     if(message.channel.type === 'dm' && !message.author.bot) {
         const regexTest = /fuck|dick|stupid/.test(message.content); // Hidden easter egg lol
@@ -88,7 +96,7 @@ client.on('message', async message => {
 
     try {
         let dataIfExists = await currentPlayer.checkExisting();
-        if (!dataIfExists && command !== 'create' && recipientPlayerName !== '@everyone') return createResponseEmbed('channel', 'invalid', `No data for ${recipientPlayerName}. Run /create to start an inventory for this player.`)
+        if (!dataIfExists && command !== 'create' && command !== 'helpinventory' && recipientPlayerName !== '@everyone') return createResponseEmbed('channel', 'invalid', `No data for ${recipientPlayerName}. Run /create to start an inventory for this player.`)
         switch (command) {
             case `inv`:
             case `inventory`:
