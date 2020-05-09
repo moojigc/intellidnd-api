@@ -41,7 +41,7 @@ client.on('message', async message => {
         command = messageArr[0].split('').slice(1).join(''),
         commandKeywords = messageArr.slice(1), // used by the if statement
         validCommands = { 
-            commands: 'inventory inv wallet create deleteplayer helpinventory add remove overwrite changelog dm',
+            commands: 'login inventory inv wallet create deleteplayer helpinventory add remove overwrite changelog dm',
             isValid: function(input) {
                 let userInput;
                 this.commands.split(' ').forEach(command=> {
@@ -85,7 +85,7 @@ client.on('message', async message => {
     });
     // Map recipient player into Player object to compare against Mongo database
     const currentPlayer = new Player(message, {
-        // My database uses the user's Discord ID and Guild ID combined to map players.
+        // My database uses the user's Discord ID, username+tag, and Guild ID combined to map players.
         // This allows players to use the bot in more than 1 Discord server at a time without worrying about overwriting their data.
         id: recipientPlayerObject.id + currentGuild._id,
         name: recipientPlayerName,
@@ -166,6 +166,12 @@ client.on('message', async message => {
             case `changelog`:
                 const { changelog } = require('./commands/changelog');        
                 changelog(message, currentPlayer);
+                break;
+            
+            case `login`:
+                const webLogin = require('./commands/login');    
+                webLogin(message, currentPlayer);
+                
                 break;
             default: // Keep blank so the bot doesn't interfere with other bots
                 return;
