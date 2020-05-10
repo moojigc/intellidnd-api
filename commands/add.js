@@ -127,8 +127,9 @@ function add(message, args, player) {
 
             if (newItem.includes(',')) { // Case that user adds a list of items
                 let itemsList = newItem.trim().split(',').filter(item => item !== ' ');
-                let itemMap = itemsList.map(item => new Item(item.toLowerCase().trim(), 1));
-                category.push(itemMap);
+                itemsList.forEach(item => {
+                    category.push(new Item(item.toLowerCase().trim(), 1))
+                })
                 return category;
             } else { // Case that user adds single item
                return addQuantity(newItemArr, thisCategory)
