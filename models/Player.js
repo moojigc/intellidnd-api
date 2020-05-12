@@ -15,8 +15,9 @@ class Player extends Table {
         this.guildID = guildID;
         this.notificationsToDM = false;
         this.inventory = {};
+        this.lastUpdated = moment().format();
         this.changelog = [{
-            on: `at ${moment().format("hh:mm a on MMMM Do YYYY")}`,
+            on: moment().format(),
             command: message.content,
         }];
     }
@@ -66,7 +67,6 @@ class Player extends Table {
                         quantity: 100
                     }
                 ],
-                lastUpdated: moment().format("MMMM Do, hh:mm a")
             };
             this.inventory = prepackaged;
         } else {
@@ -94,8 +94,7 @@ class Player extends Table {
                         quantity: 0
                     }
                 ],
-                lastUpdated: moment().format("MMMM Do, hh:mm a")
-                };
+            };
             this.inventory = empty;
         };
         return this;
@@ -113,10 +112,10 @@ class Player extends Table {
     };
     writeChangelog(command) {
         let change = {
-            on: moment().format('hh:mm a, MMMM Do, YYYY'),
+            on: moment().format(),
             command: command,
         }
-        if (this.changelog.length > 9) {
+        if (this.changelog.length > 19) {
             this.changelog.shift();
             this.changelog.push(change);
         } else {
@@ -128,6 +127,7 @@ class Player extends Table {
         let response = await this.dbRead()
         if (response === null) return false;
         else {
+            this.lastUpdated = response.lastUpdated;
             this.inventory = response.inventory;
             this.changelog = response.changelog;
             this.notificationsToDM = response.notificationsToDM;

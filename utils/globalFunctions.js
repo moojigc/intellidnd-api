@@ -79,7 +79,8 @@ module.exports = function (message) {
         // Create user wallet or full inventory
         // must pass in the Player object
         let embed;
-        const { gold, silver, platinum, electrum, copper, potions, weapons, misc, lastUpdated } = player.inventory;
+        const { lastUpdated } = player;
+        const { gold, silver, platinum, electrum, copper, potions, weapons, misc } = player.inventory;
         if (type === 'wallet') {         
             embed = new MessageEmbed()
                 .setTitle(`${player.name}'s wallet`)
@@ -136,7 +137,7 @@ module.exports = function (message) {
                     { name: 'Potions', value: potionsList.makeReadable(), inline: true },
                     { name: 'Weapons', value: weaponsList.makeReadable(), inline: true },
                     { name: 'Misc.', value: miscList.makeReadable(), inline: true },
-                    { name: 'Last updated', value: lastUpdated }
+                    { name: 'Last updated', value: moment(lastUpdated).format('MMMM Do, hh:mm a') }
                 )
                 .setColor("#9B59B6")
                 .setFooter(`Campaign: ${player.guild}`)

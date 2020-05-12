@@ -91,7 +91,6 @@ function add(message, args, player) {
     } 
     else if (coins.isCoin(cat)) 
     {
-        player.inventory.lastUpdated = moment().format('MMMM Do, hh:mm a');
         if (newItem) createResponseEmbed('send', 'success', `Added ${newItem} ${cat} to ${player.name}'s wallet!`, player)
         switch (cat) {
             case 'gold': 
@@ -148,7 +147,6 @@ function add(message, args, player) {
                 player.inventory.misc = addToCategory(misc);
                 break;
         }
-        player.inventory.lastUpdated = moment().format('MMMM Do, hh:mm a');
     }
     return player;
 }

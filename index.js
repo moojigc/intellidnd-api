@@ -85,12 +85,12 @@ client.on('message', async message => {
     });
     // Map recipient player into Player object to compare against Mongo database
     const currentPlayer = new Player(message, {
-        // My database uses the user's Discord ID, username+tag, and Guild ID combined to map players.
+        // My database uses the user's Discord ID, and Guild ID combined to map players.
         // This allows players to use the bot in more than 1 Discord server at a time without worrying about overwriting their data.
         id: recipientPlayerObject.id + currentGuild._id,
         name: recipientPlayerName,
         guild: currentGuild.name,
-        // The Discord server ID is used to all the Dungeon Master to see the inventory of every player at once.
+        // The Discord server ID is used to let the Dungeon Master/(server manager) to see the inventory of every player at once.
         guildID: currentGuild._id
     })
 
