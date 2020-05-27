@@ -11,7 +11,7 @@ const client = new Client({disableMentions: 'everyone'}),
 client.once('ready', async () => {
     console.log(`${client.user.username} is ready!`);
     try {
-        let link = await client.generateInvite(['MANAGE_MESSAGES', 'MANAGE_NICKNAMES', 'SEND_MESSAGES', 'READ_MESSAGE_HISTORY', 'EMBED_LINKS']);
+        let link = await client.generateInvite(['MANAGE_MESSAGES', 'SEND_MESSAGES', 'READ_MESSAGE_HISTORY', 'EMBED_LINKS']);
         console.log(link);
     } catch(e) {
         console.log(e.stack);
@@ -146,7 +146,6 @@ client.on('message', async message => {
                 
                 break;
             case `deleteplayer`:
-                // deletePlayer is a method on the Guild constructor. Code can be found at utils/globalFunctions.
                 let deletion = await currentPlayer.dbDelete()
                 if (deletion.deletedCount === 1) createResponseEmbed('channel', 'success', `Player ${recipientPlayerName}'s inventory successfully deleted.`);
                 else createResponseEmbed('channel', 'invalid', 'Sorry, there was an error with the database server. Please try again.', currentPlayer);
@@ -171,12 +170,10 @@ client.on('message', async message => {
             case `login`:
                 const webLogin = require('./commands/login');    
                 webLogin(message, currentPlayer);
-                
                 break;
             default: // Keep blank so the bot doesn't interfere with other bots
                 return;
         }
-        process.on('SIGINT', () => currentGuild.dbDisconnect());
     } catch (err) {
         console.trace(err);
         let errorEmbed = new MessageEmbed()
@@ -191,11 +188,5 @@ client.on('message', async message => {
         if (!message.author.bot) message.author.send(errorEmbed);
     }
 }); 
-// end of client.on('message')
-
-client.on('error', (err) => {
-    console.log(err);
-})
-
+// end of client.on('message)
 client.login(BOT_TOKEN);
-

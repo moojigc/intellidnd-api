@@ -20,6 +20,7 @@ class Player extends Table {
             on: moment().format(),
             command: message.content,
         }];
+        this.token = ""
     }
     createInventory(prepack, goldCoins, silverCoins) {
         if (prepack === 'prepack') {
@@ -133,6 +134,18 @@ class Player extends Table {
             this.notificationsToDM = response.notificationsToDM;
             return response
         };
+    }
+    async getToken() {
+        const res = await this.dbRead();
+        console.log(res);
+        if (res.token) {
+            return res.token;
+        } else {
+            const { suid } = require("rand-token");
+            this.token = suid(16);
+            await this.dbUpdate({ token: this.token });
+            return this.token;
+        }
     }
 }
 
