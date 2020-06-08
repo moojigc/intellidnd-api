@@ -1,9 +1,7 @@
-module.exports = {
-    changelog: function(message, player) {
-        let readableLog = [];
-        player.changelog.forEach(change => {
-            readableLog.push(`Ran \`${change.command}\` at ${change.on}.`)
-        })
-        message.author.send(readableLog.join('\n\n'));
-    }
-}
+const changelog = function (message, player, moment) {
+	let readableLog = player.changelog.map(({ command, on }) => {
+		return `Ran \`${command}\` at ${moment(on).format("hh:mm a, MMMM Do, YYYY")}.`;
+	});
+	message.author.send(readableLog.join("\n\n"));
+};
+module.exports = changelog;
