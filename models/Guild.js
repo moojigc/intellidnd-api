@@ -1,19 +1,21 @@
-const Table = require('./Table');
+const { Schema, model } = require("mongoose");
 
-class Guild extends Table {
-    constructor(params) {
-        let { id, name, players } = params;
-        super({
-            collection: 'guilds',
-            id: id
-        })
-        this.name = name;
-        this.players = players;
-    }
-    async getPlayers() {
-        const result = await this.dbRead();
-        return result.players;
-    }
-}
+const GuildSchema = new Schema({
+	name: {
+		type: String
+	},
+	players: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: "Player"
+		}
+	],
+	discordId: {
+		type: String,
+		unique: true
+	}
+});
+
+const Guild = model("Guild", GuildSchema);
 
 module.exports = Guild;
