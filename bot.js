@@ -35,13 +35,13 @@ client.on("guildCreate", async (guild) => {
 });
 
 client.on("message", async (message) => {
-	if (message.content.split("")[0] !== "/") return;
 	if (process.env.PORT && message.guild.name === "Bot Testing") return;
 	if (message.channel.type === "dm" && !message.author.bot) {
 		const regexTest = /fuck|dick|stupid/.test(message.content); // Hidden easter egg lol
 		if (regexTest) return message.author.send(`:poop:僕は悪いボットではないよ！`).catch(console.error);
 		else return message.author.send(`Messages to this bot are not monitored. If you have any issues or feature requests, please go to https://github.com/moojigc/DiscordBot/issues.`);
 	}
+	if (message.content.split("")[0] !== "/") return;
 	// stops function if author is the bot itself
 	if (message.author === client.user) return;
 	const validCommands = {
@@ -89,11 +89,11 @@ client.on("message", async (message) => {
 			case `inv`:
 			case `inventory`:
 				const { showInventory } = require("./commands/inv_wallet")(message);
-				await showInventory(currentPlayer, currentGuild.players);
+				await showInventory(currentPlayer, currentGuild);
 				break;
 			case `wallet`:
 				const { showWallet } = require("./commands/inv_wallet")(message);
-				await showWallet(currentPlayer, currentGuild.players);
+				await showWallet(currentPlayer, currentGuild);
 				break;
 			case `add`:
 				const { add } = require("./commands/add");
@@ -147,6 +147,17 @@ client.on("message", async (message) => {
 				} else {
 					player.createInventory();
 					createResponse = await player.save();
+				}
+				if (currentGuild) {
+					await Guild.create({
+						players: createResponse._id
+					});
+				} else {
+					await currentGuild.updateOne({
+						$push: {
+							players: currentPlayer._id
+						}
+					});
 				}
 				if (createResponse) createResponseEmbed("channel", "success", `Created ${recipientPlayerName}'s inventory!`, currentPlayer);
 				else createResponseEmbed("channel", "invalid", "Sorry, there was an error with the database server. Please try again.", currentPlayer);
