@@ -1,0 +1,36 @@
+<nav>
+    <div class="nav-wrapper">
+        <div class="brand-logo">
+            <a href="/" style="display: inline-grid; align-content: center;">
+                <img src="/assets/images/primary-logo-sm.png" alt="DnD Inventory Logo"
+                    style="width: 2rem; border-radius: 50%; margin-right: 0.5rem">
+            </a> D&D Inventory Bot for
+            <a target="_blank" href="https://discord.com/app" style="margin-left: 0.5rem; color:#7289DA;">
+                <i class="fab fa-discord" style="font-size: 2rem;"></i>
+            </a>
+        </div>
+        <ul class="right hide-on-med-and-down">
+            {{#if userStatus.loggedIn}}
+            <li class="nav-item">
+                <a class="nav-link" href="/inventory">Inventory</a>
+            </li>
+            {{/if}}
+            <li class="nav-item">
+                <a class="nav-link" href="/">Guide</a>
+            </li>
+            <li class="nav-item">
+                {{#if userStatus.loggedIn}}
+                <a class="nav-link" href="/logout">Logout</a>
+                {{/if}}
+                {{#if userStatus.loggedOut}}
+                <a class="nav-link" href="/login">Login</a>
+                {{/if}}
+            </li>
+            {{#if userStatus.loggedIn}}
+            <li class="nav-item">
+                <a class="nav-link" href="/add-character">Characters</a>
+            </li>
+            {{/if}}
+        </ul>
+    </div>
+</nav>

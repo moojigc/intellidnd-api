@@ -1,0 +1,31 @@
+{{> navbar}}
+<main class="container wrapper">
+    <header>
+        <h1>Add a Character</h1>
+    </header>
+    <div class="row justify-content-center">
+        <div class="col l8">
+            <div class="row" style="justify-content: center;">
+                <h5>Info from Discord Bot</h5>
+            </div>
+            <form action="/api/add-character" method="POST">
+                <div class="row">
+                    <input type="text" class="form-control characterName" name="characterName"
+                        placeholder="Enter character name">
+                    <small>Enter your character name exactly as it is on
+                        Discord.</small>
+                </div>
+                <div class="row">
+                    <input type="text" class="form-control token" name="token" placeholder="Enter token">
+                </div>
+                {{#if successMsg}}
+                <div class="row alert alert-success">{{successMsg}}</div>
+                {{/if}}
+                {{#if errorMsg}}
+                <div class="row alert alert-danger">{{errorMsg}}</div>
+                {{/if}}
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+</main>
