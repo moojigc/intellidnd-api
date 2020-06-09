@@ -2,6 +2,7 @@
 	font-size: 20px;
 	--primary: #9b59b6;
 	--secondary: #192a51;
+	--secondary-trans: #192a51eb;
 	--third: #aaa1c8;
 	--fourth: #d5c6e0;
 	--fifth: #f5e6e8;
@@ -13,6 +14,7 @@
 }
 
 body {
+	background-image: url("/assets/images/primary-logo-sm.png");
 	color: whitesmoke;
 	font-family: "Open Sans", sans-serif;
 	background-color: var(--accent);
@@ -52,7 +54,7 @@ h1 {
 	text-align: center;
 	padding: 2rem;
 	border-radius: 0.3rem;
-	background: var(--secondary);
+	background: var(--secondary-trans);
 	box-shadow: 0 0 1rem 0.2rem var(--boxshadow);
 	margin-bottom: 2rem;
 }
