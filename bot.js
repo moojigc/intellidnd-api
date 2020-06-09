@@ -2,8 +2,8 @@ const { Client, MessageEmbed } = require("discord.js"),
 	moment = require("moment"),
 	{ Player, Guild } = require("./models"),
 	{ connect } = require("mongoose"),
-	{ MONGODB_URI } = require("./private.json").dev || process.env,
 	client = new Client({ disableMentions: "everyone" }),
+	MONGODB_URI = process.env.MONGODB_URI || require("./private.json").dev.MONGODB_URI,
 	BOT_TOKEN = process.env.BOT_TOKEN || require("./private.json").BOT_TOKEN;
 
 connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })

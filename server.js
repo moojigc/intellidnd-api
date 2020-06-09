@@ -6,7 +6,7 @@ const express = require("express"),
 	passport = require("./config/passport"),
 	flash = require("connect-flash"),
 	PORT = process.env.PORT || 3000,
-	{ MONGODB_URI } = require("./private.json").dev || process.env;
+	MONGODB_URI = process.env.MONGODB_URI || require("./private.json").dev.MONGODB_URI;
 
 mongoose
 	.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
