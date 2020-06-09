@@ -19,13 +19,13 @@ function removeItem(message, args, player) {
 				createResponseEmbed("send", "invalid", `You don't have enough ${cat}!`, player);
 				return thisCoin;
 			} else {
+				createResponseEmbed("send", "success", `Removed ${removedItem} ${cat} from *${player.name}'s* wallet.`, player);
 				return newAmount;
 			}
 		};
 		if (!removedItem) {
 			createResponseEmbed("send", "invalid", `Remove how much ${cat}?`, player);
 		} else {
-			createResponseEmbed("send", "success", `Removed ${removedItem} ${cat} from *${player.name}'s* wallet.`, player);
 			player.inventory[cat] = removeCoins(player.inventory[cat]);
 		}
 	} else if (userEntry.isValid(cat) && removedItem === undefined) {

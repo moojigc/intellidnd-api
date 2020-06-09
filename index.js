@@ -1,15 +1,12 @@
 const { Client, MessageEmbed } = require("discord.js"),
 	moment = require("moment"),
 	{ Player, Guild } = require("./models"),
-	mongoose = require("mongoose"),
-	{ MONGODB_URI } = require("./private.json").dev || process.env;
+	{ connect } = require("mongoose"),
+	{ MONGODB_URI } = require("./private.json").dev || process.env,
+	client = new Client({ disableMentions: "everyone" }),
+	BOT_TOKEN = process.env.BOT_TOKEN || require("./private.json").BOT_TOKEN;
 
-const client = new Client({ disableMentions: "everyone" }),
-	BOT_TOKEN = process.env.BOT_TOKEN || require("./private.json").BOT_TOKEN,
-	prefix = "/";
-
-mongoose
-	.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
+connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
 	.then((conn) => {
 		console.log(`Connected to ${conn.connections[0].db.databaseName}`);
 	})
@@ -27,14 +24,18 @@ client.once("ready", async () => {
 
 client.on("guildCreate", async (guild) => {
 	try {
-		// @ts-ignore
-		guild.channels.cache.find((c) => c.name === "general").send("Hello! To see a list of commands, run **/helpinventory**.");
+		let [defaultChannel] = guild.channels.cache.filter((channel) => {
+			if (channel.type == "text" && channel.permissionsFor(guild.me).has("SEND_MESSAGES")) return true;
+			else return false;
+		});
+		defaultChannel[1].send("Hello! To see a list of commands, run **/helpinventory**.");
 	} catch (error) {
 		console.log(error);
 	}
 });
 
 client.on("message", async (message) => {
+	if (message.content.split("")[0] !== "/") return;
 	if (process.env.PORT && message.guild.name === "Bot Testing") return;
 	if (message.channel.type === "dm" && !message.author.bot) {
 		const regexTest = /fuck|dick|stupid/.test(message.content); // Hidden easter egg lol
@@ -43,7 +44,6 @@ client.on("message", async (message) => {
 	}
 	// stops function if author is the bot itself
 	if (message.author === client.user) return;
-
 	const validCommands = {
 		commands: ["login", "inventory", "inv", "wallet", "create", "deleteplayer", "helpinventory", "add", "remove", "overwrite", "changelog", "dm"],
 		isValid: function (input) {
@@ -53,13 +53,12 @@ client.on("message", async (message) => {
 			});
 		}
 	};
-	const messageContentLowerCase = message.content.toLowerCase(),
-		messageArr = messageContentLowerCase.split(" "),
+	const messageArr = message.content.toLowerCase().split(" "),
 		command = messageArr[0].split("").slice(1).join(""),
-		commandKeywords = messageArr.slice(1), // used by the if statement
-		{ createResponseEmbed } = require("./utils/globalFunctions.js")(message);
+		commandKeywords = messageArr.slice(1); // used by the if statement
 	// End whole script if no valid command entered
 	if (!validCommands.isValid(command)) return;
+	const { createResponseEmbed } = require("./utils/globalFunctions.js")(message);
 
 	const checkMentionsAndPermissions = () => {
 		// Check whether acting upon author of the message or a mentioned user, or @ everyone
@@ -100,19 +99,18 @@ client.on("message", async (message) => {
 				const { add } = require("./commands/add");
 				currentPlayer.inventory = add(message, args, currentPlayer).inventory;
 				currentPlayer.writeChangelog(message.content);
-				let addResponse = await currentPlayer.updateOne({
+				await currentPlayer.updateOne({
 					inventory: currentPlayer.inventory,
 					changelog: currentPlayer.changelog,
 					lastUpdated: Date.now()
 				});
-				console.log(addResponse);
 
 				break;
 			case `remove`:
 				const removeItem = require("./commands/remove");
 				currentPlayer.inventory = removeItem(message, args, currentPlayer).inventory;
 				currentPlayer.writeChangelog(message.content);
-				currentPlayer.updateOne({
+				await currentPlayer.updateOne({
 					inventory: currentPlayer.inventory,
 					changelog: currentPlayer.changelog,
 					lastUpdated: Date.now()
@@ -123,7 +121,7 @@ client.on("message", async (message) => {
 				const overwrite = require("./commands/overwrite");
 				currentPlayer.inventory = overwrite(message, args, currentPlayer).inventory;
 				currentPlayer.writeChangelog(message.content);
-				let overwriteResponse = await currentPlayer.updateOne({
+				await currentPlayer.updateOne({
 					inventory: currentPlayer.inventory,
 					changelog: currentPlayer.changelog,
 					lastUpdated: Date.now()
@@ -131,9 +129,7 @@ client.on("message", async (message) => {
 
 				break;
 			case `create`:
-				console.log(currentPlayer);
 				if (currentPlayer) return createResponseEmbed("channel", "invalid", `This user already has an inventory set up!`);
-				console.log("Creating player...");
 				let [prepack, gold, silver, copper, DMsetting] = args;
 				let notificationsToDM = DMsetting === "DM" || DMsetting === "dm" ? true : false;
 				let createResponse;
@@ -157,9 +153,8 @@ client.on("message", async (message) => {
 
 				break;
 			case `deleteplayer`:
-				let deletion = await currentPlayer.remove();
-				if (deletion.deletedCount === 1) createResponseEmbed("channel", "success", `Player ${recipientPlayerName}'s inventory successfully deleted.`);
-				else createResponseEmbed("channel", "invalid", "Sorry, there was an error with the database server. Please try again.", currentPlayer);
+				await currentPlayer.remove();
+				createResponseEmbed("channel", "success", `Player ${recipientPlayerName}'s inventory successfully deleted.`);
 
 				break;
 			case `dm`:
