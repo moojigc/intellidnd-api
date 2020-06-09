@@ -2,15 +2,17 @@
   "name": "dnd-inventory-discord-bot",
   "version": "1.1.0",
   "description": "A Discord bot for handling inventory in DnD campaigns.",
-  "main": "index.js",
+  "main": "bot.js",
   "engines": {
     "node": "12.13.0",
     "npm": "6.12.0"
   },
   "scripts": {
-    "start": "node index.js",
+    "bot": "node bot.js",
     "test": "jest",
-    "open": "code . & nodemon"
+    "open web": "code . & nodemon server.js",
+    "open bot": "code . & nodemon bot.js",
+    "web": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -19,9 +21,18 @@
   "author": "M. Moojig Battsogt",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-flash": "^0.1.1",
+    "connect-mongodb-session": "^2.3.2",
     "discord.js": "^12.0.2",
+    "express": "^4.17.1",
+    "express-handlebars": "^4.0.4",
+    "express-session": "^1.17.1",
+    "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "mongoose": "^5.9.18",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
     "rand-token": "^1.0.1"
   },
   "bugs": {

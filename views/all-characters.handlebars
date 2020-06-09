@@ -1,0 +1,32 @@
+{{> navbar}}
+
+<main class="container wrapper">
+    <header>
+        <h1>All Characters</h1>
+    </header>
+    <div class="row">
+        <div class="col l8" style="margin-left: auto; margin-right: auto">
+            <div class="card">
+                <div class="card-body">
+                    <ul class="list-group">
+                        {{#each characters}}
+                        <form action="/change-default-char" method="POST">
+                            <input name="characterId" hidden value="{{_id}}">
+                            <li class="list-group-item">{{name}}
+                                <a href="/inventory/{{_id}}" class="btn">Inventory</a>
+                                <button type="submit" class="btn btn-info">Make default</button>
+                            </li>
+                        </form>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{#if successMsg}}
+    <h2 class="alert alert-success">{{successMsg}}</h2>
+    {{/if}}
+    {{#if errorMsg}}
+    <h2 class="alert alert-danger">{{errorMsg}}</h2>
+    {{/if}}
+</main>

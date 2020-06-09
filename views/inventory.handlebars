@@ -1,0 +1,105 @@
+{{> navbar}}
+<main class="container wrapper">
+    <header>
+        <h1>Hi, <strong>{{player.name}}!</strong></h1>
+    </header>
+
+    {{#with player}}
+    <form>
+        {{#with inventory}}
+        <div class="grid">
+            <div class="card potion-card">
+                <h3 class="delete-alert alert alert-success card-title" style="display: none;">
+                </h3>
+                <h3 class="card-title">Potions ⚗️
+                </h3>
+                <div class="card-content">
+                    {{#each potions}}
+                    <div class="row potion-row" data-name="{{name}}" data-quantity="{{quantity}}">
+                        {{> input}}
+                    </div>
+                    {{/each}}
+                    <div class="row potion-row">
+                        {{> input-nondynamic}}
+                    </div>
+                </div>
+                {{> add-btn}}
+            </div>
+            <div class="card weapon-card">
+                <h3 class="card-title">Weapons ⚔️</h3>
+                <div class="card-content">
+                    {{#each weapons}}
+                    <div class="row weapon-row" data-name="{{name}}" data-quantity="{{quantity}}">
+                        {{> input}}
+                    </div>
+                    {{/each}}
+                    <div class="row weapon-row">
+                        {{> input-nondynamic}}
+                    </div>
+                </div>
+                {{> add-btn}}
+            </div>
+            <div class="card misc-card">
+                <h3 class="card-title">Miscellaneous 🎒</h3>
+                <div class="card-content">
+                    {{#each misc}}
+                    <div class="row misc-row" data-name="{{name}}" data-quantity="{{quantity}}">
+                        {{> input}}
+                    </div>
+                    {{/each}}
+                    <div class="row misc-row">
+                        {{> input-nondynamic}}
+                    </div>
+                </div>
+                {{> add-btn}}
+            </div>
+
+            <div class="card money-card">
+                <h3 class="card-title">Money <i class="fas fa-coins" style="color: gold;"></i></h3>
+                <div class="card-content">
+                    <div class="card-grid">
+                        <div class="input-field">
+                            <label for="gold" class="prefixed-label">Gold</label>
+                            <input type="number" class="gold preloaded" placeholder="{{gold}}" value="{{gold}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="silver" class="prefixed-label">Silver</label>
+                            <input type="number" class="silver preloaded" placeholder="{{silver}}" value="{{silver}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="platinum" class="prefixed-label">Platinum</label>
+                            <input type="number" class="platinum preloaded" placeholder="{{platinum}}"
+                                value="{{platinum}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="copper" class="prefixed-label">Copper</label>
+                            <input type="number" class="copper preloaded" placeholder="{{copper}}" value="{{copper}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="electrum" class="prefixed-label">Electrum</label>
+                            <input type="number" class="electrum preloaded" placeholder="{{electrum}}"
+                                value="{{electrum}}">
+                        </div>
+                    </div>
+                    <p class="money-total"></p>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        {{/with}}
+        <aside class="card">
+            <h3 class="card-title">Change Log 📋</h3>
+            <ul class="list-group list-group-flush" style="max-height: 15rem; overflow-y: auto;">
+                {{#each changelog}}
+                <li class="list-group-item changelog-item" data-time="{{on}}"><code>{{command}}</code></li>
+                {{/each}}
+            </ul>
+        </aside>
+        <div class="row" style="justify-content: center;">
+            <button class="btn btn-danger col l5 mr-4 reset">Reset <i class="fas fa-undo"></i></button>
+            <button class="btn btn-light col l5 submit">Submit <i class="fas fa-save"></i></button>
+        </div>
+    </form>
+    {{/with}}
+</main>

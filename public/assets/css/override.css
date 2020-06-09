@@ -1,0 +1,29 @@
+.card input:not([type]),
+.card input[type="text"]:not(.browser-default),
+.card input[type="password"]:not(.browser-default),
+.card input[type="email"]:not(.browser-default),
+.card input[type="url"]:not(.browser-default),
+.card input[type="time"]:not(.browser-default),
+.card input[type="date"]:not(.browser-default),
+.card input[type="datetime"]:not(.browser-default),
+.card input[type="datetime-local"]:not(.browser-default),
+.card input[type="tel"]:not(.browser-default),
+.card input[type="number"]:not(.browser-default),
+.card input[type="search"]:not(.browser-default),
+textarea.materialize-textarea {
+	padding: 5px;
+	margin: 0;
+}
+
+.card .card-content {
+	padding: 0.25rem;
+}
+
+.card .row {
+	margin: 0;
+}
+
+.card-content .col,
+.card-content .col {
+	padding: 0;
+}
