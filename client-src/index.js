@@ -4,7 +4,7 @@ import moment from "moment";
 import money from "./money";
 import modal from "./modal";
 import { translateChangelog, validNumberInput, addRow } from "./helpers";
-import { Dropdown } from "materialize-css";
+import { Dropdown, Sidenav } from "materialize-css";
 
 const $modalBackground = $(".modal-background"),
 	$responseMsg = $(".response-msg");
@@ -107,6 +107,11 @@ function main() {
 		alignment: "right",
 		coverTrigger: false,
 		closeOnClick: true
+	});
+
+	new Sidenav(document.querySelector(".sidenav"), {
+		edge: "right",
+		draggable: true
 	});
 
 	adjFooter();
