@@ -139,7 +139,7 @@ function main() {
 		}
 	});
 	// Add rows
-	$("addBtn").on("click", (event) => {
+	$(".add-btn").on("click", (event) => {
 		event.preventDefault();
 		addRow($(event.target));
 	});
