@@ -1,5 +1,4 @@
 const { Schema, model } = require("mongoose");
-
 const PlayerSchema = new Schema({
 	discordId: {
 		type: String,
@@ -25,24 +24,9 @@ const PlayerSchema = new Schema({
 	inventory: {
 		type: Object,
 		default: {
-			potions: [
-				{
-					name: "none",
-					quantity: 0
-				}
-			],
-			weapons: [
-				{
-					name: "none",
-					quantity: 0
-				}
-			],
-			misc: [
-				{
-					name: "none",
-					quantity: 0
-				}
-			],
+			potions: [],
+			weapons: [],
+			misc: [],
 			gold: 0,
 			silver: 0,
 			copper: 0,
@@ -72,18 +56,8 @@ PlayerSchema.methods.createInventory = function (prepack, goldCoins, silverCoins
 			copper: parseInt(copperCoins ? copperCoins : 0),
 			platinum: 0,
 			electrum: 0,
-			potions: [
-				{
-					name: "none",
-					quantity: 0
-				}
-			],
-			weapons: [
-				{
-					name: "none",
-					quantity: 0
-				}
-			],
+			potions: [],
+			weapons: [],
 			misc: [
 				{
 					name: "crowbar",
@@ -119,24 +93,9 @@ PlayerSchema.methods.createInventory = function (prepack, goldCoins, silverCoins
 			copper: 0,
 			platinum: 0,
 			electrum: 0,
-			potions: [
-				{
-					name: "none",
-					quantity: 0
-				}
-			],
-			weapons: [
-				{
-					name: "none",
-					quantity: 0
-				}
-			],
-			misc: [
-				{
-					name: "none",
-					quantity: 0
-				}
-			]
+			potions: [],
+			weapons: [],
+			misc: []
 		};
 		this.inventory = empty;
 	}
@@ -156,7 +115,7 @@ PlayerSchema.methods.writeChangelog = function (command) {
 	} else {
 		this.changelog.push(change);
 	}
-	return this;
+	return this.changelog;
 };
 
 const Player = model("Player", PlayerSchema);

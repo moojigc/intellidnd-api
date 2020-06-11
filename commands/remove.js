@@ -1,6 +1,10 @@
 const Item = require("./add").Item;
-
-function removeItem(message, args, player) {
+/**
+ * @param {import("discord.js").Message} message
+ * @param {string | any[]} args
+ * @param {import("mongoose").Document} player
+ */
+async function removeItem(message, args, player) {
 	const { userEntry, coins, createResponseEmbed } = require("../utils/globalFunctions.js")(message),
 		cat = args[0],
 		removedItemArr = args.slice(1),
@@ -46,17 +50,13 @@ function removeItem(message, args, player) {
 					else return new Item(name, parseInt(quantity));
 				})
 				.filter((item) => !!item);
-			console.log("-----removedItemMap----");
-			console.log(removedItemMap);
 
 			// Check against existing objects
 			let changedBoolean = false;
 			let remaining = oldCategory
 				.map((old) => {
-					// For every index of oldCategory, catch its .name property against each item in removedItemMap
+					// For every index of oldCategory, check its .name property against each item in removedItemMap
 					let matches = removedItemMap.filter((removed) => removed.name === old.name);
-					console.log("-----matches----");
-					console.log(matches);
 					// Return old if no matches found
 					if (matches.length === 0) return old;
 					else {
@@ -64,25 +64,19 @@ function removeItem(message, args, player) {
 						let [reducedItem] = matches.map((match) => {
 							return old.removeQuantity(match.quantity);
 						});
-						console.log("-----reducedItem----");
-						console.log(reducedItem);
 						// If item quantity is now zero (or null), i.e. totally gone, return null
 						if (reducedItem.quantity === 0 || isNaN(reducedItem.quantity)) return null;
 						else return reducedItem;
 					}
 				})
 				.filter((item) => !!item);
-			console.log("----remaining-----");
-			console.log(remaining);
 
 			if (remaining.length === oldCategory.length && !changedBoolean) {
 				createResponseEmbed("send", "invalid", `Error: *${removedItemArr.join(" ")}* not found in ${cat}. Check spelling if your input should have matched an item.`, player);
 				return oldCategory;
 			} else if (remaining.length === 0) {
-				createResponseEmbed("send", "success", `Removed **${removedItem}** from *${player.name}'s* ${cat}.`, player);
-				return [new Item("none", 0)];
+				return null;
 			} else {
-				createResponseEmbed("send", "success", `Removed **${removedItem}** from *${player.name}'s* ${cat}.`, player);
 				return remaining;
 			}
 		};
@@ -92,7 +86,13 @@ function removeItem(message, args, player) {
 		} else if (!removedItem) {
 			createResponseEmbed("send", "invalid", `Remove what from ${cat}?`, player);
 		} else {
+			createResponseEmbed("send", "success", `Removed **${removedItem}** from *${player.name}'s* ${cat}.`, player);
 			player.inventory[cat] = removeFromCategory(player.inventory[cat], removedItemArr.join(" "));
+			await player.updateOne({
+				inventory: player.inventory,
+				lastUpdated: Date.now(),
+				changelog: player.writeChangelog(message)
+			});
 		}
 	}
 	return player;

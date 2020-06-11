@@ -1,4 +1,9 @@
-function overwrite(message, args, player) {
+/**
+ * @param {import("discord.js").Message} message
+ * @param {string | any[]} args
+ * @param {import("mongoose").Document} player
+ */
+async function overwrite(message, args, player) {
 	const { coins, userEntry, createResponseEmbed } = require("../utils/globalFunctions")(message);
 
 	const cat = args[0];
@@ -17,6 +22,11 @@ function overwrite(message, args, player) {
 		} else {
 			createResponseEmbed("send", "success", `${player.name} now has ${newItem} ${cat}.`, player);
 			player.inventory[cat] = parseInt(newItem);
+			await player.updateOne({
+				inventory: player.inventory,
+				changelog: player.writeChangelog(message.content),
+				lastUpdated: Date.now()
+			});
 		}
 	} else if (!userEntry.isValid(cat)) {
 		// Invalid entries
@@ -29,6 +39,11 @@ function overwrite(message, args, player) {
 		} else {
 			createResponseEmbed("send", "success", `Overwrote ${player.name}'s ${cat} to ${newItem}.`, player);
 			player.inventory[cat] = addQuantity(newItemArr, player.inventory[cat], "overwrite");
+			await player.updateOne({
+				inventory: player.inventory,
+				changelog: player.writeChangelog(message.content),
+				lastUpdated: Date.now()
+			});
 		}
 	}
 	return player;

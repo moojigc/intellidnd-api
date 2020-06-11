@@ -7,3 +7,5 @@
 /index_old.js
 /utils/logger.js
 .vscode/launch.json
+.eslintrc.json
+/public/dist

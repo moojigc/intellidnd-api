@@ -7,9 +7,11 @@
 	--fourth: #d5c6e0;
 	--fifth: #f5e6e8;
 	--accent: #d9b9f5;
-	--boxshadow: #00000047;
+	--darkgray: #00000047;
 	--gold: #ffcb51;
 	--dark: #00000047;
+	--boxshadow-ontop: 0 1rem 1.1rem -0.7rem var(--secondary);
+	--boxshadow-onbottom: 0 -1rem 1.1rem -0.7rem var(--secondary);
 	overflow-x: hidden;
 }
 
@@ -32,6 +34,9 @@ nav {
 	font-family: "Bellota Text", sans-serif;
 	background: var(--secondary);
 }
+nav .nav-wrapper {
+	box-shadow: var(--boxshadow-ontop);
+}
 
 nav .brand-logo {
 	display: flex;
@@ -41,6 +46,9 @@ nav .brand-logo {
 
 nav ul a {
 	font-size: 1.2rem;
+}
+.dropdown-content {
+	background: var(--fifth);
 }
 
 h1 {
@@ -55,8 +63,26 @@ h1 {
 	padding: 2rem;
 	border-radius: 0.3rem;
 	background: var(--secondary-trans);
-	box-shadow: 0 0 1rem 0.2rem var(--boxshadow);
+	box-shadow: 0 0 1rem 0.2rem var(--darkgray);
 	margin-bottom: 2rem;
+}
+.form-wrapper {
+	display: flex;
+	justify-content: center;
+}
+.form-wrapper form {
+	width: 50%;
+	margin: 0 !important;
+}
+
+.label-icon-parent {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.label-icon {
+	height: 100%;
+	margin: 0 auto;
 }
 
 code {
@@ -65,12 +91,10 @@ code {
 	color: #e83e8c;
 }
 
-.player-name-display,
-.login-header,
 header {
 	background: var(--accent);
 	color: black;
-	box-shadow: inset 0 -1rem 1.1rem -0.7rem var(--secondary);
+	box-shadow: inset var(--boxshadow-onbottom);
 	margin: -2rem -2rem 1rem -2rem;
 	padding: 0.7rem;
 	border-radius: 0.3rem 0.3rem 0 0;
@@ -198,7 +222,7 @@ card-content {
 
 .card li,
 .card ul {
-	background: var(--boxshadow);
+	background: var(--darkgray);
 	box-shadow: inset 0 0 2rem 0.05rem var(--dark);
 }
 
@@ -225,8 +249,8 @@ input[readonly],
 input,
 input:focus {
 	color: white;
-	background-color: var(--boxshadow);
-	border: 1px solid var(--boxshadow);
+	background-color: var(--darkgray);
+	border: 1px solid var(--darkgray);
 	box-shadow: inset 0 0 2rem 0.05rem var(--dark);
 }
 input:focus {
@@ -276,7 +300,7 @@ input::placeholder {
 	font-weight: bold;
 	position: relative;
 	border-radius: 0.2rem;
-	box-shadow: 0px 0px 10px 1px var(--boxshadow);
+	box-shadow: 0px 0px 10px 1px var(--darkgray);
 	background: var(--secondary);
 }
 
