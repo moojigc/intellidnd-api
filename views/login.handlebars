@@ -3,30 +3,27 @@
     <header>
         <h1>Login</h1>
     </header>
-    <div class="row" style="display: flex; justify-content: center;">
-        <div class="col l8" style="margin: 0;">
-            <form action="/api/login" method="POST">
-                <div class="input-field">
-                    <i class="material-icons prefix">account_circle</i>
-                    <input required type="text" class="validate username" name="username" placeholder="Enter username">
-                </div>
-                <div class="input-field">
-                    <i class="material-icons prefix">fingerprint</i>
-                    <input required type="password" class="validate password" name="password"
-                        placeholder="Enter password">
-                </div>
-                {{#if error}}
-                <div class="row alert alert-warning">{{error}}</div>
-                {{/if}}
-                {{#if errorMsg}}
-                <div class="row alert alert-warning">{{errorMsg}}</div>
-                {{/if}}
-                {{#if successMsg}}
-                <div class="row alert alert-success">{{successMsg}}</div>
-                {{/if}}
-                <button type="submit" class="btn btn-primary login-btn">Login</button>
-            </form>
-        </div>
+    <div class="row form-wrapper">
+        <form action="/api/login" method="POST">
+            <div class="input-field">
+                <i class="material-icons prefix">account_circle</i>
+                <input required type="text" class="validate username" name="username" placeholder="Enter username">
+            </div>
+            <div class="input-field">
+                <i class="material-icons prefix">fingerprint</i>
+                <input required type="password" class="validate password" name="password" placeholder="Enter password">
+            </div>
+            {{#if error}}
+            <div class="row alert alert-warning">{{error}}</div>
+            {{/if}}
+            {{#if errorMsg}}
+            <div class="row alert alert-warning">{{errorMsg}}</div>
+            {{/if}}
+            {{#if successMsg}}
+            <div class="row alert alert-success">{{successMsg}}</div>
+            {{/if}}
+            <button type="submit" class="btn btn-primary login-btn">Login</button>
+        </form>
     </div>
     <a href="/register">Click here to register.</a>
 </main>

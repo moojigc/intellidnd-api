@@ -1,8 +1,7 @@
 const { Player, User } = require("../models"),
 	{ ObjectId } = require("mongoose").Types,
 	passport = require("passport"),
-	{ isEqual, filter, isMatch } = require("lodash"),
-	moment = require("moment"),
+	{ isEqual } = require("lodash"),
 	isAuth = require("../config/middleware/isAuth"),
 	userStatus = (req) => {
 		return {
@@ -10,20 +9,25 @@ const { Player, User } = require("../models"),
 			loggedIn: req.user ? true : false
 		};
 	},
-	serverError = (res) => res.redirect("/server-error");
+	serverError = (res) => res.status(500).redirect("/server-error");
 
 module.exports = (app) => {
 	app.post("/api/register", async (req, res) => {
 		let { email, username, password, password2, token, characterName } = req.body;
+		console.log(req.body);
 		let playerData = await Player.findOne({ token: token, name: characterName });
 
 		if (!playerData) {
 			req.flash("errorMsg", "Token or player name does not match. Please double check.");
-			res.json({ redirectURL: "/register" });
+			res.redirect("/register");
+			// Player registered to another user
+		} else if (playerData.webUserId) {
+			req.flash("errorMsg", "Player is already registered. If you think this is incorrect, please reset your token.");
+			res.redirect("/register");
 			// If any field is empty
 		} else if (username === "" || password === "" || password2 === "") {
 			req.flash("errorMsg", "Please fill in all required fields.");
-			res.json({ redirectURL: "/register" });
+			res.redirect("/register");
 			// Passwords match
 		} else if (password === password2) {
 			// Check for usernames
@@ -32,7 +36,7 @@ module.exports = (app) => {
 			// If username taken
 			if (response) {
 				req.flash("errorMsg", "Username already taken!");
-				res.json({ redirectURL: "/register" });
+				res.redirect("/register");
 				// Username not taken
 			} else {
 				let user = new User({
@@ -42,19 +46,19 @@ module.exports = (app) => {
 					characters: [playerData._id]
 				});
 				await user.encryptPass();
-				let userInsert = await user.save();
+				let userInsert = await User.create(user.toObject());
 				console.log(userInsert);
 				if (userInsert) {
 					req.flash("successMsg", `Welcome, player ${user.username}!`);
-					res.json({ redirectURL: "/login" });
+					res.redirect("/login");
 				} else {
 					req.flash("errorMsg", "Could not register you. Please try again later.");
-					res.json({ redirectURL: "/register" });
+					res.redirect("/register");
 				}
 			}
 		} else {
 			req.flash("errorMsg", "Passwords do not match.");
-			res.json({ redirectURL: "/register" });
+			res.redirect("/register");
 		}
 	});
 
@@ -132,10 +136,6 @@ module.exports = (app) => {
 	});
 	// Update route. Also used for deleting of single items bc it uses the same logic
 	app.put("/inventory", isAuth, async (req, res) => {
-		if (!req.user) {
-			req.flash("Please login again.");
-			res.json({ redirectURL: "/login" });
-		}
 		try {
 			// Add new logs from front-end to the player instance
 			let player = await Player.findOne({ webUserId: ObjectId(req.user) });
@@ -226,8 +226,7 @@ module.exports = (app) => {
 					// Update player with new webUserId, update user with new player IDs
 					let playerResponse = await Player.updateOne({ _id: ObjectId(playerData._id) }, { webUserId: req.user });
 					let userResponse = await User.updateOne({ _id: ObjectId(req.user) }, { $push: { players: playerData._id } });
-					console.log(playerResponse);
-					console.log(userResponse);
+
 					if (userResponse.nModified === 1 && playerResponse.nModified === 1) {
 						req.flash("successMsg", `Added ${playerData.name} to your list of characters.`);
 						res.redirect("/add-character");

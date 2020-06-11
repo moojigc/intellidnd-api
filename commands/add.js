@@ -13,7 +13,7 @@ class Item {
 
 function addQuantity(newItemArr, thisCategory, addOrOverwriteQ) {
 	let newItem = newItemArr.filter((item) => item !== "").join(" ");
-	let category = thisCategory.slice().filter((item) => item.name !== "none");
+	let category = thisCategory.slice();
 	let thisItemName = newItemArr.filter((item) => isNaN(item) && item !== " ").join(" "); // Filter out numbers and extra spaces
 	let number = parseInt(newItemArr.filter((item) => !isNaN(item) && item !== "")[0]);
 	let thisItemMap;
@@ -92,7 +92,7 @@ function add(message, args, player) {
 		// Non-money items
 		function addToCategory(thisCategory) {
 			// Adds to new items
-			let category = thisCategory.slice().filter((item) => item.name !== "none");
+			let category = thisCategory.slice();
 
 			createResponseEmbed("send", "success", `Added ${newItem} to ${player.name}'s ${cat}!`, player);
 

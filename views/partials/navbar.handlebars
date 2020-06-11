@@ -1,3 +1,21 @@
+<ul id="dropdown1" class="dropdown-content">
+    <li class="nav-item">
+        {{#if userStatus.loggedIn}}
+        <a class="nav-link" href="/logout">Logout</a>
+        {{/if}}
+        {{#if userStatus.loggedOut}}
+        <a class="nav-link" href="/login">Login</a>
+        {{/if}}
+    </li>
+    {{#if userStatus.loggedIn}}
+    <li class="nav-item">
+        <a class="nav-link" href="/add-character">Add character</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/all-characters">See all characters</a>
+    </li>
+    {{/if}}
+</ul>
 <nav>
     <div class="nav-wrapper">
         <div class="brand-logo">
@@ -10,6 +28,10 @@
             </a>
         </div>
         <ul class="right hide-on-med-and-down">
+            <li>
+                <a class="dropdown-trigger" href="#!" data-target="dropdown1">Settings<i
+                        class="material-icons right">arrow_drop_down</i></a>
+            </li>
             {{#if userStatus.loggedIn}}
             <li class="nav-item">
                 <a class="nav-link" href="/inventory">Inventory</a>
@@ -18,19 +40,6 @@
             <li class="nav-item">
                 <a class="nav-link" href="/">Guide</a>
             </li>
-            <li class="nav-item">
-                {{#if userStatus.loggedIn}}
-                <a class="nav-link" href="/logout">Logout</a>
-                {{/if}}
-                {{#if userStatus.loggedOut}}
-                <a class="nav-link" href="/login">Login</a>
-                {{/if}}
-            </li>
-            {{#if userStatus.loggedIn}}
-            <li class="nav-item">
-                <a class="nav-link" href="/add-character">Characters</a>
-            </li>
-            {{/if}}
         </ul>
     </div>
 </nav>

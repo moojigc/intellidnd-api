@@ -3,29 +3,27 @@
     <header>
         <h1>Add a Character</h1>
     </header>
-    <div class="row justify-content-center">
-        <div class="col l8">
-            <div class="row" style="justify-content: center;">
-                <h5>Info from Discord Bot</h5>
+    <div class="row form-wrapper">
+        <form action="/api/add-character" method="POST">
+            <h5 class="row">Info from Discord bot</h5>
+            <div class="input-field">
+                <i class="material-icons prefix">person_add</i>
+                <input required type="text" class="validate characterName" name="characterName"
+                    placeholder="Enter character name">
+                <small>Enter your character name exactly as it is on
+                    Discord.</small>
             </div>
-            <form action="/api/add-character" method="POST">
-                <div class="row">
-                    <input type="text" class="form-control characterName" name="characterName"
-                        placeholder="Enter character name">
-                    <small>Enter your character name exactly as it is on
-                        Discord.</small>
-                </div>
-                <div class="row">
-                    <input type="text" class="form-control token" name="token" placeholder="Enter token">
-                </div>
-                {{#if successMsg}}
-                <div class="row alert alert-success">{{successMsg}}</div>
-                {{/if}}
-                {{#if errorMsg}}
-                <div class="row alert alert-danger">{{errorMsg}}</div>
-                {{/if}}
-                <button class="btn btn-primary" type="submit">Submit</button>
-            </form>
-        </div>
+            <div class="input-field">
+                <i class="material-icons prefix">vpn_key</i>
+                <input required type="text" class="token validate" name="token" placeholder="Enter token">
+            </div>
+            {{#if successMsg}}
+            <div class="row alert alert-success">{{successMsg}}</div>
+            {{/if}}
+            {{#if errorMsg}}
+            <div class="row alert alert-danger">{{errorMsg}}</div>
+            {{/if}}
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </form>
     </div>
 </main>

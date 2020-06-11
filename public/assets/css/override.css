@@ -27,3 +27,14 @@ textarea.materialize-textarea {
 .card-content .col {
 	padding: 0;
 }
+
+.character-collection {
+	padding: 0 !important;
+}
+.character-collection .collection-item {
+	margin: 0;
+	background: var(--primary) !important;
+}
+.dropdown-content li > a {
+	color: black;
+}

@@ -36,12 +36,12 @@ client.on("guildCreate", async (guild) => {
 
 client.on("message", async (message) => {
 	if (process.env.PORT && message.guild.name === "Bot Testing") return;
+	if (message.content.split("")[0] !== "/") return;
 	if (message.channel.type === "dm" && !message.author.bot) {
 		const regexTest = /fuck|dick|stupid/.test(message.content); // Hidden easter egg lol
 		if (regexTest) return message.author.send(`:poop:僕は悪いボットではないよ！`).catch(console.error);
 		else return message.author.send(`Messages to this bot are not monitored. If you have any issues or feature requests, please go to https://github.com/moojigc/DiscordBot/issues.`);
 	}
-	if (message.content.split("")[0] !== "/") return;
 	// stops function if author is the bot itself
 	if (message.author === client.user) return;
 	const validCommands = {
@@ -65,12 +65,18 @@ client.on("message", async (message) => {
 		if (message.mentions.users.array().length > 0 || message.mentions.everyone) {
 			const nullObject = { id: null, displayName: "@everyone" }; // Prevents errors when getting the inventory of @everyone
 			if (!message.member.hasPermission("BAN_MEMBERS") || !message.member.hasPermission("KICK_MEMBERS")) {
-				return createResponseEmbed("channel", "invalid", `User <@${message.author.id}> does not have sufficient privileges for this action.`);
-			} else
+				createResponseEmbed("channel", "invalid", `User <@${message.author.id}> does not have sufficient privileges for this action.`);
+				return {
+					args: [""],
+					recipientPlayerObject: message.member,
+					insufficientPerms: true
+				};
+			} else {
 				return {
 					args: commandKeywords.slice(1), // accounts for @mention being the 2nd word in the message
 					recipientPlayerObject: commandKeywords[0] === "@everyone" ? nullObject : message.mentions.members.first()
 				};
+			}
 		} else {
 			return {
 				args: commandKeywords.slice(0),
@@ -78,8 +84,10 @@ client.on("message", async (message) => {
 			};
 		}
 	};
-	const { args, recipientPlayerObject } = checkMentionsAndPermissions(),
+
+	const { args, recipientPlayerObject, insufficientPerms } = checkMentionsAndPermissions(),
 		recipientPlayerName = recipientPlayerObject.displayName;
+	if (insufficientPerms) return;
 
 	try {
 		let currentGuild = await Guild.findOne({ discordId: message.guild.id });
@@ -90,77 +98,44 @@ client.on("message", async (message) => {
 			case `inventory`:
 				const { showInventory } = require("./commands/inv_wallet")(message);
 				await showInventory(currentPlayer, currentGuild);
+
 				break;
 			case `wallet`:
 				const { showWallet } = require("./commands/inv_wallet")(message);
 				await showWallet(currentPlayer, currentGuild);
+
 				break;
 			case `add`:
 				const { add } = require("./commands/add");
-				currentPlayer.inventory = add(message, args, currentPlayer).inventory;
-				currentPlayer.writeChangelog(message.content);
 				await currentPlayer.updateOne({
-					inventory: currentPlayer.inventory,
-					changelog: currentPlayer.changelog,
+					inventory: add(message, args, currentPlayer).inventory,
+					changelog: currentPlayer.writeChangelog(message.content),
 					lastUpdated: Date.now()
 				});
 
 				break;
 			case `remove`:
 				const removeItem = require("./commands/remove");
-				currentPlayer.inventory = removeItem(message, args, currentPlayer).inventory;
-				currentPlayer.writeChangelog(message.content);
-				await currentPlayer.updateOne({
-					inventory: currentPlayer.inventory,
-					changelog: currentPlayer.changelog,
-					lastUpdated: Date.now()
-				});
+				await removeItem(message, args, currentPlayer);
 
 				break;
 			case `overwrite`:
 				const overwrite = require("./commands/overwrite");
-				currentPlayer.inventory = overwrite(message, args, currentPlayer).inventory;
-				currentPlayer.writeChangelog(message.content);
-				await currentPlayer.updateOne({
-					inventory: currentPlayer.inventory,
-					changelog: currentPlayer.changelog,
-					lastUpdated: Date.now()
-				});
+				await overwrite(message, args, currentPlayer);
 
 				break;
 			case `create`:
-				if (currentPlayer) return createResponseEmbed("channel", "invalid", `This user already has an inventory set up!`);
-				let [prepack, gold, silver, copper, DMsetting] = args;
-				let notificationsToDM = DMsetting === "DM" || DMsetting === "dm" ? true : false;
-				let createResponse;
-				let player = new Player({
-					name: recipientPlayerName,
-					discordId: recipientPlayerObject.id + message.guild.id,
-					guildId: message.guild.id,
-					guild: message.guild.name,
-					notificationsToDM: notificationsToDM
+				const create = require("./commands/create");
+				await create({
+					createResponseEmbed: createResponseEmbed,
+					Player: Player,
+					Guild: Guild,
+					currentGuild: currentGuild,
+					currentPlayer: currentPlayer,
+					args: args,
+					recipientPlayerObject: recipientPlayerObject,
+					message: message
 				});
-				player.writeChangelog(message.content);
-				if (prepack === "prepack") {
-					player.createInventory("prepack", gold, silver, copper);
-					createResponse = await player.save();
-				} else {
-					player.createInventory();
-					createResponse = await player.save();
-				}
-				if (currentGuild) {
-					await Guild.create({
-						players: createResponse._id
-					});
-				} else {
-					await currentGuild.updateOne({
-						$push: {
-							players: currentPlayer._id
-						}
-					});
-				}
-				if (createResponse) createResponseEmbed("channel", "success", `Created ${recipientPlayerName}'s inventory!`, currentPlayer);
-				else createResponseEmbed("channel", "invalid", "Sorry, there was an error with the database server. Please try again.", currentPlayer);
 
 				break;
 			case `deleteplayer`:
@@ -170,11 +145,9 @@ client.on("message", async (message) => {
 				break;
 			case `dm`:
 				const dm = require("./commands/dm");
-				currentPlayer.notificationsToDM = dm(message, currentPlayer).notificationsToDM;
-				currentPlayer.writeChangelog(message.content);
 				await currentPlayer.updateOne({
-					notificationsToDM: currentPlayer.notificationsToDM,
-					changelog: currentPlayer.changelog,
+					notificationsToDM: dm(message, currentPlayer).notificationsToDM,
+					changelog: currentPlayer.writeChangelog(message.content),
 					lastUpdated: Date.now()
 				});
 

@@ -3,7 +3,6 @@
     <header>
         <h1>Hi, <strong>{{player.name}}!</strong></h1>
     </header>
-
     {{#with player}}
     <form>
         {{#with inventory}}
@@ -40,7 +39,8 @@
                 {{> add-btn}}
             </div>
             <div class="card misc-card">
-                <h3 class="card-title">Miscellaneous 🎒</h3>
+                <h3 class="card-title">Miscellaneous <img src="/assets/images/bag-only.png" alt="bag"
+                        class="title-image"></h3>
                 <div class="card-content">
                     {{#each misc}}
                     <div class="row misc-row" data-name="{{name}}" data-quantity="{{quantity}}">

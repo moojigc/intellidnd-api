@@ -5,7 +5,7 @@ const express = require("express"),
 	MongoDBStore = require("connect-mongodb-session")(session),
 	passport = require("./config/passport"),
 	flash = require("connect-flash"),
-	PORT = process.env.PORT || 3000,
+	PORT = process.env.PORT || 3001,
 	MONGODB_URI = process.env.MONGODB_URI || require("./private.json").dev.MONGODB_URI;
 
 mongoose
@@ -34,7 +34,8 @@ app.use(express.static("public"))
 			secret: process.env.SESS_SECRET || "deku",
 			resave: true,
 			saveUninitialized: false,
-			store: Store
+			store: Store,
+			sameSite: true
 		})
 	)
 	.use(passport.initialize())
