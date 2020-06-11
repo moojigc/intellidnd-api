@@ -9,7 +9,7 @@
   },
   "scripts": {
     "watch": "webpack --watch",
-    "build": "webpack",
+    "build": "webpack --mode=production",
     "bot": "node bot.js",
     "test": "jest",
     "openweb": "code . & nodemon server.js",
