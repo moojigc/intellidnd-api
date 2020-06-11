@@ -1,9 +1,0 @@
-{
-  "name": "DnD Inventory",
-  "short_name": "DnD Inv",
-  "orientation": "portrait",
-  "display": "standalone",
-  "start_url": "/",
-  "theme_color": "#9b59b6",
-  "background_color": "#192a51"
-}

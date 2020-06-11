@@ -8,4 +8,4 @@
 /utils/logger.js
 .vscode/launch.json
 .eslintrc.json
-webpack.config.js
+/public/dist
