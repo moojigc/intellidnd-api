@@ -88,11 +88,13 @@
         </div>
 
         {{/with}}
-        <aside class="card">
-            <h3 class="card-title">Change Log 📋</h3>
-            <ul class="list-group list-group-flush" style="max-height: 15rem; overflow-y: auto;">
+        <aside class="card" style="margin-top: 0.5rem; background: transparent;">
+            <h3 class="card-title" style="margin: 0; padding: 0.5rem; background: var(--third);">Change Log 📋</h3>
+            <ul class="collection" style="max-height: 15rem; overflow-y: auto; margin-top: 0;">
                 {{#each changelog}}
-                <li class="list-group-item changelog-item" data-time="{{on}}"><code>{{command}}</code></li>
+                <li class="collection-item changelog-item" style="background: transparent; border: unset;"
+                    data-time="{{on}}">
+                    <code>{{command}}</code></li>
                 {{/each}}
             </ul>
         </aside>

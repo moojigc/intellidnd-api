@@ -4,7 +4,7 @@
  */
 export function translateChangelog($changelogItem, moment) {
 	$changelogItem.get().forEach((item) => {
-		let rawTime = parseInt(item.dataset.time);
+		let rawTime = item.dataset.time.split("").length > 13 ? item.dataset.time : parseInt(item.dataset.time);
 		let text = item.innerText;
 		let date = moment(rawTime).format("MMMM Do, YYYY");
 		let time = moment(rawTime).format("hh:mm a");

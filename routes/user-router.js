@@ -141,26 +141,23 @@ module.exports = (app) => {
 			let player = await Player.findOne({ webUserId: ObjectId(req.user) });
 			// Destructure the inventory Object from request body
 			let { gold, silver, copper, platinum, electrum, potions, weapons, misc } = req.body.inventory;
-			// Fix the numbers...
-			// HTTP prot only sends strings, so you must convert strings to numbers
-			function correctTypes(category) {
-				if (!category || category === "") {
-					return [
-						{
-							name: "none",
-							quantity: 0
-						}
-					];
+			/**
+			 * Fix the numbers...
+			 * HTTP prot only sends strings, so you must convert strings to numbers
+			 * @param {Array} category
+			 */
+			const correctTypes = (category) => {
+				if (!category) {
+					return [];
 				} else {
-					let unNulled = category.filter((item) => item.name !== "none");
-					return unNulled.map((item) => {
+					return category.map((item) => {
 						return {
 							name: item.name,
 							quantity: parseInt(item.quantity)
 						};
 					});
 				}
-			}
+			};
 			// Just running parseInt and correctTypes to fix the stupid numbers first...
 			const inventory = {
 				gold: parseInt(gold),
