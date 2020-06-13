@@ -1,5 +1,5 @@
 {{> navbar}}
-<main class="container wrapper">
+<main class="container wrapper inventory">
     <header>
         <h1>Hi, <strong>{{player.name}}!</strong></h1>
     </header>
@@ -60,25 +60,23 @@
                     <div class="card-grid">
                         <div class="input-field">
                             <label for="gold" class="prefixed-label">Gold</label>
-                            <input type="number" class="gold preloaded" placeholder="{{gold}}" value="{{gold}}">
+                            <input type="number" class="gold preloaded" placeholder="0" value="{{gold}}">
                         </div>
                         <div class="input-field">
                             <label for="silver" class="prefixed-label">Silver</label>
-                            <input type="number" class="silver preloaded" placeholder="{{silver}}" value="{{silver}}">
+                            <input type="number" class="silver preloaded" placeholder="0" value="{{silver}}">
                         </div>
                         <div class="input-field">
                             <label for="platinum" class="prefixed-label">Platinum</label>
-                            <input type="number" class="platinum preloaded" placeholder="{{platinum}}"
-                                value="{{platinum}}">
+                            <input type="number" class="platinum preloaded" placeholder="0" value="{{platinum}}">
                         </div>
                         <div class="input-field">
                             <label for="copper" class="prefixed-label">Copper</label>
-                            <input type="number" class="copper preloaded" placeholder="{{copper}}" value="{{copper}}">
+                            <input type="number" class="copper preloaded" placeholder="0" value="{{copper}}">
                         </div>
                         <div class="input-field">
                             <label for="electrum" class="prefixed-label">Electrum</label>
-                            <input type="number" class="electrum preloaded" placeholder="{{electrum}}"
-                                value="{{electrum}}">
+                            <input type="number" class="electrum preloaded" placeholder="0" value="{{electrum}}">
                         </div>
                     </div>
                     <p class="money-total"></p>
@@ -86,7 +84,6 @@
             </div>
         </div>
         </div>
-
         {{/with}}
         <aside class="card" style="margin-top: 0.5rem; background: transparent;">
             <h3 class="card-title" style="margin: 0; padding: 0.5rem; background: var(--third);">Change Log 📋</h3>
@@ -98,9 +95,11 @@
                 {{/each}}
             </ul>
         </aside>
-        <div class="row" style="justify-content: center;">
-            <button class="btn btn-danger col l5 mr-4 reset">Reset <i class="fas fa-undo"></i></button>
-            <button class="btn btn-light col l5 submit">Submit <i class="fas fa-save"></i></button>
+        <div class="row" style="display: flex; justify-content: space-around;">
+            <button class="btn btn-large red darken-1 waves-effect waves-orange reset" type="button">Reset <i
+                    class="material-icons right">undo</i></button>
+            <button class="btn btn-large purple lighten-1 waves-effect waves-orange submit" type="submit">Save <i
+                    class="material-icons right">send</i></button>
         </div>
     </form>
     {{/with}}

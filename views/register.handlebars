@@ -32,11 +32,12 @@
                 <input type="password" class="validate password2" name="password2" placeholder="Confirm password">
             </div>
             {{#if errorMsg}}
-            <div class="row alert alert-warning">{{errorMsg}}</div>
+            <div class="row alert alert-danger">{{errorMsg}}</div>
             {{/if}}
-            <button type="submit" class="row btn btn-primary register-user">Submit<i
+            <button type="submit"
+                class="btn btn-large purple lighten-1 waves-effect waves-orange register-user">Submit<i
                     class="material-icons right">send</i></button>
         </form>
     </div>
-    <a href="/login">Have an account? Login here.</a>
+    <a href="/login"><b>Have an account? Login here.</b></a>
 </main>

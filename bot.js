@@ -35,15 +35,13 @@ client.on("guildCreate", async (guild) => {
 });
 
 client.on("message", async (message) => {
-	if (process.env.PORT && message.guild.name === "Bot Testing") return;
-	if (message.content.split("")[0] !== "/") return;
+	if ((process.env.PORT && message.guild.name === "Bot Testing") || message.author.bot) return;
 	if (message.channel.type === "dm" && !message.author.bot) {
 		const regexTest = /fuck|dick|stupid/.test(message.content); // Hidden easter egg lol
 		if (regexTest) return message.author.send(`:poop:僕は悪いボットではないよ！`).catch(console.error);
 		else return message.author.send(`Messages to this bot are not monitored. If you have any issues or feature requests, please go to https://github.com/moojigc/DiscordBot/issues.`);
 	}
-	// stops function if author is the bot itself
-	if (message.author === client.user) return;
+	if (message.content.split("")[0] !== "/") return;
 	const validCommands = {
 		commands: ["login", "inventory", "inv", "wallet", "create", "deleteplayer", "helpinventory", "add", "remove", "overwrite", "changelog", "dm"],
 		isValid: function (input) {
@@ -68,102 +66,128 @@ client.on("message", async (message) => {
 				createResponseEmbed("channel", "invalid", `User <@${message.author.id}> does not have sufficient privileges for this action.`);
 				return {
 					args: [""],
-					recipientPlayerObject: message.member,
+					recipientPlayer: message.member,
 					insufficientPerms: true
 				};
 			} else {
 				return {
 					args: commandKeywords.slice(1), // accounts for @mention being the 2nd word in the message
-					recipientPlayerObject: commandKeywords[0] === "@everyone" ? nullObject : message.mentions.members.first()
+					recipientPlayer: commandKeywords[0] === "@everyone" ? nullObject : message.mentions.members.first()
 				};
 			}
 		} else {
 			return {
 				args: commandKeywords.slice(0),
-				recipientPlayerObject: message.member // all commands will be carried out on the author of the message
+				recipientPlayer: message.member // all commands will be carried out on the author of the message
 			};
 		}
 	};
 
-	const { args, recipientPlayerObject, insufficientPerms } = checkMentionsAndPermissions(),
-		recipientPlayerName = recipientPlayerObject.displayName;
+	const { args, recipientPlayer, insufficientPerms } = checkMentionsAndPermissions();
 	if (insufficientPerms) return;
 
 	try {
 		let currentGuild = await Guild.findOne({ discordId: message.guild.id });
-		let currentPlayer = await Player.findOne({ discordId: recipientPlayerObject.id + message.guild.id });
-		if (!currentPlayer && command !== "create" && command !== "helpinventory" && recipientPlayerName !== "@everyone") return createResponseEmbed("channel", "invalid", `No data for ${recipientPlayerName}. Run /create to start an inventory for this player.`);
+		let currentPlayer = await Player.findOne({ discordId: recipientPlayer.id + message.guild.id });
+		if (!currentPlayer && command !== "create" && command !== "helpinventory" && recipientPlayer.displayName !== "@everyone") return createResponseEmbed("channel", "invalid", `No data for ${recipientPlayer.displayName}. Run /create to start an inventory for this player.`);
+		// Auto change names
+		if (currentPlayer.name !== recipientPlayer.displayName) {
+			currentPlayer.name = recipientPlayer.displayName;
+			Player.updateOne({ name: recipientPlayer.displayName }).catch(console.error);
+		}
 		switch (command) {
 			case `inv`:
 			case `inventory`:
-				const { showInventory } = require("./commands/inv_wallet")(message);
-				await showInventory(currentPlayer, currentGuild);
+				{
+					const { showInventory } = require("./commands/inv_wallet")(message);
+					await showInventory(currentPlayer, currentGuild);
+				}
 
 				break;
 			case `wallet`:
-				const { showWallet } = require("./commands/inv_wallet")(message);
-				await showWallet(currentPlayer, currentGuild);
+				{
+					const { showWallet } = require("./commands/inv_wallet")(message);
+					await showWallet(currentPlayer, currentGuild);
+				}
 
 				break;
 			case `add`:
-				const { add } = require("./commands/add");
-				await currentPlayer.updateOne({
-					inventory: add(message, args, currentPlayer).inventory,
-					changelog: currentPlayer.writeChangelog(message.content),
-					lastUpdated: Date.now()
-				});
+				{
+					const { add } = require("./commands/add");
+					await currentPlayer.updateOne({
+						inventory: add(message, args, currentPlayer).inventory,
+						changelog: currentPlayer.writeChangelog(message.content),
+						lastUpdated: Date.now()
+					});
+				}
 
 				break;
 			case `remove`:
-				const removeItem = require("./commands/remove");
-				await removeItem(message, args, currentPlayer);
+				{
+					const removeItem = require("./commands/remove");
+					await removeItem(message, args, currentPlayer);
+				}
 
 				break;
 			case `overwrite`:
-				const overwrite = require("./commands/overwrite");
-				await overwrite(message, args, currentPlayer);
+				{
+					const overwrite = require("./commands/overwrite");
+					await overwrite(message, args, currentPlayer);
+				}
 
 				break;
 			case `create`:
-				const create = require("./commands/create");
-				await create({
-					createResponseEmbed: createResponseEmbed,
-					Player: Player,
-					Guild: Guild,
-					currentGuild: currentGuild,
-					currentPlayer: currentPlayer,
-					args: args,
-					recipientPlayerObject: recipientPlayerObject,
-					message: message
-				});
+				{
+					const create = require("./commands/create");
+					await create({
+						createResponseEmbed: createResponseEmbed,
+						Player: Player,
+						Guild: Guild,
+						currentGuild: currentGuild,
+						currentPlayer: currentPlayer,
+						args: args,
+						recipientPlayer: recipientPlayer,
+						message: message
+					});
+				}
 
 				break;
 			case `deleteplayer`:
-				await currentPlayer.remove();
-				createResponseEmbed("channel", "success", `Player ${recipientPlayerName}'s inventory successfully deleted.`);
+				{
+					await currentPlayer.remove();
+					createResponseEmbed("channel", "success", `Player ${recipientPlayer.displayName}'s inventory successfully deleted.`);
+				}
 
 				break;
 			case `dm`:
-				const dm = require("./commands/dm");
-				await currentPlayer.updateOne({
-					notificationsToDM: dm(message, currentPlayer).notificationsToDM,
-					changelog: currentPlayer.writeChangelog(message.content),
-					lastUpdated: Date.now()
-				});
+				{
+					const dm = require("./commands/dm");
+					await currentPlayer.updateOne({
+						notificationsToDM: dm(message, currentPlayer).notificationsToDM,
+						changelog: currentPlayer.writeChangelog(message.content),
+						lastUpdated: Date.now()
+					});
+				}
 
 				break;
 			case `helpinventory`:
-				const help = require("./commands/help");
-				help(message);
+				{
+					const help = require("./commands/help");
+					help(message);
+				}
 				break;
 			case `changelog`:
-				const changelog = require("./commands/changelog");
-				changelog(message, currentPlayer, moment);
+				{
+					const changelog = require("./commands/changelog");
+					changelog(message, currentPlayer, moment);
+				}
 				break;
 
 			case `login`:
-				const webLogin = require("./commands/login");
-				webLogin(message, currentPlayer);
+				{
+					const webLogin = require("./commands/login");
+					webLogin(message, currentPlayer);
+				}
 				break;
 
 			default:

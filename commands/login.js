@@ -1,10 +1,12 @@
 const { suid } = require("rand-token");
-
-// This function allows user and Dungeon Master to access their inventory from the web.
+/**
+ * This function allows user and Dungeon Master to access their inventory from the web.
+ * @param {import("discord.js").Message} message
+ * @param {import("../models/Player")} player
+ */
 async function webLogin(message, player) {
 	const { MessageEmbed } = require("discord.js");
-	const url = process.env.MONGODB_URI ? `https://dnd-inventory-web.herokuapp.com/login/` : `http://localhost:3000/login/`;
-	console.log(player.token);
+	const url = "https://dnd-inventory-bot.herokuapp.com/login/";
 	const token = async () => {
 		if (!player.token) {
 			let t = suid(16);

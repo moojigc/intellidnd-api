@@ -16,9 +16,10 @@ textarea.materialize-textarea {
 }
 
 .card .card-content {
-	padding: 0.25rem;
+	padding: 0;
 }
 
+.card .row .col,
 .card .row {
 	margin: 0;
 }
@@ -29,12 +30,21 @@ textarea.materialize-textarea {
 }
 
 .character-collection {
+	margin: 0 auto;
 	padding: 0 !important;
 }
+.character-collection h3 {
+	margin: 0 0 1rem 0 !important;
+}
 .character-collection .collection-item {
+	padding: 1rem 2rem;
 	margin: 0;
-	background: var(--primary) !important;
+	background: #ffffffcf !important;
 }
 .dropdown-content li > a {
 	color: black;
+}
+
+button:hover {
+	opacity: 0.9;
 }

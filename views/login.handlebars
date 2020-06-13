@@ -14,15 +14,16 @@
                 <input required type="password" class="validate password" name="password" placeholder="Enter password">
             </div>
             {{#if error}}
-            <div class="row alert alert-warning">{{error}}</div>
+            <div class="row alert alert-danger">{{error}}</div>
             {{/if}}
             {{#if errorMsg}}
-            <div class="row alert alert-warning">{{errorMsg}}</div>
+            <div class="row alert alert-danger">{{errorMsg}}</div>
             {{/if}}
             {{#if successMsg}}
             <div class="row alert alert-success">{{successMsg}}</div>
             {{/if}}
-            <button type="submit" class="btn btn-primary login-btn">Login</button>
+            <button type="submit" class="btn btn-large waves-effect waves-orange purple lighten-1 login-btn">Login<i
+                    class="material-icons right">send</i></button>
         </form>
     </div>
     <a href="/register">Click here to register.</a>

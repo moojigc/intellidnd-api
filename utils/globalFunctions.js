@@ -39,6 +39,11 @@ module.exports = function (message) {
 			}
 		}
 	};
+	/**
+	 * Handles sending message based on user settings
+	 * @param {import("../models/Player")} player
+	 * @param {string} botMessageContents
+	 */
 	function channelOrDM(player, botMessageContents) {
 		// sends message to either channel or DMs
 		try {
@@ -48,6 +53,13 @@ module.exports = function (message) {
 			console.log(error);
 		}
 	}
+	/**
+	 * Send red/green MessageEmbed
+	 * @param {"send" | "channel" | "DM"} send
+	 * @param {"invalid" | "success"} type
+	 * @param {string} contents
+	 * @param {import("../models/Player")} player required if send === "send"
+	 */
 	function createResponseEmbed(send, type, contents, player) {
 		let embed;
 		try {
@@ -64,8 +76,13 @@ module.exports = function (message) {
 			console.log(error);
 		}
 	}
+	/**
+	 * Create user wallet or full inventory
+	 * @param {import("../models/Player")} player
+	 * @param {"send" | "DM"} send
+	 * @param {"invalid" | "success"} type
+	 */
 	function createInventoryEmbed(player, send, type) {
-		// Create user wallet or full inventory
 		let embed;
 		const { lastUpdated } = player;
 		const { gold, silver, platinum, electrum, copper, potions, weapons, misc } = player.inventory;
@@ -74,21 +91,18 @@ module.exports = function (message) {
 		} else {
 			// add the coins together, formatted into silver
 			const money = parseInt(platinum) * 10 + parseInt(gold) + parseInt(electrum) / 2 + parseInt(silver) / 10 + parseInt(copper) / 100;
-			function List(items) {
-				this.items = items;
-				this.makeReadable = function () {
-					if (!this.items || this.items.length === 0) {
-						return "None";
-					} else {
-						return this.items.map((item) => {
-							return `${capitalize(item.name)} x${item.quantity}`;
-						});
-					}
-				};
-			}
+			const List = (items) => {
+				if (!items || items.length === 0) {
+					return "None";
+				} else {
+					return items.map((item) => {
+						return `${capitalize(item.name)} x${item.quantity}`;
+					});
+				}
+			};
 			embed = new MessageEmbed()
 				.setTitle(`${player.name}'s inventory`)
-				.addFields({ name: "Coins", value: `${money} gold` }, { name: "Potions", value: new List(potions).makeReadable(), inline: true }, { name: "Weapons", value: new List(weapons).makeReadable(), inline: true }, { name: "Misc.", value: new List(misc).makeReadable(), inline: true }, { name: "Last updated", value: moment(lastUpdated).format("MMMM Do, hh:mm a") })
+				.addFields({ name: "Coins", value: `${money} gold` }, { name: "Potions", value: List(potions), inline: true }, { name: "Weapons", value: List(weapons), inline: true }, { name: "Misc.", value: List(misc), inline: true }, { name: "Last updated", value: moment(lastUpdated).format("MMMM Do, hh:mm a") })
 				.setColor("#9B59B6")
 				.setFooter(`Campaign: ${player.guild}`);
 		}

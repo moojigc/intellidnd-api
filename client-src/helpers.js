@@ -56,7 +56,6 @@ export function addRow(target) {
 <div class="row ${findCategory(parentCard)}">
 	<div class="col s8">
 		<div class="input-field">
-			<label class="prefixed-label name-label">Name</label>
 			<button class="btn red lighten-1 del-btn" style="display: none;">Delete</button>
 			<input type="text" maxlength="90" class="name" placeholder="New..." value="">
 		</div>

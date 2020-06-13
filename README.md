@@ -1,75 +1,83 @@
-# DnD Inventory Bot Guide
+# D&D Inventory
 
-A simple Discord Bot that manages inventory for D&D campaigns.
-
-Commands are _not_ case sensitive.
-
-Members with kick/ban permission can run commands on other users by _@mentions_ immediately after the command.
-For example, **/add @tomNook gold 1000** will add 1000 gold to @tomNook. This works for every command.
+A simple Discord Bot that manages inventory for D&D campaigns, accompanied by a [website](https://dnd-inventory-bot.herokuapp.com) that you can also use to interact with your data.
 
 Invite to your server: https://discordapp.com/api/oauth2/authorize?client_id=692109220371365989&permissions=134309888&scope=bot.
 
-## /create
+## Bot Commands
 
-This command creates your inventory and all fields will be empty or 0 by default.
-This bot uses nicknames as the player names, not the user's regular Discord username.
+Commands are _not_ case sensitive.
 
-## /create prepack gold# silver# DM/channel
+Members with at least **kick/ban permission** can run commands on other users by _@mentions_ immediately after the command.
+For example, **/add @tomNook gold 1000** will add 1000 gold to @tomNook. This works for every command.
 
-This will prepack inventory with `crowbar, hammer, pitons x10, torches x10, rations x10, feet of hempen rope x100.`
+### /create
 
-**/create prepack 100 10 DM** will set `gold to 100`, `silver to 10`, `DMs on`. If DM is not specified, they will be off by default.
+This command creates your character with an empty inventory. I recommend running `/create` then `/login` and use the website for initial setup.
 
-## /inventory, /inv
+This bot will set your nickname in the server as the player name, or your username if you do not have a nickname set.
 
-Displays your own inventory. Adding a category
-plus a value (e.g. /inventory gold 100) will update your inventory.
-Mods/admins can use /inventory everyone to see all inventories. Currently, @everyone does not work.
+### /create prepack gold# silver# copper# DM/channel
 
-## /add _category_
+`Ex: /create prepack 100 10 1 dm` will generate a character that has **100 gold, 10 silver, 1 copper**, and the bot will send you **direct messages** instead of in-channel replies (which is the default behaviour).
+
+This will also prepack your inventory with `crowbar, hammer, pitons x10, torches x10, rations x10, feet of hempen rope x100.`
+
+### /inventory, /inv
+
+Displays your own inventory.
+
+Members with elevated permissions can use **/inventory @everyone** to see all inventories.
+
+### /add _category_
+
+> `Ex: /add potions healing 2` will add two healing potions to your potions category.
 
 Adds new items to specified category. Supports lists of items, and quantity, but not both at the same time.
 e.g. **/add gold 50** adds 50 to gold, **/add potions Health 2** will add Health x2, and **/add potions Health, Poison** will add Health and Poison.
 /create
-This command creates your inventory and all fields will be empty or 0 by default.
-This bot uses nicknames as the player names, not the user's regular Discord username.
 
-## /remove _category_
+### /remove _category_
 
-Removes specified item or amount from the category.
-For example, **/remove weapons Net** will remove Net from weapons.
+> Ex: `/remove weapons net` will remove 1 Net from weapons. `/remove weapons net 5` will remove 5 Nets.
 
-## /dm
+Removes specified item or amount from the category. Also supports comma-separated lists.
+
+### /dm
 
 **/dm on** will send all notifications from the bot to your DMs. **/dm off** will send them to the channel.
 Set individually per user. DMs are off by default.
 
-## /overwrite
+### /overwrite
 
-This command overwrites EVERYTHING in the specified category. For example, **/overwrite weapons sword**
-will delete all your weapons and set the Sword as your only weapon. Use with care.
+> Ex:`/overwrite weapons sword` will delete your weapons category and replace it with Sword x1.
 
-## /deleteplayer
+This command overwrites EVERYTHING in the specified category. _Use with care._
+
+### /deleteplayer
 
 Deletes your entire inventory and changelog.
-Use with care.
+_Use with care._
 
-## Money
+### /login
+
+You can login/register to view and edit your inventory on the D&D Inventory website: https://dnd-inventory-bot.herokuapp.com.
+
+### Money
 
 When dealing with money, there are 3 possible commands.
-**/overwrite gold 50** will overwrite any previous amount and hardcode your current gold to 50.
-**/add gold 50** will add to the current amount.
-**/remove gold 50** will subtract from the current amount.
 
-## /login
+> `/overwrite gold 50` will overwrite any previous amount and hardcode your current gold to 50.
 
-You can login to view and edit your inventory on the DnD Inventory website: https://dnd-inventory-bot.herokuapp.com.
+> `/add gold 50` will add to the current amount.
 
-## Support
+> `/remove gold 50` will subtract from the current amount.
+
+### Support
 
 If you find a bug or have any suggestions for additional features, please submit a ticket at https://github.com/moojigc/DiscordBot/issues.
 
-## Your Data
+### Your Data
 
 What data from Discord does this bot store?
 

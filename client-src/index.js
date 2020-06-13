@@ -139,7 +139,7 @@ function main() {
 	});
 	// Cancel 'enter' key press
 	$(document).on("keypress", (event) => {
-		if (event.which === 13) {
+		if (event.which === 13 && location.pathname === "/inventory") {
 			event.preventDefault();
 		}
 	});
@@ -150,6 +150,27 @@ function main() {
 	});
 	// Handle single-item deletion
 	removeItem();
+	// Copy link
+	$("#get-invite-link").on("click", (event) => {
+		const copyToClipboard = (str) => {
+			const el = document.createElement("textarea");
+			el.value = str;
+			el.setAttribute("readonly", "");
+			el.style.position = "absolute";
+			el.style.left = "-9999px";
+			document.body.appendChild(el);
+			const selected = document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false;
+			el.select();
+			document.execCommand("copy");
+			document.body.removeChild(el);
+			if (selected) {
+				document.getSelection().removeAllRanges();
+				document.getSelection().addRange(selected);
+			}
+		};
+		copyToClipboard("https://discord.com/oauth2/authorize?client_id=692109220371365989&permissions=134309888&scope=bot");
+		event.target.innerText = "Link copied!";
+	});
 }
 
 main();

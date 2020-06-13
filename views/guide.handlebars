@@ -1,77 +1,88 @@
 {{> navbar}}
 <main class="container wrapper">
-    <h1 class="title" style="display: inline-flex;"> <img style="height: 5rem;" src="/assets/images/book.png"
-            alt="book">
-        Guide</h1>
+    <header style="padding: 0.5rem;">
+        <h1 style="display: flex; margin: 0rem; align-items: center; justify-content: center;">Guide <img
+                style="height: 4rem;" src="/assets/images/book.png" alt="book"></h1>
+    </header>
     <article>
-        <p>A simple Discord Bot that manages inventory for D&amp;D campaigns.</p>
-        <p>Commands are <em>not</em> case sensitive, neither are inventory items. However, they will still appear
-            capitalized when viewing them.
-        </p>
-        <p>Members with kick/ban permission can run commands on other users by <em>@mentions</em> immediately after the
-            command.
+        <h4>Welcome to <b>IntelliDnD</b>, an application that helps you manage your D&D character, accompanied by a <a
+                href="https://discordapp.com/api/oauth2/authorize?client_id=692109220371365989&permissions=134309888&scope=bot.">Discord
+                bot.</a>
+            <button id="get-invite-link" style="color: black;"
+                class="btn purple lighten-5 waves-effect waves-orange">Copy link</button>
+        </h4>
+        <hr>
+        <h3 id="bot-commands">Bot Commands</h3>
+        <p>Commands are <em>not</em> case sensitive.</p>
+        <p>Members with at least <strong>kick/ban permission</strong> can run commands on other users by
+            <em>@mentions</em> immediately after the command.
             For example, <strong>/add @tomNook gold 1000</strong> will add 1000 gold to @tomNook. This works for every
-            command.
-        </p>
-        <p>Invite to your server: <a
-                href="https://discordapp.com/api/oauth2/authorize?client_id=692109220371365989&amp;permissions=134309888&amp;scope=bot">https://discordapp.com/api/oauth2/authorize?client_id=692109220371365989&amp;permissions=134309888&amp;scope=bot</a>.
-        </p>
-        <h2 id="-create">/create</h2>
-        <p>This command creates your inventory and all fields will be empty or 0 by default.
-            This bot uses nicknames as the player names, not the user&#39;s regular Discord username.</p>
-        <h2 id="-create-prepack-gold-silver-dm-channel">/create prepack gold# silver# DM/channel</h2>
-        <p>This will prepack inventory with
+            command.</p>
+        <h3 id="-create">/create</h3>
+        <p>This command creates your character with an empty inventory. I recommend running <code>/create</code> then
+            <code>/login</code> and use the website for initial setup.</p>
+        <p>This bot will set your nickname in the server as the player name, or your username if you do not have a
+            nickname set.</p>
+        <h3 id="-create-prepack-gold-silver-copper-dm-channel">/create prepack gold# silver# copper# DM/channel</h3>
+        <p><code>Ex: /create prepack 100 10 1 dm</code> will generate a character that has <strong>100 gold, 10 silver,
+                1 copper</strong>, and the bot will send you <strong>direct messages</strong> instead of in-channel
+            replies (which is the default behaviour).</p>
+        <p>This will also prepack your inventory with
             <code>crowbar, hammer, pitons x10, torches x10, rations x10, feet of hempen rope x100.</code></p>
-        <p><strong>/create prepack 100 10 DM</strong> will set <code>gold to 100</code>, <code>silver to 10</code>,
-            <code>DMs on</code>. If DM is not specified, they will be off by default.</p>
-        <h2 id="-inventory-inv">/inventory, /inv</h2>
-        <p>Displays your own inventory. Adding a category
-            plus a value (e.g. /inventory gold 100) will update your inventory.
-            Mods/admins can use /inventory everyone to see all inventories. Currently, @everyone does not work.</p>
-        <h2 id="-add-category-">/add <em>category</em></h2>
+        <h3 id="-inventory-inv">/inventory, /inv</h3>
+        <p>Displays your own inventory.</p>
+        <p>Members with elevated permissions can use <strong>/inventory @everyone</strong> to see all inventories.</p>
+        <h3 id="-add-_category_">/add <em>category</em></h3>
+        <blockquote>
+            <p><code>Ex: /add potions healing 2</code> will add two healing potions to your potions category.</p>
+        </blockquote>
         <p>Adds new items to specified category. Supports lists of items, and quantity, but not both at the same time.
             e.g. <strong>/add gold 50</strong> adds 50 to gold, <strong>/add potions Health 2</strong> will add Health
-            x2,
-            and
-            <strong>/add potions Health, Poison</strong> will add Health and Poison.
-            /create
-            This command creates your inventory and all fields will be empty or 0 by default.
-            This bot uses nicknames as the player names, not the user&#39;s regular Discord username.</p>
-        <h2 id="-remove-category-">/remove <em>category</em></h2>
-        <p>Removes specified item or amount from the category.
-            For example, <strong>/remove weapons Net</strong> will remove Net from weapons.</p>
-        <h2 id="-dm">/dm</h2>
+            x2, and <strong>/add potions Health, Poison</strong> will add Health and Poison.
+            /create</p>
+        <h3 id="-remove-_category_">/remove <em>category</em></h3>
+        <blockquote>
+            <p>Ex: <code>/remove weapons net</code> will remove 1 Net from weapons. <code>/remove weapons net 5</code>
+                will remove 5 Nets.</p>
+        </blockquote>
+        <p>Removes specified item or amount from the category. Also supports comma-separated lists.</p>
+        <h3 id="-dm">/dm</h3>
         <p><strong>/dm on</strong> will send all notifications from the bot to your DMs. <strong>/dm off</strong> will
-            send
-            them
-            to the channel.
+            send them to the channel.
             Set individually per user. DMs are off by default.</p>
-        <h2 id="-overwrite">/overwrite</h2>
-        <p>This command overwrites EVERYTHING in the specified category. For example, <strong>/overwrite weapons
-                sword</strong>
-            will delete all your weapons and set the Sword as your only weapon. Use with care.</p>
-        <h2 id="-deleteplayer">/deleteplayer</h2>
+        <h3 id="-overwrite">/overwrite</h3>
+        <blockquote>
+            <p>Ex:<code>/overwrite weapons sword</code> will delete your weapons category and replace it with Sword x1.
+            </p>
+        </blockquote>
+        <p>This command overwrites EVERYTHING in the specified category. <em>Use with care.</em></p>
+        <h3 id="-deleteplayer">/deleteplayer</h3>
         <p>Deletes your entire inventory and changelog.
-            Use with care.</p>
-        <h2 id="money">Money</h2>
-        <p>When dealing with money, there are 3 possible commands.
-            <strong>/overwrite gold 50</strong> will overwrite any previous amount and hardcode your current gold to 50.
-            <strong>/add gold 50</strong> will add to the current amount.
-            <strong>/remove gold 50</strong> will subtract from the current amount.</p>
-        <h2 id="support">Support</h2>
+            <em>Use with care.</em></p>
+        <h3 id="-login">/login</h3>
+        <p>You can login/register to view and edit your inventory on the D&amp;D Inventory website: <a
+                href="https://dnd-inventory-bot.herokuapp.com">https://dnd-inventory-bot.herokuapp.com</a>.</p>
+        <h3 id="money">Money</h3>
+        <p>When dealing with money, there are 3 possible commands.</p>
+        <blockquote>
+            <p><code>/overwrite gold 50</code> will overwrite any previous amount and hardcode your current gold to 50.
+            </p>
+            <p><code>/add gold 50</code> will add to the current amount.</p>
+            <p><code>/remove gold 50</code> will subtract from the current amount.</p>
+        </blockquote>
+        <h3 id="support">Support</h3>
         <p>If you find a bug or have any suggestions for additional features, please submit a ticket at <a
                 href="https://github.com/moojigc/DiscordBot/issues">https://github.com/moojigc/DiscordBot/issues</a>.
         </p>
-        <h2 id="your-data">Your Data</h2>
-        <p>This bot uses a secure MongoDB database to store your inventory information. Additionally, it stores your
-            unique
-            Discord user ID plus the server&#39;s ID (both are just random integers) in order to match each player with
-            their
-            inventory. It also stores all user IDs from a given server. You can have one inventory per Discord server.
-        </p>
-        <p>No sensitive data, like passwords, are stored. It does not store usernames (unless you do not have a nickname
-            set
-            up).
-        </p>
+        <h3 id="your-data">Your Data</h3>
+        <p>What data from Discord does this bot store?</p>
+        <ul class="browser-default">
+            <li>Your Discord user ID</li>
+            <li>Your Discord server&#39;s ID</li>
+            <li>Your nickname in that server (just your Discord username if you don&#39;t use a
+                nickname)</li>
+            <li>The last 20 commands you gave the bot</li>
+        </ul>
+
     </article>
 </main>

@@ -10,7 +10,9 @@ const { Player, User } = require("../models"),
 		};
 	},
 	serverError = (res) => res.status(500).redirect("/server-error");
-
+/**
+ * @param {import('express').Express} app
+ */
 module.exports = (app) => {
 	app.post("/api/register", async (req, res) => {
 		let { email, username, password, password2, token, characterName } = req.body;
@@ -61,7 +63,6 @@ module.exports = (app) => {
 			res.redirect("/register");
 		}
 	});
-
 	// Login handle
 	app.post(
 		"/api/login",
@@ -81,25 +82,6 @@ module.exports = (app) => {
 			failureFlash: true
 		})
 	);
-
-	// Most important page! Lets user see and update their data
-	app.get("/inventory/:playerId", async (req, res) => {
-		if (!req.user) {
-			req.flash("errorMsg", "Must log in to see inventory.");
-			res.redirect("/login");
-		} else {
-			try {
-				let player = await (await Player.findOne({ _id: ObjectId(req.params.playerId) })).toObject();
-				res.render("inventory", {
-					player: player,
-					userStatus: userStatus(req)
-				});
-			} catch (error) {
-				console.trace(error);
-				serverError(res);
-			}
-		}
-	});
 	app.get("/inventory", async (req, res) => {
 		if (!req.user) {
 			req.flash("errorMsg", "Must log in to see inventory.");
@@ -151,20 +133,24 @@ module.exports = (app) => {
 					return [];
 				} else {
 					return category.map((item) => {
-						return {
-							name: item.name,
-							quantity: parseInt(item.quantity)
-						};
+						if (!item.name || item.quantity === 0) {
+							return null;
+						} else {
+							return {
+								name: item.name,
+								quantity: parseInt(item.quantity || 0)
+							};
+						}
 					});
 				}
 			};
 			// Just running parseInt and correctTypes to fix the stupid numbers first...
 			const inventory = {
-				gold: parseInt(gold),
-				silver: parseInt(silver),
-				copper: parseInt(copper),
-				platinum: parseInt(platinum),
-				electrum: parseInt(electrum),
+				gold: parseInt(gold || 0),
+				silver: parseInt(silver || 0),
+				copper: parseInt(copper || 0),
+				platinum: parseInt(platinum || 0),
+				electrum: parseInt(electrum || 0),
 				potions: correctTypes(potions),
 				weapons: correctTypes(weapons),
 				misc: correctTypes(misc)
@@ -176,7 +162,6 @@ module.exports = (app) => {
 					on: Date.now(),
 					command: "Updated on website."
 				};
-				console.log(inventory);
 				let response = await Player.updateOne({ webUserId: req.user }, { $push: { changelog: changelog }, inventory: inventory });
 				// Database responds positively
 				if (response) res.status(200).json({ message: "Success!", status: 200 }).end();
@@ -241,7 +226,7 @@ module.exports = (app) => {
 			serverError(res);
 		}
 	});
-	app.post("/change-default-char", async (req, res) => {
+	app.post("/change-default-char", isAuth, async (req, res) => {
 		const player = await Player.findOne({ _id: ObjectId(req.body.characterId) });
 		const playerWebUserId = ObjectId(player.webUserId),
 			userId = ObjectId(req.user);
@@ -259,7 +244,7 @@ module.exports = (app) => {
 			res.redirect("/all-characters");
 		}
 	});
-	app.get("/all-characters", async (req, res) => {
+	app.get("/all-characters", isAuth, async (req, res) => {
 		// let user = await new User({ id: req.user }).dbRead();
 		// console.log(user);
 		let allCharacters = (await Player.find({ webUserId: req.user })).map((p) => p.toObject());

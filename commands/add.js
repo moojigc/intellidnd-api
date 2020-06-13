@@ -1,5 +1,3 @@
-const moment = require("moment");
-
 class Item {
 	constructor(name, quantity) {
 		this.name = name;

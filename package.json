@@ -24,6 +24,7 @@
   "author": "M. Moojig Battsogt",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
     "connect-mongodb-session": "^2.3.2",
