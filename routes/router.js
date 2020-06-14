@@ -1,5 +1,4 @@
 const { Guild, Player } = require("../models"),
-	isEqual = require("lodash/isEqual"),
 	serverError = (res, error) => {
 		res.json({ redirectURL: "/server-error" });
 		console.trace(error);
@@ -10,8 +9,19 @@ const { Guild, Player } = require("../models"),
 			loggedIn: req.user ? true : false
 		};
 	};
-
+/**
+ *
+ * @param {import("express").Express} app
+ */
 module.exports = (app) => {
+	app.get("/demo", async (req, res) => {
+		try {
+			let player = await (await Player.findOne({ discordId: "123" })).toObject();
+			res.render("inventory", { player: player });
+		} catch (error) {
+			serverError(res, error);
+		}
+	});
 	// Renders the bot Guide
 	app.get("/", async (req, res) => {
 		try {

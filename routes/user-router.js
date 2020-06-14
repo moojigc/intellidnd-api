@@ -24,7 +24,10 @@ module.exports = (app) => {
 			res.redirect("/register");
 			// Player registered to another user
 		} else if (playerData.webUserId) {
-			req.flash("errorMsg", "Player is already registered. If you think this is incorrect, please reset your token.");
+			req.flash(
+				"errorMsg",
+				"Player is already registered. If you think this is incorrect, please reset your token."
+			);
 			res.redirect("/register");
 			// If any field is empty
 		} else if (username === "" || password === "" || password2 === "") {
@@ -69,10 +72,10 @@ module.exports = (app) => {
 		(req, res, next) => {
 			if (req.body.rememberMe) {
 				// 6 months
-				req.session.cookie.originalMaxAge = 6000 * 60 * 24 * 7 * 26;
+				req.session.cookie.originalMaxAge = 60000 * 60 * 24 * 7 * 26;
 			} else {
 				// 24 hours
-				req.session.cookie.originalMaxAge = 6000 * 60 * 24;
+				req.session.cookie.originalMaxAge = 60000 * 60 * 24;
 			}
 			next();
 		},
@@ -88,7 +91,9 @@ module.exports = (app) => {
 			res.redirect("/login");
 		} else {
 			try {
-				let { defaultPlayer } = await User.findOne({ _id: ObjectId(req.user) }).populate("defaultPlayer");
+				let { defaultPlayer } = await User.findOne({ _id: ObjectId(req.user) }).populate(
+					"defaultPlayer"
+				);
 				res.render("inventory", {
 					player: defaultPlayer.toObject(),
 					userStatus: userStatus(req)
@@ -122,7 +127,16 @@ module.exports = (app) => {
 			// Add new logs from front-end to the player instance
 			let player = await Player.findOne({ webUserId: ObjectId(req.user) });
 			// Destructure the inventory Object from request body
-			let { gold, silver, copper, platinum, electrum, potions, weapons, misc } = req.body.inventory;
+			let {
+				gold,
+				silver,
+				copper,
+				platinum,
+				electrum,
+				potions,
+				weapons,
+				misc
+			} = req.body.inventory;
 			/**
 			 * Fix the numbers...
 			 * HTTP prot only sends strings, so you must convert strings to numbers
@@ -162,11 +176,19 @@ module.exports = (app) => {
 					on: Date.now(),
 					command: "Updated on website."
 				};
-				let response = await Player.updateOne({ webUserId: req.user }, { $push: { changelog: changelog }, inventory: inventory });
+				let response = await Player.updateOne(
+					{ webUserId: req.user },
+					{ $push: { changelog: changelog }, inventory: inventory }
+				);
 				// Database responds positively
 				if (response) res.status(200).json({ message: "Success!", status: 200 }).end();
 				// Database fails to update for some reason
-				else res.status(404).json({ message: "Could not update player. Please go back to Discord and try there first.", status: 404 });
+				else
+					res.status(404).json({
+						message:
+							"Could not update player. Please go back to Discord and try there first.",
+						status: 404
+					});
 			}
 			// Case that no changes were detected
 			else {
@@ -174,7 +196,11 @@ module.exports = (app) => {
 			}
 		} catch (error) {
 			console.error(error);
-			res.json({ redirectURL: "/server-error", message: "Internal server error. Please try again later.", status: 500 }).end();
+			res.json({
+				redirectURL: "/server-error",
+				message: "Internal server error. Please try again later.",
+				status: 500
+			}).end();
 		}
 	});
 	app.get("/logout", (req, res) => {
@@ -198,26 +224,46 @@ module.exports = (app) => {
 				let playerData = await Player.findOne({ token: token, name: characterName });
 				if (playerData) {
 					let user = await User.findOne({ _id: ObjectId(req.user) }).populate("players");
-					let characterCheck = user.players.filter((p) => playerData._id.toString() === p._id.toString());
+					let characterCheck = user.players.filter(
+						(p) => playerData._id.toString() === p._id.toString()
+					);
 
 					if (characterCheck.length > 0) {
-						req.flash("errorMsg", `${req.body.characterName} has already been added to your character list.`);
+						req.flash(
+							"errorMsg",
+							`${req.body.characterName} has already been added to your character list.`
+						);
 						res.redirect("/add-character");
 						return;
 					}
 					// Update player with new webUserId, update user with new player IDs
-					let playerResponse = await Player.updateOne({ _id: ObjectId(playerData._id) }, { webUserId: req.user });
-					let userResponse = await User.updateOne({ _id: ObjectId(req.user) }, { $push: { players: playerData._id } });
+					let playerResponse = await Player.updateOne(
+						{ _id: ObjectId(playerData._id) },
+						{ webUserId: req.user }
+					);
+					let userResponse = await User.updateOne(
+						{ _id: ObjectId(req.user) },
+						{ $push: { players: playerData._id } }
+					);
 
 					if (userResponse.nModified === 1 && playerResponse.nModified === 1) {
-						req.flash("successMsg", `Added ${playerData.name} to your list of characters.`);
+						req.flash(
+							"successMsg",
+							`Added ${playerData.name} to your list of characters.`
+						);
 						res.redirect("/add-character");
 					} else {
-						req.flash("errorMsg", `Unexpected error: Could not add ${playerData.name} to your list of characters.`);
+						req.flash(
+							"errorMsg",
+							`Unexpected error: Could not add ${playerData.name} to your list of characters.`
+						);
 						res.redirect("/add-character");
 					}
 				} else {
-					req.flash("errorMsg", "Sorry, either that character doesn't exist, or the token was incorrect.");
+					req.flash(
+						"errorMsg",
+						"Sorry, either that character doesn't exist, or the token was incorrect."
+					);
 					res.redirect("/add-character");
 				}
 			}
@@ -235,7 +281,10 @@ module.exports = (app) => {
 			res.redirect("/all-characters");
 			return;
 		}
-		const { nModified } = await User.updateOne({ _id: ObjectId(req.user) }, { defaultPlayer: player._id });
+		const { nModified } = await User.updateOne(
+			{ _id: ObjectId(req.user) },
+			{ defaultPlayer: player._id }
+		);
 		if (nModified === 1) {
 			req.flash("successMsg", `${player.name} is now your default character.`);
 			res.redirect("/all-characters");

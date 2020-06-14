@@ -5,14 +5,6 @@
     </header>
     <div class="row form-wrapper">
         <form action="/api/login" method="POST">
-            <div class="input-field">
-                <i class="material-icons prefix">account_circle</i>
-                <input required type="text" class="validate username" name="username" placeholder="Enter username">
-            </div>
-            <div class="input-field">
-                <i class="material-icons prefix">fingerprint</i>
-                <input required type="password" class="validate password" name="password" placeholder="Enter password">
-            </div>
             {{#if error}}
             <div class="row alert alert-danger">{{error}}</div>
             {{/if}}
@@ -22,9 +14,27 @@
             {{#if successMsg}}
             <div class="row alert alert-success">{{successMsg}}</div>
             {{/if}}
+            <div class="input-field">
+                <i class="material-icons prefix">account_circle</i>
+                <input required type="text" class="validate username" name="username" placeholder="Enter username">
+            </div>
+            <div class="input-field">
+                <i class="material-icons prefix">fingerprint</i>
+                <input required type="password" class="validate password" name="password" placeholder="Enter password">
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="rememberMe">
+                        <input id="rememberMe" style="margin-bottom: 2rem;" type="checkbox" name="rememberMe" />
+                        <span>Remember me? (6 months)</span>
+                    </label>
+                </div>
+            </div>
             <button type="submit" class="btn btn-large waves-effect waves-orange purple lighten-1 login-btn">Login<i
                     class="material-icons right">send</i></button>
         </form>
     </div>
-    <a href="/register">Click here to register.</a>
+    <div class="row" style="margin-top: 2rem;">
+        <a href="/register" style="font-size: 2rem; margin: 0 auto;">New here? Click here to create account.</a>
+    </div>
 </main>

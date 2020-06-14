@@ -90,7 +90,8 @@ h1 {
 }
 
 code {
-	font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+	font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+		monospace;
 	font-size: 87.5%;
 	color: #e83e8c;
 }
@@ -191,7 +192,7 @@ card-content {
 	transition: 100ms;
 }
 
-.money-card input[type="number"] {
+/* .money-card input[type="number"] {
 	margin: 0;
 	text-align: center;
 	padding: 15px;
@@ -199,7 +200,7 @@ card-content {
 	width: 100%;
 	color: white !important;
 	box-shadow: inset 0 0 2rem 0.05rem var(--dark) !important;
-}
+} */
 aside ul,
 .potion-card > .card-content,
 .weapon-card > .card-content,
