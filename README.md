@@ -1,4 +1,4 @@
-# D&D Inventory
+# IntelliDnD
 
 A simple Discord Bot that manages inventory for D&D campaigns, accompanied by a [website](https://dnd-inventory-bot.herokuapp.com) that you can also use to interact with your data.
 
