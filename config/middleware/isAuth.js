@@ -1,12 +1,8 @@
-// This is middleware for restricting routes a user is not allowed to visit if not logged in
 module.exports = function (req, res, next) {
-	// If the user is logged in, continue with the request to the restricted route
 	if (req.user) {
 		return next();
 	} else if (req.path !== "/") {
-		// If the user isn't logged in, redirect them to the login page
+		req.flash("errorMsg", "You must be logged in to view this resource.");
 		return res.redirect("/users/login");
-	} else {
-		return next();
 	}
 };

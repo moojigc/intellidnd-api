@@ -17,7 +17,7 @@ module.exports = (app) => {
 	app.get("/demo", async (req, res) => {
 		try {
 			let player = await (await Player.findOne({ discordId: "123" })).toObject();
-			res.render("inventory", { player: player });
+			res.render("inventory", { player: player, userStatus: userStatus(req) });
 		} catch (error) {
 			serverError(res, error);
 		}
