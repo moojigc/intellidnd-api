@@ -15,7 +15,12 @@ connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreat
 client.once("ready", async () => {
 	console.log(`${client.user.username} is ready!`);
 	try {
-		let link = await client.generateInvite(["MANAGE_MESSAGES", "SEND_MESSAGES", "READ_MESSAGE_HISTORY", "EMBED_LINKS"]);
+		let link = await client.generateInvite([
+			"MANAGE_MESSAGES",
+			"SEND_MESSAGES",
+			"READ_MESSAGE_HISTORY",
+			"EMBED_LINKS"
+		]);
 		console.log(link);
 	} catch (e) {
 		console.log(e.stack);
@@ -25,7 +30,8 @@ client.once("ready", async () => {
 client.on("guildCreate", async (guild) => {
 	try {
 		let [defaultChannel] = guild.channels.cache.filter((channel) => {
-			if (channel.type == "text" && channel.permissionsFor(guild.me).has("SEND_MESSAGES")) return true;
+			if (channel.type == "text" && channel.permissionsFor(guild.me).has("SEND_MESSAGES"))
+				return true;
 			else return false;
 		});
 		defaultChannel[1].send("Hello! To see a list of commands, run **/helpinventory**.");
@@ -35,61 +41,84 @@ client.on("guildCreate", async (guild) => {
 });
 
 client.on("message", async (message) => {
-	if ((process.env.PORT && message.guild.name === "Bot Testing") || message.author.bot) return;
-	if (message.channel.type === "dm" && !message.author.bot) {
-		const regexTest = /fuck|dick|stupid/.test(message.content); // Hidden easter egg lol
-		if (regexTest) return message.author.send(`:poop:僕は悪いボットではないよ！`).catch(console.error);
-		else return message.author.send(`Messages to this bot are not monitored. If you have any issues or feature requests, please go to https://github.com/moojigc/DiscordBot/issues.`);
-	}
-	if (message.content.split("")[0] !== "/") return;
-	const validCommands = {
-		commands: ["login", "inventory", "inv", "wallet", "create", "deleteplayer", "helpinventory", "add", "remove", "overwrite", "changelog", "dm"],
-		isValid: function (input) {
-			return this.commands.map((c) => {
-				if (c === input) return true;
-				else return false;
-			});
+	try {
+		if ((process.env.PORT && message.guild.name === "Bot Testing") || message.author.bot)
+			return;
+		if (message.channel.type === "dm" && !message.author.bot) {
+			const regexTest = /fuck|dick|stupid/.test(message.content); // Hidden easter egg lol
+			if (regexTest)
+				return message.author.send(`:poop:僕は悪いボットではないよ！`).catch(console.error);
+			else
+				return message.author.send(
+					`Messages to this bot are not monitored. If you have any issues or feature requests, please go to https://github.com/moojigc/DiscordBot/issues.`
+				);
 		}
-	};
-	const messageArr = message.content.toLowerCase().split(" "),
-		command = messageArr[0].split("").slice(1).join(""),
-		commandKeywords = messageArr.slice(1); // used by the if statement
-	// End whole script if no valid command entered
-	if (!validCommands.isValid(command)) return;
-	const { createResponseEmbed } = require("./utils/globalFunctions.js")(message);
+		if (message.content.split("")[0] !== "/") return;
+		const isValid = (input) => {
+			let commands = /login|inventory|inv|wallet|create|deleteplayer|helpinventory|add|remove|overwrite|changelog|dm/;
+			return input.match(commands);
+		};
+		const messageArr = message.content.toLowerCase().split(" "),
+			command = messageArr[0].split("").slice(1).join(""),
+			commandKeywords = messageArr.slice(1); // used by the if statement
+		// End whole script if no valid command entered
+		console.time("check");
+		if (!isValid(command)) return;
+		console.timeEnd("check");
+		const { createResponseEmbed } = require("./utils/globalFunctions.js")(message);
 
-	const checkMentionsAndPermissions = () => {
-		// Check whether acting upon author of the message or a mentioned user, or @ everyone
-		if (message.mentions.users.array().length > 0 || message.mentions.everyone) {
-			const nullObject = { id: null, displayName: "@everyone" }; // Prevents errors when getting the inventory of @everyone
-			if (!message.member.hasPermission("BAN_MEMBERS") || !message.member.hasPermission("KICK_MEMBERS")) {
-				createResponseEmbed("channel", "invalid", `User <@${message.author.id}> does not have sufficient privileges for this action.`);
-				return {
-					args: [""],
-					recipientPlayer: message.member,
-					insufficientPerms: true
-				};
+		const checkMentionsAndPermissions = () => {
+			// Check whether acting upon author of the message or a mentioned user, or @ everyone
+			if (message.mentions.users.array().length > 0 || message.mentions.everyone) {
+				const nullObject = { id: null, displayName: "@everyone" }; // Prevents errors when getting the inventory of @everyone
+				if (
+					!message.member.hasPermission("BAN_MEMBERS") ||
+					!message.member.hasPermission("KICK_MEMBERS")
+				) {
+					createResponseEmbed(
+						"channel",
+						"invalid",
+						`User <@${message.author.id}> does not have sufficient privileges for this action.`
+					);
+					return {
+						args: [""],
+						recipientPlayer: message.member,
+						insufficientPerms: true
+					};
+				} else {
+					return {
+						args: commandKeywords.slice(1), // accounts for @mention being the 2nd word in the message
+						recipientPlayer:
+							commandKeywords[0] === "@everyone"
+								? nullObject
+								: message.mentions.members.first()
+					};
+				}
 			} else {
 				return {
-					args: commandKeywords.slice(1), // accounts for @mention being the 2nd word in the message
-					recipientPlayer: commandKeywords[0] === "@everyone" ? nullObject : message.mentions.members.first()
+					args: commandKeywords.slice(0),
+					recipientPlayer: message.member // all commands will be carried out on the author of the message
 				};
 			}
-		} else {
-			return {
-				args: commandKeywords.slice(0),
-				recipientPlayer: message.member // all commands will be carried out on the author of the message
-			};
-		}
-	};
+		};
 
-	const { args, recipientPlayer, insufficientPerms } = checkMentionsAndPermissions();
-	if (insufficientPerms) return;
-
-	try {
+		const { args, recipientPlayer, insufficientPerms } = checkMentionsAndPermissions();
+		if (insufficientPerms) return;
 		let currentGuild = await Guild.findOne({ discordId: message.guild.id });
-		let currentPlayer = await Player.findOne({ discordId: recipientPlayer.id + message.guild.id });
-		if (!currentPlayer && command !== "create" && command !== "helpinventory" && recipientPlayer.displayName !== "@everyone") return createResponseEmbed("channel", "invalid", `No data for ${recipientPlayer.displayName}. Run /create to start an inventory for this player.`);
+		let currentPlayer = await Player.findOne({
+			discordId: recipientPlayer.id + message.guild.id
+		});
+		if (
+			!currentPlayer &&
+			command !== "create" &&
+			command !== "helpinventory" &&
+			recipientPlayer.displayName !== "@everyone"
+		)
+			return createResponseEmbed(
+				"channel",
+				"invalid",
+				`No data for ${recipientPlayer.displayName}. Run /create to start an inventory for this player.`
+			);
 		// Auto change names
 		if (currentPlayer.name !== recipientPlayer.displayName) {
 			currentPlayer.name = recipientPlayer.displayName;
@@ -155,7 +184,11 @@ client.on("message", async (message) => {
 			case `deleteplayer`:
 				{
 					await currentPlayer.remove();
-					createResponseEmbed("channel", "success", `Player ${recipientPlayer.displayName}'s inventory successfully deleted.`);
+					createResponseEmbed(
+						"channel",
+						"success",
+						`Player ${recipientPlayer.displayName}'s inventory successfully deleted.`
+					);
 				}
 
 				break;
