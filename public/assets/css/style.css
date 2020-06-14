@@ -155,7 +155,7 @@ card-content {
 
 .card input[type="text"],
 .card input[type="number"] {
-	background-color: var(--primary);
+	background-color: var(--secondary-trans);
 	box-shadow: inset 0 0 2rem 0.05rem var(--dark) !important;
 	font-size: 1.2rem;
 }
@@ -192,21 +192,12 @@ card-content {
 	transition: 100ms;
 }
 
-/* .money-card input[type="number"] {
-	margin: 0;
-	text-align: center;
-	padding: 15px;
-	height: auto;
-	width: 100%;
-	color: white !important;
-	box-shadow: inset 0 0 2rem 0.05rem var(--dark) !important;
-} */
 aside ul,
 .potion-card > .card-content,
 .weapon-card > .card-content,
 .misc-card > .card-content {
 	padding: 5px 0px 5px 10px;
-	max-height: 15rem;
+	max-height: 17.5rem;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	scrollbar-color: #cf4aff transparent;

@@ -4,7 +4,10 @@
  */
 export function translateChangelog($changelogItem, moment) {
 	$changelogItem.get().forEach((item) => {
-		let rawTime = item.dataset.time.split("").length > 13 ? item.dataset.time : parseInt(item.dataset.time);
+		let rawTime =
+			item.dataset.time.split("").length > 13
+				? item.dataset.time
+				: parseInt(item.dataset.time);
 		let text = item.innerText;
 		let date = moment(rawTime).format("MMMM Do, YYYY");
 		let time = moment(rawTime).format("hh:mm a");
@@ -52,19 +55,22 @@ export function addRow(target) {
 			.join();
 		return htmlClass.split("-")[0] + "-row";
 	};
-	target.closest(".card").children(".card-content").append(`
-<div class="row ${findCategory(parentCard)}">
-	<div class="col s8">
-		<div class="input-field">
-			<button class="btn red lighten-1 del-btn" style="display: none;">Delete</button>
-			<input type="text" maxlength="90" class="name" placeholder="New..." value="">
-		</div>
-	</div>
-	<div class="col s4">
-		<div class="input-field">
-			<label for="quantity" class="prefixed-label">#</label>
-			<input type="number" class="quantity" placeholder="?" value="1">
-		</div>
-	</div>
-</div>`);
+	let row = $("<div>").addClass("row");
+	row.append(`
+		<div class="row ${findCategory(parentCard)}">
+			<div class="col s8">
+				<div class="input-field">
+					<button class="btn red lighten-1 del-btn" style="display: none;">Delete</button>
+					<input type="text" maxlength="90" class="name" placeholder="New..." value="">
+				</div>
+			</div>
+			<div class="col s4">
+				<div class="input-field">
+					<label for="quantity" class="prefixed-label">#</label>
+					<input type="number" class="quantity" placeholder="?" value="1">
+				</div>
+			</div>
+		</div>`);
+	target.closest(".card").children(".card-content").append(row);
+	return row.get(0);
 }

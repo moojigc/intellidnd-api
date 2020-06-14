@@ -19,7 +19,8 @@ const $gold = $(".gold"),
  * Adjust footer based on document body height
  */
 function adjFooter() {
-	if (window.innerHeight > $("body").height()) $("footer").attr("style", "position: fixed; bottom: 0");
+	if (window.innerHeight > $("body").height())
+		$("footer").attr("style", "position: fixed; bottom: 0");
 	else $("footer").attr("style", "position: unset");
 }
 /**
@@ -121,7 +122,14 @@ function main() {
 	translateChangelog($(".changelog-item"), moment);
 	// Event listener for validation on inputs
 	$("input.quantity").on("click", () => {
-		validNumberInput(null, $gold.get()[0], $silver.get()[0], $copper.get()[0], $electrum.get()[0], $platinum.get()[0]);
+		validNumberInput(
+			null,
+			$gold.get()[0],
+			$silver.get()[0],
+			$copper.get()[0],
+			$electrum.get()[0],
+			$platinum.get()[0]
+		);
 		validNumberInput($("input.quantity").get());
 	});
 	// Click event on the submit button
@@ -146,7 +154,12 @@ function main() {
 	// Add rows
 	$(".add-btn").on("click", (event) => {
 		event.preventDefault();
-		addRow($(event.target));
+		let row = addRow($(event.target));
+		let x = window.scrollX,
+			y = window.scrollY;
+		row.scrollIntoView();
+		event.target.scrollIntoView();
+		window.scroll(x, y);
 	});
 	// Handle single-item deletion
 	removeItem();
@@ -159,7 +172,10 @@ function main() {
 			el.style.position = "absolute";
 			el.style.left = "-9999px";
 			document.body.appendChild(el);
-			const selected = document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false;
+			const selected =
+				document.getSelection().rangeCount > 0
+					? document.getSelection().getRangeAt(0)
+					: false;
 			el.select();
 			document.execCommand("copy");
 			document.body.removeChild(el);
@@ -168,7 +184,9 @@ function main() {
 				document.getSelection().addRange(selected);
 			}
 		};
-		copyToClipboard("https://discord.com/oauth2/authorize?client_id=692109220371365989&permissions=134309888&scope=bot");
+		copyToClipboard(
+			"https://discord.com/oauth2/authorize?client_id=692109220371365989&permissions=134309888&scope=bot"
+		);
 		event.target.innerText = "Link copied!";
 	});
 }
