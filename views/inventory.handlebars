@@ -10,7 +10,8 @@
             <div class="card potion-card">
                 <h3 class="delete-alert alert alert-success card-title" style="display: none;">
                 </h3>
-                <h3 class="card-title">Potions <img src="/assets/images/potion.png" class="title-image" alt="potion">
+                <h3 class="card-title">Potions <img src="/assets/images/potion-icon.png" class="title-image"
+                        alt="potion">
                 </h3>
                 <div class="card-content">
                     {{#each potions}}
@@ -25,7 +26,8 @@
                 {{> add-btn}}
             </div>
             <div class="card weapon-card">
-                <h3 class="card-title">Weapons <img src="/assets/images/knife.png" alt="knife" class="title-image"></h3>
+                <h3 class="card-title">Weapons <img src="/assets/images/knife-icon.png" alt="knife" class="title-image">
+                </h3>
                 <div class="card-content">
                     {{#each weapons}}
                     <div class="row weapon-row" data-name="{{name}}" data-quantity="{{quantity}}">
@@ -39,7 +41,7 @@
                 {{> add-btn}}
             </div>
             <div class="card misc-card">
-                <h3 class="card-title">Miscellaneous <img src="/assets/images/bag-only.png" alt="bag"
+                <h3 class="card-title">Miscellaneous <img src="/assets/images/bag-only-icon.png" alt="bag"
                         class="title-image"></h3>
                 <div class="card-content">
                     {{#each misc}}

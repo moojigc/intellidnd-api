@@ -5,6 +5,7 @@ import money from "./money";
 import modal from "./modal";
 import { translateChangelog, validNumberInput, addRow } from "./helpers";
 import { Dropdown, Sidenav } from "materialize-css";
+import registerSW from "./register-service-worker";
 
 const $modalBackground = $(".modal-background"),
 	$responseMsg = $(".response-msg");
@@ -154,8 +155,8 @@ function main() {
 	// Add rows
 	$(".add-btn").on("click", (event) => {
 		event.preventDefault();
-		let row = addRow($(event.target));
-		let x = window.scrollX,
+		let row = addRow($(event.target)),
+			x = window.scrollX,
 			y = window.scrollY;
 		row.scrollIntoView();
 		event.target.scrollIntoView();
@@ -189,6 +190,7 @@ function main() {
 		);
 		event.target.innerText = "Link copied!";
 	});
+	registerSW();
 }
 
 main();

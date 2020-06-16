@@ -13,6 +13,7 @@
 	--boxshadow-ontop: 0 1rem 1.1rem -0.7rem var(--secondary);
 	--boxshadow-onbottom: 0 -1rem 1.1rem -0.7rem var(--secondary);
 	overflow-x: hidden;
+	--fancy-font: "Satisfy", sans-serif;
 }
 
 body {
@@ -32,7 +33,7 @@ article {
 }
 
 nav {
-	font-family: "Bellota Text", sans-serif;
+	font-family: var(--fancy-font);
 	background: var(--secondary);
 }
 nav .nav-wrapper {
@@ -104,6 +105,9 @@ header {
 	padding: 0.7rem;
 	border-radius: 0.3rem 0.3rem 0 0;
 	border: 1px solid var(--secondary);
+}
+header h1 {
+	font-size: 4rem;
 }
 
 .grid {
@@ -314,7 +318,7 @@ input::placeholder {
 }
 
 footer {
-	font-family: "Bellota Text", cursive;
+	font-family: var(--fancy-font);
 	text-decoration: underline;
 	padding: 0.5rem;
 	margin: 0;

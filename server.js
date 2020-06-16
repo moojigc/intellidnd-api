@@ -5,6 +5,7 @@ const express = require("express"),
 	MongoDBStore = require("connect-mongodb-session")(session),
 	passport = require("./config/passport"),
 	flash = require("connect-flash"),
+	compression = require("compression"),
 	PORT = process.env.PORT || 3001,
 	MONGODB_URI = process.env.MONGODB_URI || require("./private.json").dev.MONGODB_URI;
 
@@ -23,6 +24,7 @@ Store.on("error", (error) => console.log(error));
 
 const app = express();
 app.use(express.static("public"))
+	.use(compression())
 	.use(express.urlencoded({ extended: true }))
 	.use(express.json())
 	// handlebars stuff
@@ -53,5 +55,12 @@ require("./routes/router")(app);
 require("./routes/user-router")(app);
 app.listen(PORT, (error) => {
 	if (error) throw error;
-	else console.log(`Listening on ${process.env.PORT ? "https://dnd-inventory-web.herokuapp.com/" : `http://localhost:${PORT}`}`);
+	else
+		console.log(
+			`Listening on ${
+				process.env.PORT
+					? "https://dnd-inventory-web.herokuapp.com/"
+					: `http://localhost:${PORT}`
+			}`
+		);
 });

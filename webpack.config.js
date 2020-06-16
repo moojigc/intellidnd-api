@@ -25,10 +25,10 @@ const config = {
 	plugins: [
 		new WebpackPwaManifest({
 			filename: "manifest.webmanifest",
-			inject: false,
+			inject: true,
 			fingerprints: false,
-			name: "DnD Inventory",
-			short_name: "DnD Inv",
+			name: "IntelliDnD",
+			short_name: "IntelliDnD",
 			theme_color: "#9b59b6",
 			background_color: "#192a51",
 			start_url: "/",
