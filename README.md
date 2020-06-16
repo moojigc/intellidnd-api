@@ -4,6 +4,8 @@ A simple Discord Bot that manages inventory for D&D campaigns, accompanied by a 
 
 Invite to your server: https://discordapp.com/api/oauth2/authorize?client_id=692109220371365989&permissions=134309888&scope=bot.
 
+<img src="https://www.intellidnd.com/assets/images/primary-logo-sm.png" width="75px">
+
 ## Bot Commands
 
 Commands are _not_ case sensitive.
