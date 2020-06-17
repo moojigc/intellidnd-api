@@ -74,23 +74,26 @@ function removeItem() {
 	modal($modalBackground, $);
 	money($, $gold, $silver, $copper, $electrum, $platinum);
 	// Show delete button
-	function delBtnShow() {
-		$(this).hide();
-		$(this).siblings(".del-btn").fadeIn("fast");
-	}
-	// Hide delete button
-	function delBtnHide() {
-		$(this).children(".del-btn").hide();
-		$(this).children(".name-label").fadeIn("fast");
-	}
-	// Event listeners
-	$(document).on("mouseenter", ".name-label", delBtnShow);
-	$(document).on("mouseleave", ".input-field", delBtnHide);
+	// function delBtnShow() {
+	// 	$(this).hide();
+	// 	$(this).siblings(".del-btn").fadeIn("fast");
+	// }
+	// // Hide delete button
+	// function delBtnHide() {
+	// 	$(this).children(".del-btn").hide();
+	// 	$(this).children(".name-label").fadeIn("fast");
+	// }
+	// // Event listeners
+	// $(document).on("mouseenter", ".name-label", delBtnShow);
+	// $(document).on("mouseleave", ".input-field", delBtnHide);
 	// delete button event
 	$(document).on("click", ".del-btn", async (event) => {
 		event.preventDefault();
 		// Delete the parent .row element
+		let confirmDelete = confirm("Confirm delete?");
+		if (!confirmDelete) return;
 		$(event.target).closest(".row").remove();
+		// Check with user
 		// Send to server...
 		let res = await entireBodyInputHandler(".potion-row", ".weapon-row", ".misc-row");
 		if (res.status === 404 || res.status === 202) {

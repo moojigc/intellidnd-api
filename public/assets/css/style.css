@@ -170,9 +170,14 @@ card-content {
 	flex-direction: row;
 	font-size: 1.5rem;
 }
-
-.prefixed-label,
 .del-btn {
+	display: flex;
+	align-items: center;
+	justify-content: right;
+	min-width: min-content;
+	height: auto;
+}
+.prefixed-label {
 	/* these undo Materialize CSS */
 	-webkit-transform: unset !important;
 	transform: unset;
@@ -184,11 +189,16 @@ card-content {
 	padding: 0.25rem;
 	display: flex;
 	align-items: center;
-	justify-content: right;
+	justify-content: center;
 	min-width: min-content;
-	width: 6rem;
+	width: auto;
 	font-stretch: expanded;
 	height: auto;
+}
+.money-card .prefixed-label {
+	width: 6rem;
+	justify-content: flex-end;
+	text-align: right;
 }
 
 .add-btn:hover {
@@ -261,9 +271,6 @@ input:focus {
 
 input::placeholder {
 	color: var(--gold);
-}
-.del-btn {
-	border-radius: 0.25rem 0 0 0.25rem !important;
 }
 
 .invalid {
