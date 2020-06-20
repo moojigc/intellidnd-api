@@ -1,5 +1,3 @@
-const { relativeTimeRounding } = require("moment");
-
 // @ts-check
 const dexRolls = /acrobatics|stealth|sleight\s?of\s?hand/i;
 const wisRolls = /animal\s?handling|insight|medicine|perception|survival/i;
@@ -21,9 +19,8 @@ const roll = async (message, player, discordMember, args) => {
 	const getRollDetails = (args) => {
 		let stringified = args.slice(0).join(" ");
 		let rolls = stringified.substring(stringified.search(/[0-9]|d/i)).split(/(?=-)|(?=\+)/);
-		// This regex checks for a string in the format of an optional leading 1 or 2 digit number, the letter "d", and a trailing 1 or 2 digit number.
-		// The first number cannot be 0 if there are 2 numbers.
-		let rollRegex = /\d+d\d+/i;
+		// This regex checks for a string in the format of an
+		let rollRegex = /(\d+)?d\d+/i;
 		return {
 			modifiers: rolls
 				// @ts-ignore
