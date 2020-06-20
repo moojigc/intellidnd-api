@@ -8,12 +8,11 @@
     "npm": "6.12.0"
   },
   "scripts": {
-    "watch": "webpack --watch",
+    "watch": "concurrently \"webpack --watch\" \"nodemon server.js\" --kill-others",
     "build": "webpack --mode=production",
     "bot": "node bot.js",
     "test": "jest",
-    "openweb": "code . & nodemon server.js",
-    "openbot": "code . & nodemon bot.js",
+    "open": "code . & concurrently \"webpack --watch\" \"nodemon server.js\" --kill-others",
     "web": "node server.js",
     "start": "node server.js"
   },
@@ -50,6 +49,7 @@
     "@babel/preset-env": "^7.10.2",
     "@babel/runtime": "^7.10.2",
     "babel-loader": "^8.1.0",
+    "concurrently": "^5.2.0",
     "eslint": "^7.2.0",
     "jquery": "^3.5.1",
     "materialize-css": "^1.0.0-rc.2",

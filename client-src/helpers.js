@@ -60,7 +60,10 @@ export function addRow(target) {
 		<div class="row ${findCategory(parentCard)}">
 			<div class="col s8">
 				<div class="input-field">
-					<button class="btn red lighten-1 del-btn" style="display: none;">Delete</button>
+					<div class="prefixed-label">
+						<button class="btn-floating red lighten-1 waves-effect waves-light del-btn"><i
+								class="material-icons">remove</i></button>
+					</div>
 					<input type="text" maxlength="90" class="name" placeholder="New..." value="">
 				</div>
 			</div>

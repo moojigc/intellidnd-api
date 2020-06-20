@@ -6,11 +6,11 @@ const { Client, MessageEmbed } = require("discord.js"),
 	MONGODB_URI = process.env.MONGODB_URI || require("./private.json").dev.MONGODB_URI,
 	BOT_TOKEN = process.env.BOT_TOKEN || require("./private.json").BOT_TOKEN;
 
-connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
-	.then((conn) => {
-		console.log(`Connected to ${conn.connections[0].db.databaseName}`);
-	})
-	.catch(console.error);
+connect(MONGODB_URI, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	useCreateIndex: true
+}).catch(console.error);
 
 client.once("ready", async () => {
 	console.log(`${client.user.username} is ready!`);
@@ -42,6 +42,7 @@ client.on("guildCreate", async (guild) => {
 
 client.on("message", async (message) => {
 	try {
+		if (!message.channel.permissionsFor(message.guild.me).has("SEND_MESSAGES")) return;
 		if ((process.env.PORT && message.guild.name === "Bot Testing") || message.author.bot)
 			return;
 		if (message.channel.type === "dm" && !message.author.bot) {
@@ -49,22 +50,22 @@ client.on("message", async (message) => {
 			if (regexTest)
 				return message.author.send(`:poop:僕は悪いボットではないよ！`).catch(console.error);
 			else
-				return message.author.send(
-					`Messages to this bot are not monitored. If you have any issues or feature requests, please go to https://github.com/moojigc/DiscordBot/issues.`
-				);
+				return message.author
+					.send(
+						`Messages to this bot are not monitored. If you have any issues or feature requests, please go to https://github.com/moojigc/DiscordBot/issues.`
+					)
+					.catch(console.error);
 		}
 		if (message.content.split("")[0] !== "/") return;
 		const isValid = (input) => {
-			let commands = /login|inventory|inv|wallet|create|deleteplayer|helpinventory|add|remove|overwrite|changelog|dm/;
+			let commands = /dice|d|login|inventory|inv|wallet|create|deleteplayer|helpinventory|add|remove|overwrite|changelog|dm/;
 			return input.match(commands);
 		};
 		const messageArr = message.content.toLowerCase().split(" "),
 			command = messageArr[0].split("").slice(1).join(""),
 			commandKeywords = messageArr.slice(1); // used by the if statement
 		// End whole script if no valid command entered
-		console.time("check");
 		if (!isValid(command)) return;
-		console.timeEnd("check");
 		const { createResponseEmbed } = require("./utils/globalFunctions.js")(message);
 
 		const checkMentionsAndPermissions = () => {
@@ -108,10 +109,11 @@ client.on("message", async (message) => {
 		let currentPlayer = await Player.findOne({
 			discordId: recipientPlayer.id + message.guild.id
 		});
+		// commands usable by anyone
+		const allUserCommands = (input) => /create|helpinventory|dice|d/.test(input);
 		if (
 			!currentPlayer &&
-			command !== "create" &&
-			command !== "helpinventory" &&
+			!allUserCommands(command) &&
 			recipientPlayer.displayName !== "@everyone"
 		)
 			return createResponseEmbed(
@@ -120,30 +122,30 @@ client.on("message", async (message) => {
 				`No data for ${recipientPlayer.displayName}. Run /create to start an inventory for this player.`
 			);
 		// Auto change names
-		if (currentPlayer.name !== recipientPlayer.displayName) {
+		if (currentPlayer && currentPlayer.name !== recipientPlayer.displayName) {
 			currentPlayer.name = recipientPlayer.displayName;
-			Player.updateOne({ name: recipientPlayer.displayName }).catch(console.error);
+			Player.updateOne({ name: recipientPlayer.displayName });
 		}
 		switch (command) {
 			case `inv`:
 			case `inventory`:
 				{
 					const { showInventory } = require("./commands/inv_wallet")(message);
-					await showInventory(currentPlayer, currentGuild);
+					showInventory(currentPlayer, currentGuild);
 				}
 
 				break;
 			case `wallet`:
 				{
 					const { showWallet } = require("./commands/inv_wallet")(message);
-					await showWallet(currentPlayer, currentGuild);
+					showWallet(currentPlayer, currentGuild);
 				}
 
 				break;
 			case `add`:
 				{
 					const { add } = require("./commands/add");
-					await currentPlayer.updateOne({
+					currentPlayer.updateOne({
 						inventory: add(message, args, currentPlayer).inventory,
 						changelog: currentPlayer.writeChangelog(message.content),
 						lastUpdated: Date.now()
@@ -154,21 +156,21 @@ client.on("message", async (message) => {
 			case `remove`:
 				{
 					const removeItem = require("./commands/remove");
-					await removeItem(message, args, currentPlayer);
+					removeItem(message, args, currentPlayer);
 				}
 
 				break;
 			case `overwrite`:
 				{
 					const overwrite = require("./commands/overwrite");
-					await overwrite(message, args, currentPlayer);
+					overwrite(message, args, currentPlayer);
 				}
 
 				break;
 			case `create`:
 				{
 					const create = require("./commands/create");
-					await create({
+					create({
 						createResponseEmbed: createResponseEmbed,
 						Player: Player,
 						Guild: Guild,
@@ -195,7 +197,7 @@ client.on("message", async (message) => {
 			case `dm`:
 				{
 					const dm = require("./commands/dm");
-					await currentPlayer.updateOne({
+					currentPlayer.updateOne({
 						notificationsToDM: dm(message, currentPlayer).notificationsToDM,
 						changelog: currentPlayer.writeChangelog(message.content),
 						lastUpdated: Date.now()
@@ -220,6 +222,13 @@ client.on("message", async (message) => {
 				{
 					const webLogin = require("./commands/login");
 					webLogin(message, currentPlayer);
+				}
+				break;
+			case `d`:
+			case `dice`:
+				{
+					const roll = require("./commands/roll");
+					roll(message, currentPlayer, recipientPlayer, args);
 				}
 				break;
 

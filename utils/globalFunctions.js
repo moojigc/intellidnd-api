@@ -12,15 +12,33 @@ function capitalize(input) {
 			}
 		};
 
-		if (englishKeywords.match() === false) return w.slice()[0].toUpperCase() + w.substring(1).toLowerCase();
+		if (englishKeywords.match() === false)
+			return w.slice()[0].toUpperCase() + w.substring(1).toLowerCase();
 		else return w.toLowerCase();
 	});
 	return caps.join(" ");
 }
 
+/**
+ * @module globalFunctions
+ * @exports createResponseEmbed
+ * @param {import("discord.js").Message} message
+ */
 module.exports = function (message) {
 	const userEntry = {
-		array: ["gold", "silver", "electrum", "platinum", "copper", "potions", "potion", "weapons", "weapon", "backpack", "misc"],
+		array: [
+			"gold",
+			"silver",
+			"electrum",
+			"platinum",
+			"copper",
+			"potions",
+			"potion",
+			"weapons",
+			"weapon",
+			"backpack",
+			"misc"
+		],
 		isValid: function (cat) {
 			if (this.array.includes(cat)) {
 				return true;
@@ -60,7 +78,7 @@ module.exports = function (message) {
 	 * @param {string} contents
 	 * @param {import("../models/Player")} player required if send === "send"
 	 */
-	function createResponseEmbed(send, type, contents, player) {
+	const createResponseEmbed = async (send, type, contents, player) => {
 		let embed;
 		try {
 			if (type === "invalid") {
@@ -75,7 +93,7 @@ module.exports = function (message) {
 		} catch (error) {
 			console.log(error);
 		}
-	}
+	};
 	/**
 	 * Create user wallet or full inventory
 	 * @param {import("../models/Player")} player
@@ -85,12 +103,36 @@ module.exports = function (message) {
 	function createInventoryEmbed(player, send, type) {
 		let embed;
 		const { lastUpdated } = player;
-		const { gold, silver, platinum, electrum, copper, potions, weapons, misc } = player.inventory;
+		const {
+			gold,
+			silver,
+			platinum,
+			electrum,
+			copper,
+			potions,
+			weapons,
+			misc
+		} = player.inventory;
 		if (type === "wallet") {
-			embed = new MessageEmbed().setTitle(`${player.name}'s wallet`).addFields({ name: "Platinum", value: platinum, inline: true }, { name: "Gold", value: gold, inline: true }, { name: "Electrum", value: electrum, inline: true }, { name: "Silver", value: silver, inline: true }, { name: "Copper", value: copper, inline: true }).setColor("#9B59B6").setFooter(`Campaign: ${player.guild}`);
+			embed = new MessageEmbed()
+				.setTitle(`${player.name}'s wallet`)
+				.addFields(
+					{ name: "Platinum", value: platinum, inline: true },
+					{ name: "Gold", value: gold, inline: true },
+					{ name: "Electrum", value: electrum, inline: true },
+					{ name: "Silver", value: silver, inline: true },
+					{ name: "Copper", value: copper, inline: true }
+				)
+				.setColor("#9B59B6")
+				.setFooter(`Campaign: ${player.guild}`);
 		} else {
 			// add the coins together, formatted into silver
-			const money = parseInt(platinum) * 10 + parseInt(gold) + parseInt(electrum) / 2 + parseInt(silver) / 10 + parseInt(copper) / 100;
+			const money =
+				parseInt(platinum) * 10 +
+				parseInt(gold) +
+				parseInt(electrum) / 2 +
+				parseInt(silver) / 10 +
+				parseInt(copper) / 100;
 			const List = (items) => {
 				if (!items || items.length === 0) {
 					return "None";
@@ -102,7 +144,13 @@ module.exports = function (message) {
 			};
 			embed = new MessageEmbed()
 				.setTitle(`${player.name}'s inventory`)
-				.addFields({ name: "Coins", value: `${money} gold` }, { name: "Potions", value: List(potions), inline: true }, { name: "Weapons", value: List(weapons), inline: true }, { name: "Misc.", value: List(misc), inline: true }, { name: "Last updated", value: moment(lastUpdated).format("MMMM Do, hh:mm a") })
+				.addFields(
+					{ name: "Coins", value: `${money} gold` },
+					{ name: "Potions", value: List(potions), inline: true },
+					{ name: "Weapons", value: List(weapons), inline: true },
+					{ name: "Misc.", value: List(misc), inline: true },
+					{ name: "Last updated", value: moment(lastUpdated).format("MMMM Do, hh:mm a") }
+				)
 				.setColor("#9B59B6")
 				.setFooter(`Campaign: ${player.guild}`);
 		}

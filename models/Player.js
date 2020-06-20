@@ -45,7 +45,41 @@ const PlayerSchema = new Schema({
 		type: Schema.Types.ObjectId,
 		ref: "User"
 	},
-	token: String
+	token: String,
+	diceRollsModifiers: {
+		type: Object,
+		default: {
+			initiative: 20
+		}
+	},
+	hitPoints: {
+		type: Number,
+		default: 1
+	},
+	strength: {
+		type: Number,
+		default: 10
+	},
+	dexterity: {
+		type: Number,
+		default: 10
+	},
+	constitution: {
+		type: Number,
+		default: 10
+	},
+	intelligence: {
+		type: Number,
+		default: 10
+	},
+	wisdom: {
+		type: Number,
+		default: 10
+	},
+	charisma: {
+		type: Number,
+		default: 10
+	}
 });
 
 PlayerSchema.methods.createInventory = function (prepack, goldCoins, silverCoins, copperCoins) {

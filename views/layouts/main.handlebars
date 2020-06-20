@@ -30,13 +30,19 @@
                     <h4 class="response-msg">Awaiting server response...</h4>
                 </div>
             </div>
-            <div class="row" style="margin: 1rem 0 0 0; justify-content: end;">
+            <div class="row">
                 <button class="btn btn-light back-btn">Back</button>
             </div>
         </div>
     </div>
     {{{body}}}
-
+    <div id="changes-alert" style="display: none;">
+        <div class="alert alert-danger" style="position: fixed; bottom: 1rem; padding: 0.5rem 2rem;
+            box-shadow: 0 0 1rem 1rem var(--dark);
+            text-shadow: 0px 0px 9px black;
+            background: #ff5b5b;">You
+            have unsaved changes!</div>
+    </div>
     <footer>
         <a href="/">See Bot Commands Guide</a>
         <a href="https://github.com/moojigc">Developed by Moojig Battsogt Ⓒ 2020</a>

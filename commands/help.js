@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js");
 
-function help(message) {
+const help = async (message) => {
 	let helpEmbed = new MessageEmbed()
 		.setTitle("DnD Inventory Bot Guide")
 		.setDescription(
@@ -57,8 +57,14 @@ function help(message) {
             **/add gold 50** will add to the current amount.
             **/remove gold 50** will subtract from the current amount.`
 			},
-			{ name: "/login", value: `Use this to get a link to login to this bot's website, where you can interact with your inventory through a graphic interface.` },
-			{ name: "Support", value: `If you find a bug or have any suggestions for additional features, please submit a ticket at https://github.com/moojigc/DiscordBot/issues.` },
+			{
+				name: "/login",
+				value: `Use this to get a link to login to this bot's website, where you can interact with your inventory through a graphic interface.`
+			},
+			{
+				name: "Support",
+				value: `If you find a bug or have any suggestions for additional features, please submit a ticket at https://github.com/moojigc/DiscordBot/issues.`
+			},
 			{
 				name: "Your Data",
 				value: `This bot uses a secure MongoDB database to store your inventory data. 
@@ -70,6 +76,6 @@ function help(message) {
 		.setColor("#9B59B6")
 		.setFooter("Both author: Moojig Battsogt");
 	message.channel.send(helpEmbed);
-}
+};
 
 module.exports = help;

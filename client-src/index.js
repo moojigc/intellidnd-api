@@ -89,19 +89,8 @@ function removeItem() {
 	// delete button event
 	$(document).on("click", ".del-btn", async (event) => {
 		event.preventDefault();
-		// Delete the parent .row element
-		let confirmDelete = confirm("Confirm delete?");
-		if (!confirmDelete) return;
+		$("#changes-alert").show("fast");
 		$(event.target).closest(".row").remove();
-		// Check with user
-		// Send to server...
-		let res = await entireBodyInputHandler(".potion-row", ".weapon-row", ".misc-row");
-		if (res.status === 404 || res.status === 202) {
-			$modalBackground.show("fast");
-			$responseMsg.text(res.message);
-		} else if (res.status === 500) {
-			window.location.assign(res.redirectURL);
-		}
 	});
 }
 
@@ -143,10 +132,12 @@ function main() {
 			let response = await entireBodyInputHandler(".potion-row", ".weapon-row", ".misc-row");
 			$modalBackground.fadeIn("fast");
 			$responseMsg.text(response.message);
+			$("#changes-alert").hide("fast");
 		} catch (error) {
-			console.log(error);
 			$modalBackground.fadeIn("fast");
 			$responseMsg.text("Sorry, an error occurred. Please try again later.");
+		} finally {
+			window.scrollTo({ top: 0 });
 		}
 	});
 	// Cancel 'enter' key press
@@ -194,6 +185,11 @@ function main() {
 		event.target.innerText = "Link copied!";
 	});
 	registerSW();
+	// Reset button
+	$(".reset").on("click", () => {
+		let reloadConf = confirm("Do you want to reset?");
+		if (reloadConf) location.reload();
+	});
 }
 
 main();

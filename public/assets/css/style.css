@@ -277,6 +277,15 @@ input::placeholder {
 	border: 1px solid red;
 }
 
+#changes-alert {
+	display: flex;
+	width: 100vw;
+	height: 100vh;
+	position: fixed;
+	z-index: 5;
+	justify-content: center;
+}
+
 .modal-background {
 	position: fixed;
 	z-index: 1000;
