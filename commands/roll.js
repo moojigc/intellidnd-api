@@ -39,7 +39,6 @@ const roll = async (message, player, discordMember, args) => {
 		};
 	};
 	let { rollName, rolls, modifiers } = getRollDetails(args);
-	console.log(modifiers);
 
 	// Ends func if no rolls, usually as a result of user inputting wrong syntax and regexes failed
 	if (rolls.length === 0) return message.channel.send(":poop:");
@@ -58,7 +57,6 @@ const roll = async (message, player, discordMember, args) => {
 		.reduce((prev, curr) => {
 			return prev.concat(curr);
 		}, []);
-	console.log(totalRaw);
 
 	// Returns a formatted string
 	const reply = () => {
