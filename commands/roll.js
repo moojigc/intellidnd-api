@@ -12,12 +12,32 @@ const strRolls = /athletics/i;
  * @param {string[]} args
  */
 const roll = async (message, player, discordMember, args) => {
+	const isSavedRoll = (input) =>
+		dexRolls.test(input) ||
+		wisRolls.test(input) ||
+		intRolls.test(input) ||
+		chaRolls.test(input) ||
+		strRolls.test(input);
+	switch (isSavedRoll(args)) {
+		case true:
+			{
+				console.log(true);
+			}
+			break;
+		case false:
+			{
+				console.log(false);
+			}
+			break;
+	}
 	/**
 	 * Using regexes, this deconstructs the roll, modifiers and roll label from user input
 	 * @param {string[]} args
 	 */
 	const getRollDetails = (args) => {
 		let stringified = args.slice(0).join(" ");
+		// Split the string starting from first character matching either a number or the letter d, and then
+		// set delimiter to + OR -, and include them in the result
 		let rolls = stringified.substring(stringified.search(/[0-9]|d/i)).split(/(?=-)|(?=\+)/);
 		// This regex checks for a string in the format of an
 		let rollRegex = /(\d+)?d\d+/i;
