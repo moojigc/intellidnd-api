@@ -12,24 +12,24 @@ const strRolls = /athletics/i;
  * @param {string[]} args
  */
 const roll = async (message, player, discordMember, args) => {
-	const isSavedRoll = (input) =>
-		dexRolls.test(input) ||
-		wisRolls.test(input) ||
-		intRolls.test(input) ||
-		chaRolls.test(input) ||
-		strRolls.test(input);
-	switch (isSavedRoll(args)) {
-		case true:
-			{
-				console.log(true);
-			}
-			break;
-		case false:
-			{
-				console.log(false);
-			}
-			break;
-	}
+	// const isSavedRoll = (input) =>
+	// 	dexRolls.test(input) ||
+	// 	wisRolls.test(input) ||
+	// 	intRolls.test(input) ||
+	// 	chaRolls.test(input) ||
+	// 	strRolls.test(input);
+	// switch (isSavedRoll(args)) {
+	// 	case true:
+	// 		{
+	// 			console.log(true);
+	// 		}
+	// 		break;
+	// 	case false:
+	// 		{
+	// 			console.log(false);
+	// 		}
+	// 		break;
+	// }
 	/**
 	 * Using regexes, this deconstructs the roll, modifiers and roll label from user input
 	 * @param {string[]} args
@@ -81,15 +81,10 @@ const roll = async (message, player, discordMember, args) => {
 		let readableModifiers2 = modifiers.map((m) => (m > 0 ? `+ ${m} ` : `- ${m * -1} `));
 		if (modifiers.length > 0) {
 			return (
-				`\`${rolls.join("+")}${readableModifiers.join("")}${
-					rollName ? " #" + rollName : ""
-				}\`: (` +
+				`\`${rolls.join("+")}${readableModifiers.join("")}${rollName ? " #" + rollName : ""}\`: (` +
 				totalRaw.join(" + ") +
 				`) ${readableModifiers2.join("")} ` +
-				`= **${
-					totalRaw.reduce((pv, cv) => pv + cv, 0) +
-					modifiers.reduce((pv, cv) => pv + cv, 0)
-				}**`
+				`= **${totalRaw.reduce((pv, cv) => pv + cv, 0) + modifiers.reduce((pv, cv) => pv + cv, 0)}**`
 			);
 		} else if (totalRaw.length > 1 && modifiers.length === 0) {
 			return (
@@ -101,10 +96,7 @@ const roll = async (message, player, discordMember, args) => {
 			return `\`${rolls[0]}${rollName ? " #" + rollName : ""}\`: **${totalRaw[0]}**`;
 		}
 	};
-	if (args.join(" ").match(/-s/i))
-		return message.channel.send(
-			`<@${discordMember.id}>: ${totalRaw.reduce((pv, cv) => pv + cv, 0)}`
-		);
+	if (args.join(" ").match(/-s/i)) return message.channel.send(`<@${discordMember.id}>: ${totalRaw.reduce((pv, cv) => pv + cv, 0)}`);
 	else return message.channel.send(`<@${discordMember.id}> rolled ${reply()}!`);
 };
 
