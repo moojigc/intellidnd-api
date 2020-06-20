@@ -23,7 +23,7 @@ const roll = async (message, player, discordMember, args) => {
 		let rolls = stringified.substring(stringified.search(/[0-9]|d/i)).split(/(?=-)|(?=\+)/);
 		// This regex checks for a string in the format of an optional leading 1 or 2 digit number, the letter "d", and a trailing 1 or 2 digit number.
 		// The first number cannot be 0 if there are 2 numbers.
-		let rollRegex = /[1-9]?[0-9]?d[1-9]?[0-9]/i;
+		let rollRegex = /\d+d\d+/i;
 		return {
 			modifiers: rolls
 				// @ts-ignore
@@ -84,7 +84,7 @@ const roll = async (message, player, discordMember, args) => {
 			return `\`${rolls[0]}${rollName ? " #" + rollName : ""}\`: **${totalRaw[0]}**`;
 		}
 	};
-	if (args.join(" ").match(/-s/))
+	if (args.join(" ").match(/-s/i))
 		return message.channel.send(
 			`<@${discordMember.id}>: ${totalRaw.reduce((pv, cv) => pv + cv, 0)}`
 		);
