@@ -9,7 +9,7 @@ const { create } = require("lodash");
 const setStats = async (message, args, player) => {
 	const { createResponseEmbed } = require("../utils/globalFunctions")(message);
 	let [property, value] = args;
-	const validProps = /hitPoints|strength|dexterity|constitution|intelligence|wisdom|charisma/i;
+	const validProps = /hp|strength|dexterity|constitution|intelligence|wisdom|charisma/i;
 	if (!validProps.test(property))
 		return createResponseEmbed(
 			"send",
