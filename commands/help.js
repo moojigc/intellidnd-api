@@ -2,13 +2,26 @@ const { MessageEmbed } = require("discord.js");
 
 const help = async (message) => {
 	let helpEmbed = new MessageEmbed()
-		.setTitle("DnD Inventory Bot Guide")
+		.setTitle("IntelliDnD Bot Guide")
 		.setDescription(
 			`Commands are *not* case-sensitive. 
         Members with kick/ban permission can run commands on other users by **@mentions** immediately after the command.
         For example, **/add @tomNook gold 1000** will add 1000 gold to @tomNook. This works for every command.`
 		)
 		.addFields(
+			{
+				name: "/stat",
+				value: `> \`/stat charisma 16\`
+				Use this command to modify your characters' stats. If you use the \`create\` command, all will be 10 by default.`
+			},
+			{
+				name: "/d, /dice",
+				value: `> \`/d 1d20, /dice d20+3d7+5\`
+				\`Either /d or /dice will work. Separate different rolls with a plus sign (+), and you can also add modifiers.
+				> /d persuasion, /d charisma
+				If you set your character's stats, rolling for a particular skill or stat will automatically roll 1d20 plus the correct modifier. 
+				`
+			},
 			{
 				name: "/inventory, /inv",
 				value: `Displays your own inventory. Adding a category
@@ -22,18 +35,18 @@ const help = async (message) => {
 			},
 			{
 				name: "/create",
-				value: `This command creates your inventory and all fields will be empty or 0 by default.
-            This bot uses nicknames as the player names, not the user's regular Discord username.`
+				value: `This command creates your character with an empty inventory. I recommend running /create then /login and use the website for initial setup.
+				This bot will set your nickname in the server as the player name, or your username if you do not have a nickname set.`
 			},
 			{
 				name: "/create prepack gold# silver# DM",
-				value: `This will prepack inventory with **crowbar, hammer, pitons x10, torches x10, rations x10, feet of hempen rope x100**.
-            **/create prepack 100 10 DM** set gold to 100, silver to 10, DMs on. If *DM* is not typed in, DMs will be off by default.`
+				value: `\`Ex: /create prepack 100 10 1 dm\` will generate a character that has 100 gold, 10 silver, 1 copper, and the bot will send you direct messages instead of in-channel replies (which is the default behaviour).
+				This will also prepack your inventory with \`crowbar, hammer, pitons x10, torches x10, rations x10, feet of hempen rope x100\`.`
 			},
 			{
 				name: "/remove *category*",
-				value: `Removes specified item or amount from the category.
-            For example, **/remove weapons net** will remove Net from weapons.`
+				value: `> Ex: /remove weapons net will remove 1 Net from weapons. /remove weapons net 5 will remove 5 Nets.
+				Removes specified item or amount from the category. Also supports comma-separated lists.`
 			},
 			{
 				name: "/dm",
@@ -42,24 +55,26 @@ const help = async (message) => {
 			},
 			{
 				name: "/overwrite",
-				value: `This command overwrites EVERYTHING in the specified category. For example, **/overwrite weapons Sword**
-            will delete all your weapons and set the Sword as your only weapon. Use with care.`
+				value: `> Ex:/overwrite weapons sword will delete your weapons category and replace it with Sword x1.
+				This command overwrites EVERYTHING in the specified category. Use with care.`
 			},
 			{
 				name: "/deleteplayer",
 				value: `Deletes your entire inventory and changelog.
-            Use with care.`
+            *Use with care!*`
 			},
 			{
 				name: "Money",
-				value: `When dealing with money, there are 3 possible commands. 
-            **/overwrite gold 50** will overwrite any previous amount and hardcode your current gold to 50.
-            **/add gold 50** will add to the current amount.
-            **/remove gold 50** will subtract from the current amount.`
+				value: `When dealing with money, there are 3 possible commands.
+
+				> \`/overwrite gold 50\` will overwrite any previous amount and hardcode your current gold to 50.
+				> \`/add gold 50\` will add to the current amount.			
+				> \`/remove gold 50\` will subtract from the current amount.
+			`
 			},
 			{
 				name: "/login",
-				value: `Use this to get a link to login to this bot's website, where you can interact with your inventory through a graphic interface.`
+				value: `You can login/register to view and edit your inventory on the IntelliDnD website: https://www.intellidnd.com/.`
 			},
 			{
 				name: "Support",
@@ -67,12 +82,16 @@ const help = async (message) => {
 			},
 			{
 				name: "Your Data",
-				value: `This bot uses a secure MongoDB database to store your inventory data. 
-            In addition, it stores your numerical user ID and Guild ID from Discord in order to match you with your inventory, as well as give you access to your inventory through the website with */login*. You can have one inventory per Discord server.
-            No sensitive data, like passwords, are stored.`
+				value: `Your Data
+				What data from Discord does this bot store?
+				* Your Discord user ID
+				* Your Discord server's ID
+				* Your nickname in that server (just your Discord username if you don't use a nickname)
+				* The last 20 commands you gave the bot
+				`
 			}
 		)
-		.setURL("https://github.com/moojigc/DiscordBot")
+		.setURL("https://github.com/moojigc/IntelliDnD")
 		.setColor("#9B59B6")
 		.setFooter("Both author: Moojig Battsogt");
 	message.channel.send(helpEmbed);

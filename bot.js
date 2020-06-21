@@ -34,7 +34,7 @@ client.on("guildCreate", async (guild) => {
 				return true;
 			else return false;
 		});
-		defaultChannel[1].send("Hello! To see a list of commands, run **/helpinventory**.");
+		defaultChannel[1].send("Hello! To see a list of commands, run **/intellidnd**.");
 	} catch (error) {
 		console.log(error);
 	}
@@ -43,7 +43,7 @@ client.on("guildCreate", async (guild) => {
 client.on("message", async (message) => {
 	try {
 		if (message.channel.type === "dm" && !message.author.bot) {
-			const regexTest = /fuck|dick|stupid/.test(message.content); // Hidden easter egg lol
+			const regexTest = /stupid|bad|bot/.test(message.content);
 			message.author
 				.send(
 					regexTest
@@ -59,7 +59,7 @@ client.on("message", async (message) => {
 		if (!message.channel.permissionsFor(message.guild.me).has("SEND_MESSAGES")) return;
 		if (message.content.split("")[0] !== "/") return;
 		const isValid = (input) => {
-			let commands = /stat|dice|d|login|inventory|inv|wallet|create|deleteplayer|helpinventory|add|remove|overwrite|changelog|dm/;
+			let commands = /stat|dice|d|login|inventory|inv|wallet|create|deleteplayer|intellidnd|add|remove|overwrite|changelog|dm/;
 			return input.match(commands);
 		};
 		const messageArr = message.content.toLowerCase().split(" "),
@@ -111,7 +111,7 @@ client.on("message", async (message) => {
 			discordId: recipientPlayer.id + message.guild.id
 		});
 		// commands usable by anyone
-		const allUserCommands = (input) => /create|helpinventory|dice|d/.test(input);
+		const allUserCommands = (input) => /create|intellidnd|dice|d/.test(input);
 		if (
 			!currentPlayer &&
 			!allUserCommands(command) &&
@@ -207,6 +207,7 @@ client.on("message", async (message) => {
 
 				break;
 			case `helpinventory`:
+			case `intellidnd`:
 				{
 					const help = require("./commands/help");
 					help(message);
