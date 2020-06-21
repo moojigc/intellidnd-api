@@ -76,7 +76,7 @@ module.exports = function (message) {
 	 * @param {"send" | "channel" | "DM"} send
 	 * @param {"invalid" | "success"} type
 	 * @param {string} contents
-	 * @param {import("../models/Player")} player required if send === "send"
+	 * @param {import("../models/Player")} [player] required if send === "send"
 	 */
 	const createResponseEmbed = async (send, type, contents, player) => {
 		let embed;

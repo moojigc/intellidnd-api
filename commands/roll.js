@@ -1,64 +1,87 @@
 // @ts-check
-const dexRolls = /acrobatics|stealth|sleight\s?of\s?hand/i;
-const wisRolls = /animal\s?handling|insight|medicine|perception|survival/i;
-const intRolls = /arcana|history|nature|religion/i;
-const chaRolls = /deception|intimidation|performance|persuasion/i;
-const strRolls = /athletics/i;
 /**
  * Do a roll!
- * @param {import("discord.js").Message} message
- * @param {import("../models/Player")} player
- * @param {import("discord.js").GuildMember | { id: string, displayName: string }} discordMember
- * @param {string[]} args
+ * @param {Object} options
+ * @param {import("discord.js").Message} options.message
+ * @param {import("../models/Player")} options.player
+ * @param {import("discord.js").GuildMember | { id: string, displayName: string }} options.discordMember
+ * @param {string[]} options.args
  */
-const roll = async (message, player, discordMember, args) => {
-	// const isSavedRoll = (input) =>
-	// 	dexRolls.test(input) ||
-	// 	wisRolls.test(input) ||
-	// 	intRolls.test(input) ||
-	// 	chaRolls.test(input) ||
-	// 	strRolls.test(input);
-	// switch (isSavedRoll(args)) {
-	// 	case true:
-	// 		{
-	// 			console.log(true);
-	// 		}
-	// 		break;
-	// 	case false:
-	// 		{
-	// 			console.log(false);
-	// 		}
-	// 		break;
-	// }
+const roll = ({ message, player, discordMember, args }) => {
+	const dexRolls = {
+		regExp: /acro(batics)?|stealth|sleight(\s?of\s?hand)?|dex(terity)?/i,
+		property: "dexterity"
+	};
+	const wisRolls = {
+		regExp: /animal(s?\s?handling)?|insight|med(icine)?|perc(eption)?|surv(ival)?|wis(dom)?/i,
+		property: "wisdom"
+	};
+	const intRolls = {
+		regExp: /arcana|hist(ory)?|nat(ure)?|rel(igion)?|intel(ligence)?/i,
+		property: "intelligence"
+	};
+	const chaRolls = {
+		regExp: /decep(tion)?|intim(idation)?|perf(ormance)?|pers(uasion)?|char(isma)?/i,
+		property: "charisma"
+	};
+	const strRolls = { regExp: /athletics|str(ength)?/i, property: "strength" };
+	const rollRegexes = [dexRolls, wisRolls, intRolls, chaRolls, strRolls];
+	const { createResponseEmbed } = require("../utils/globalFunctions")(message);
+	// @ts-ignore
+	const isSavedRoll = (input) =>
+		rollRegexes.filter(({ regExp }) => regExp.test(input)).length > 0 ? true : false;
 	/**
 	 * Using regexes, this deconstructs the roll, modifiers and roll label from user input
 	 * @param {string[]} args
 	 */
 	const getRollDetails = (args) => {
-		let stringified = args.slice(0).join(" ");
-		// Split the string starting from first character matching either a number or the letter d, and then
-		// set delimiter to + OR -, and include them in the result
-		let rolls = stringified.substring(stringified.search(/[0-9]|d/i)).split(/(?=-)|(?=\+)/);
-		// This regex checks for a string in the format of an
-		let rollRegex = /(\d+)?d\d+/i;
-		return {
-			modifiers: rolls
-				// @ts-ignore
-				.filter((r) => !r.match(rollRegex) && !isNaN(r))
-				.map((r) => parseInt(r)),
-			rolls: rolls
-				.map((r) => {
-					let match = r.match(rollRegex);
-					return match ? match[0] : null;
-				})
-				.filter((r) => !!r),
-			rollName: stringified.split(/#/)[1]
-		};
+		if (isSavedRoll(args.join(" "))) {
+			let [savedRoll] = args;
+			let [{ property }] = rollRegexes.filter(({ regExp, property }) =>
+				regExp.test(savedRoll)
+			);
+			let mod = player ? Math.floor((player[property] - 10) / 2) : 0;
+			console.log(mod);
+			return {
+				modifiers: mod !== 0 ? [mod] : [],
+				rollName: savedRoll,
+				rolls: ["1d20"],
+				noPlayerData: player ? false : true
+			};
+		} else {
+			let stringified = args.join(" ");
+			// Split the string starting from first character matching either a number or the letter d, and then
+			// set delimiter to + OR -, and include them in the result
+			let rolls = stringified.substring(stringified.search(/[0-9]|d/i)).split(/(?=-)|(?=\+)/);
+			// This regex checks for a string in the format of number + d + number
+			let rollRegex = /(\d+)?d\d+/i;
+			return {
+				modifiers: rolls
+					// @ts-ignore
+					.filter((r) => !r.match(rollRegex) && !isNaN(r))
+					.map((r) => parseInt(r)),
+				rolls: rolls
+					.map((r) => {
+						let match = r.match(rollRegex);
+						return match ? match[0] : null;
+					})
+					.filter((r) => !!r),
+				rollName: stringified.split(/#/)[1]
+			};
+		}
 	};
-	let { rollName, rolls, modifiers } = getRollDetails(args);
+	let { rollName, rolls, modifiers, noPlayerData } = getRollDetails(args);
 
-	// Ends func if no rolls, usually as a result of user inputting wrong syntax and regexes failed
-	if (rolls.length === 0) return message.channel.send(":poop:");
+	// If user tries to enter in a saved roll but doesn't have a player setup
+	if (noPlayerData)
+		return createResponseEmbed(
+			"channel",
+			"invalid",
+			`No saved rolls found for ${discordMember.displayName}! Try \`/create\`.`
+		);
+	if (rolls.length === 0)
+		// Ends func if no rolls, usually as a result of user inputting wrong syntax and regexes failed
+		return message.channel.send(":poop:");
 
 	let totalRaw = rolls
 		.map((roll) => {
@@ -81,10 +104,15 @@ const roll = async (message, player, discordMember, args) => {
 		let readableModifiers2 = modifiers.map((m) => (m > 0 ? `+ ${m} ` : `- ${m * -1} `));
 		if (modifiers.length > 0) {
 			return (
-				`\`${rolls.join("+")}${readableModifiers.join("")}${rollName ? " #" + rollName : ""}\`: (` +
+				`\`${rolls.join("+")}${readableModifiers.join("")}${
+					rollName ? " #" + rollName : ""
+				}\`: (` +
 				totalRaw.join(" + ") +
 				`) ${readableModifiers2.join("")} ` +
-				`= **${totalRaw.reduce((pv, cv) => pv + cv, 0) + modifiers.reduce((pv, cv) => pv + cv, 0)}**`
+				`= **${
+					totalRaw.reduce((pv, cv) => pv + cv, 0) +
+					modifiers.reduce((pv, cv) => pv + cv, 0)
+				}**`
 			);
 		} else if (totalRaw.length > 1 && modifiers.length === 0) {
 			return (
@@ -96,8 +124,15 @@ const roll = async (message, player, discordMember, args) => {
 			return `\`${rolls[0]}${rollName ? " #" + rollName : ""}\`: **${totalRaw[0]}**`;
 		}
 	};
-	if (args.join(" ").match(/-s/i)) return message.channel.send(`<@${discordMember.id}>: ${totalRaw.reduce((pv, cv) => pv + cv, 0)}`);
-	else return message.channel.send(`<@${discordMember.id}> rolled ${reply()}!`);
+	if (!message) {
+		return reply;
+	} else {
+		if (args.join(" ").match(/-s/i))
+			message.channel.send(
+				`<@${discordMember.id}>: ${totalRaw.reduce((pv, cv) => pv + cv, 0)}`
+			);
+		else message.channel.send(`<@${discordMember.id}> rolled ${reply()}!`);
+	}
 };
 
-module.exports = roll;
+module.exports = { roll, rollRegexes };

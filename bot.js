@@ -15,7 +15,12 @@ connect(MONGODB_URI, {
 client.once("ready", async () => {
 	console.log(`${client.user.username} is ready!`);
 	try {
-		let link = await client.generateInvite(["MANAGE_MESSAGES", "SEND_MESSAGES", "READ_MESSAGE_HISTORY", "EMBED_LINKS"]);
+		let link = await client.generateInvite([
+			"MANAGE_MESSAGES",
+			"SEND_MESSAGES",
+			"READ_MESSAGE_HISTORY",
+			"EMBED_LINKS"
+		]);
 		console.log(link);
 	} catch (e) {
 		console.log(e.stack);
@@ -25,7 +30,8 @@ client.once("ready", async () => {
 client.on("guildCreate", async (guild) => {
 	try {
 		let [defaultChannel] = guild.channels.cache.filter((channel) => {
-			if (channel.type == "text" && channel.permissionsFor(guild.me).has("SEND_MESSAGES")) return true;
+			if (channel.type == "text" && channel.permissionsFor(guild.me).has("SEND_MESSAGES"))
+				return true;
 			else return false;
 		});
 		defaultChannel[1].send("Hello! To see a list of commands, run **/helpinventory**.");
@@ -48,12 +54,12 @@ client.on("message", async (message) => {
 			return;
 		}
 		if (message.author.bot) return;
-		if ((process.env.PORT && message.guild.name === "Bot Testing") || message.guild.name === "A Stroll Through Chawbig" || message.author.bot)
+		if ((process.env.PORT && message.guild.name === "Bot Testing") || message.author.bot)
 			return;
 		if (!message.channel.permissionsFor(message.guild.me).has("SEND_MESSAGES")) return;
 		if (message.content.split("")[0] !== "/") return;
 		const isValid = (input) => {
-			let commands = /dice|d|login|inventory|inv|wallet|create|deleteplayer|helpinventory|add|remove|overwrite|changelog|dm/;
+			let commands = /stat|dice|d|login|inventory|inv|wallet|create|deleteplayer|helpinventory|add|remove|overwrite|changelog|dm/;
 			return input.match(commands);
 		};
 		const messageArr = message.content.toLowerCase().split(" "),
@@ -67,8 +73,15 @@ client.on("message", async (message) => {
 			// Check whether acting upon author of the message or a mentioned user, or @ everyone
 			if (message.mentions.users.array().length > 0 || message.mentions.everyone) {
 				const nullObject = { id: null, displayName: "@everyone" }; // Prevents errors when getting the inventory of @everyone
-				if (!message.member.hasPermission("BAN_MEMBERS") || !message.member.hasPermission("KICK_MEMBERS")) {
-					createResponseEmbed("channel", "invalid", `User <@${message.author.id}> does not have sufficient privileges for this action.`);
+				if (
+					!message.member.hasPermission("BAN_MEMBERS") ||
+					!message.member.hasPermission("KICK_MEMBERS")
+				) {
+					createResponseEmbed(
+						"channel",
+						"invalid",
+						`User <@${message.author.id}> does not have sufficient privileges for this action.`
+					);
 					return {
 						args: [""],
 						recipientPlayer: message.member,
@@ -77,7 +90,10 @@ client.on("message", async (message) => {
 				} else {
 					return {
 						args: commandKeywords.slice(1), // accounts for @mention being the 2nd word in the message
-						recipientPlayer: commandKeywords[0] === "@everyone" ? nullObject : message.mentions.members.first()
+						recipientPlayer:
+							commandKeywords[0] === "@everyone"
+								? nullObject
+								: message.mentions.members.first()
 					};
 				}
 			} else {
@@ -96,7 +112,11 @@ client.on("message", async (message) => {
 		});
 		// commands usable by anyone
 		const allUserCommands = (input) => /create|helpinventory|dice|d/.test(input);
-		if (!currentPlayer && !allUserCommands(command) && recipientPlayer.displayName !== "@everyone")
+		if (
+			!currentPlayer &&
+			!allUserCommands(command) &&
+			recipientPlayer.displayName !== "@everyone"
+		)
 			return createResponseEmbed(
 				"channel",
 				"invalid",
@@ -167,7 +187,11 @@ client.on("message", async (message) => {
 			case `deleteplayer`:
 				{
 					await currentPlayer.remove();
-					createResponseEmbed("channel", "success", `Player ${recipientPlayer.displayName}'s inventory successfully deleted.`);
+					createResponseEmbed(
+						"channel",
+						"success",
+						`Player ${recipientPlayer.displayName}'s inventory successfully deleted.`
+					);
 				}
 
 				break;
@@ -204,11 +228,21 @@ client.on("message", async (message) => {
 			case `d`:
 			case `dice`:
 				{
-					const roll = require("./commands/roll");
-					roll(message, currentPlayer, recipientPlayer, args);
+					const { roll } = require("./commands/roll");
+					roll({
+						message: message,
+						player: currentPlayer,
+						discordMember: recipientPlayer,
+						args: args
+					});
 				}
 				break;
-
+			case `stat`:
+				{
+					const setStats = require("./commands/setStats");
+					setStats(message, args, currentPlayer);
+				}
+				break;
 			default:
 				// Keep blank so the bot doesn't interfere with other bots
 				return;
