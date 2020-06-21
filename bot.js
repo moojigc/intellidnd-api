@@ -198,11 +198,7 @@ client.on("message", async (message) => {
 			case `dm`:
 				{
 					const dm = require("./commands/dm");
-					currentPlayer.updateOne({
-						notificationsToDM: dm(message, currentPlayer).notificationsToDM,
-						changelog: currentPlayer.writeChangelog(message.content),
-						lastUpdated: Date.now()
-					});
+					dm(message, currentPlayer);
 				}
 
 				break;

@@ -1,5 +1,5 @@
 const dexRolls = {
-	regExp: /acro(batics)?|ste(alth?)|sleight(\s?of\s?hand)?|dex(terity)?/i,
+	regExp: /acro(batics)?|ste(alth?)|sleight(\s?of\s?hand)?|dex(terity)?|init(iative)?/i,
 	property: "dexterity"
 };
 const wisRolls = {

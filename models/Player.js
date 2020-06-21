@@ -46,11 +46,9 @@ const PlayerSchema = new Schema({
 		ref: "User"
 	},
 	token: String,
-	diceRollsModifiers: {
-		type: Object,
-		default: {
-			initiative: 20
-		}
+	initiative: {
+		type: Number,
+		default: 0
 	},
 	hp: {
 		type: Number,
