@@ -1,3 +1,21 @@
+const dexRolls = {
+	regExp: /acro(batics)?|stealth|sleight(\s?of\s?hand)?|dex(terity)?/i,
+	property: "dexterity"
+};
+const wisRolls = {
+	regExp: /animal(s?\s?handling)?|insight|med(icine)?|perc(eption)?|surv(ival)?|wis(dom)?/i,
+	property: "wisdom"
+};
+const intRolls = {
+	regExp: /arcana|hist(ory)?|nat(ure)?|rel(igion)?|intel(ligence)?/i,
+	property: "intelligence"
+};
+const chaRolls = {
+	regExp: /decep(tion)?|intim(idation)?|perf(ormance)?|pers(uasion)?|char(isma)?/i,
+	property: "charisma"
+};
+const strRolls = { regExp: /athletics|str(ength)?/i, property: "strength" };
+const rollRegexes = [dexRolls, wisRolls, intRolls, chaRolls, strRolls];
 // @ts-check
 /**
  * Do a roll!
@@ -8,24 +26,6 @@
  * @param {string[]} options.args
  */
 const roll = ({ message, player, discordMember, args }) => {
-	const dexRolls = {
-		regExp: /acro(batics)?|stealth|sleight(\s?of\s?hand)?|dex(terity)?/i,
-		property: "dexterity"
-	};
-	const wisRolls = {
-		regExp: /animal(s?\s?handling)?|insight|med(icine)?|perc(eption)?|surv(ival)?|wis(dom)?/i,
-		property: "wisdom"
-	};
-	const intRolls = {
-		regExp: /arcana|hist(ory)?|nat(ure)?|rel(igion)?|intel(ligence)?/i,
-		property: "intelligence"
-	};
-	const chaRolls = {
-		regExp: /decep(tion)?|intim(idation)?|perf(ormance)?|pers(uasion)?|char(isma)?/i,
-		property: "charisma"
-	};
-	const strRolls = { regExp: /athletics|str(ength)?/i, property: "strength" };
-	const rollRegexes = [dexRolls, wisRolls, intRolls, chaRolls, strRolls];
 	const { createResponseEmbed } = require("../utils/globalFunctions")(message);
 	// @ts-ignore
 	const isSavedRoll = (input) =>
