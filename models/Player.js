@@ -52,7 +52,7 @@ const PlayerSchema = new Schema({
 			initiative: 20
 		}
 	},
-	hitPoints: {
+	hp: {
 		type: Number,
 		default: 1
 	},

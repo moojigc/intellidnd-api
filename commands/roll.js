@@ -1,5 +1,5 @@
 const dexRolls = {
-	regExp: /acro(batics)?|stealth|sleight(\s?of\s?hand)?|dex(terity)?/i,
+	regExp: /acro(batics)?|ste(alth?)|sleight(\s?of\s?hand)?|dex(terity)?/i,
 	property: "dexterity"
 };
 const wisRolls = {
@@ -7,7 +7,7 @@ const wisRolls = {
 	property: "wisdom"
 };
 const intRolls = {
-	regExp: /arcana|hist(ory)?|nat(ure)?|rel(igion)?|intel(ligence)?/i,
+	regExp: /arca(na)?|hist(ory)?|nat(ure)?|rel(igion)?|intel(ligence)?/i,
 	property: "intelligence"
 };
 const chaRolls = {
@@ -37,11 +37,8 @@ const roll = ({ message, player, discordMember, args }) => {
 	const getRollDetails = (args) => {
 		if (isSavedRoll(args.join(" "))) {
 			let [savedRoll] = args;
-			let [{ property }] = rollRegexes.filter(({ regExp, property }) =>
-				regExp.test(savedRoll)
-			);
+			let [{ property }] = rollRegexes.filter(({ regExp }) => regExp.test(savedRoll));
 			let mod = player ? Math.floor((player[property] - 10) / 2) : 0;
-			console.log(mod);
 			return {
 				modifiers: mod !== 0 ? [mod] : [],
 				rollName: savedRoll,
