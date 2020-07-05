@@ -1,5 +1,3 @@
-const { create } = require("lodash");
-
 /**
  * Set player stats
  * @param {import("discord.js").Message} message

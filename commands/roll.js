@@ -29,7 +29,7 @@ const roll = ({ message, player, discordMember, args }) => {
 	const { createResponseEmbed } = require("../utils/globalFunctions")(message);
 	// @ts-ignore
 	const isSavedRoll = (input) =>
-		rollRegexes.filter(({ regExp }) => regExp.test(input)).length > 0 ? true : false;
+		rollRegexes.filter(({ regExp }) => regExp.test(input)).length > 0 && !/#/.test(input);
 	/**
 	 * Using regexes, this deconstructs the roll, modifiers and roll label from user input
 	 * @param {string[]} args
