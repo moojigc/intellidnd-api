@@ -49,13 +49,16 @@ const roll = ({ message, player, discordMember, args }) => {
 			let stringified = args.join(" ");
 			// Split the string starting from first character matching either a number or the letter d, and then
 			// set delimiter to + OR -, and include them in the result
-			let rolls = stringified.substring(stringified.search(/[0-9]|d/i)).split(/(?=-)|(?=\+)/);
+			let rolls = stringified
+				.substring(stringified.search(/[0-9]|d/i))
+				.split(/(?=-)|(?=\+)|#/);
 			// This regex checks for a string in the format of number + d + number
 			let rollRegex = /(\d+)?d\d+/i;
 			return {
 				modifiers: rolls
-					// @ts-ignore
-					.filter((r) => !r.match(rollRegex) && !isNaN(r))
+					.filter((r) => {
+						return !r.match(rollRegex) && !isNaN(r);
+					})
 					.map((r) => parseInt(r)),
 				rolls: rolls
 					.map((r) => {

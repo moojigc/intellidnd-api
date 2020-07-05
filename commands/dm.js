@@ -16,7 +16,7 @@ const dm = async (message, player) => {
 			break;
 		case "off":
 			createResponseEmbed(
-				"send",
+				"channel",
 				"success",
 				"I will now send you updates within the channel.",
 				player

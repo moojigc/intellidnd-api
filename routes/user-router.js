@@ -24,7 +24,10 @@ module.exports = (app) => {
 			res.redirect("/register");
 			// Player registered to another user
 		} else if (playerData.webUserId) {
-			req.flash("errorMsg", "Player is already registered. If you think this is incorrect, please reset your token.");
+			req.flash(
+				"errorMsg",
+				"Player is already registered. If you think this is incorrect, please reset your token."
+			);
 			res.redirect("/register");
 			// If any field is empty
 		} else if (username === "" || password === "" || password2 === "") {
@@ -88,7 +91,9 @@ module.exports = (app) => {
 			res.redirect("/login");
 		} else {
 			try {
-				let { defaultPlayer } = await User.findOne({ _id: ObjectId(req.user) }).populate("defaultPlayer");
+				let { defaultPlayer } = await User.findOne({ _id: ObjectId(req.user) }).populate(
+					"defaultPlayer"
+				);
 				res.render("inventory", {
 					player: defaultPlayer.toObject(),
 					userStatus: userStatus(req)
@@ -146,26 +151,46 @@ module.exports = (app) => {
 				let playerData = await Player.findOne({ token: token, name: characterName });
 				if (playerData) {
 					let user = await User.findOne({ _id: ObjectId(req.user) }).populate("players");
-					let characterCheck = user.players.filter((p) => playerData._id.toString() === p._id.toString());
+					let characterCheck = user.players.filter(
+						(p) => playerData._id.toString() === p._id.toString()
+					);
 
 					if (characterCheck.length > 0) {
-						req.flash("errorMsg", `${req.body.characterName} has already been added to your character list.`);
+						req.flash(
+							"errorMsg",
+							`${req.body.characterName} has already been added to your character list.`
+						);
 						res.redirect("/add-character");
 						return;
 					}
 					// Update player with new webUserId, update user with new player IDs
-					let playerResponse = await Player.updateOne({ _id: ObjectId(playerData._id) }, { webUserId: req.user });
-					let userResponse = await User.updateOne({ _id: ObjectId(req.user) }, { $push: { players: playerData._id } });
+					let playerResponse = await Player.updateOne(
+						{ _id: ObjectId(playerData._id) },
+						{ webUserId: req.user }
+					);
+					let userResponse = await User.updateOne(
+						{ _id: ObjectId(req.user) },
+						{ $push: { players: playerData._id } }
+					);
 
 					if (userResponse.nModified === 1 && playerResponse.nModified === 1) {
-						req.flash("successMsg", `Added ${playerData.name} to your list of characters.`);
+						req.flash(
+							"successMsg",
+							`Added ${playerData.name} to your list of characters.`
+						);
 						res.redirect("/add-character");
 					} else {
-						req.flash("errorMsg", `Unexpected error: Could not add ${playerData.name} to your list of characters.`);
+						req.flash(
+							"errorMsg",
+							`Unexpected error: Could not add ${playerData.name} to your list of characters.`
+						);
 						res.redirect("/add-character");
 					}
 				} else {
-					req.flash("errorMsg", "Sorry, either that character doesn't exist, or the token was incorrect.");
+					req.flash(
+						"errorMsg",
+						"Sorry, either that character doesn't exist, or the token was incorrect."
+					);
 					res.redirect("/add-character");
 				}
 			}
@@ -183,7 +208,10 @@ module.exports = (app) => {
 			res.redirect("/all-characters");
 			return;
 		}
-		const { nModified } = await User.updateOne({ _id: ObjectId(req.user) }, { defaultPlayer: player._id });
+		const { nModified } = await User.updateOne(
+			{ _id: ObjectId(req.user) },
+			{ defaultPlayer: player._id }
+		);
 		if (nModified === 1) {
 			req.flash("successMsg", `${player.name} is now your default character.`);
 			res.redirect("/all-characters");
