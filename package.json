@@ -1,20 +1,21 @@
 {
   "name": "intellidnd",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A Discord bot for handling inventory in DnD campaigns.",
-  "main": "bot.js",
+  "main": "server/build/server.bundle.js",
   "engines": {
     "node": "12.13.0",
     "npm": "6.12.0"
   },
   "scripts": {
-    "watch": "concurrently \"webpack --watch\" \"nodemon server.js\" --kill-others",
-    "build": "webpack --mode=production",
-    "bot": "node bot.js",
-    "test": "jest",
-    "open": "code . & concurrently \"webpack --watch\" \"nodemon server.js\" --kill-others",
-    "web": "node server.js",
-    "start": "node server.js"
+    "install": "cd client && npm install",
+    "client": "cd client && npm start",
+    "server": "ts-node-dev --project ./tsconfig.server.json --respawn server/src/index.ts",
+    "open": "code . & npm run watch",
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "bot": "ts-node-dev bot/src",
+    "build": "tsc --project ./tsconfig.server.json server/src && tsc --project ./tsconfig.bot.json bot/src && cd client && npm run build",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -28,34 +29,43 @@
     "compression": "^1.7.4",
     "connect-flash": "^0.1.1",
     "connect-mongodb-session": "^2.3.2",
+    "cors": "^2.8.5",
     "discord.js": "^12.0.2",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-handlebars": "^4.0.4",
     "express-session": "^1.17.1",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "mongoose": "^5.9.18",
     "passport": "^0.4.1",
-    "passport-local": "^1.0.0",
-    "rand-token": "^1.0.1"
+    "passport-local": "^1.0.0"
   },
   "bugs": {
     "url": "https://github.com/moojigc/DiscordBot/issues"
   },
   "homepage": "https://github.com/moojigc/DiscordBot#readme",
   "devDependencies": {
-    "@babel/core": "^7.10.2",
-    "@babel/plugin-transform-runtime": "^7.10.1",
-    "@babel/preset-env": "^7.10.2",
-    "@babel/runtime": "^7.10.2",
-    "babel-loader": "^8.1.0",
+    "@types/axios": "^0.14.0",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/compression": "^1.7.0",
+    "@types/connect-mongodb-session": "0.0.3",
+    "@types/cors": "^2.8.6",
+    "@types/express": "^4.17.7",
+    "@types/express-session": "^1.17.0",
+    "@types/jsonwebtoken": "^8.5.0",
+    "@types/lodash": "^4.14.158",
+    "@types/moment": "^2.13.0",
+    "@types/mongoose": "^5.7.32",
+    "@types/node": "^14.0.26",
+    "@types/passport": "^1.0.4",
+    "@types/passport-local": "^1.0.33",
     "concurrently": "^5.2.0",
-    "eslint": "^7.2.0",
-    "jquery": "^3.5.1",
-    "materialize-css": "^1.0.0-rc.2",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
-    "webpack-pwa-manifest": "^4.2.0"
+    "ts-loader": "^8.0.1",
+    "ts-node": "^8.10.2",
+    "ts-node-dev": "^1.0.0-pre.56",
+    "typescript": "^3.9.7"
   },
   "keywords": [
     "dnd",

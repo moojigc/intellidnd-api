@@ -1,0 +1,5 @@
+{
+    "extends": "./tsconfig.base.json",
+    "include": ["backend/src/*"],
+    "outFile": "/backend/build/index.js"
+}

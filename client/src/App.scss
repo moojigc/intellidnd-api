@@ -1,0 +1,39 @@
+@import "./assets/scss/variables.scss";
+
+:root {
+    font-size: 20px;
+    --primary: #9b59b6;
+    --secondary: #192a51;
+    --purple-faded: #aaa1c8;
+    --purple-white: #d5c6e0;
+    --red-white: #f5e6e8;
+    --purple-light: #d9b9f5;
+    --gray-dark: #00000047;
+    --gold: #ffcb51;
+    --dark-transparent: #00000047;
+    --boxshadow-ontop: 0 1rem 1.1rem -0.7rem var(--secondary);
+    --boxshadow-onbottom: 0 -1rem 1.1rem -0.7rem var(--secondary);
+    overflow-x: hidden;
+    --fancy-font: 'Satisfy', sans-serif;
+}
+
+body {
+    background-image: url('/assets/images/primary-logo-sm.png');
+    background-size: auto;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--purple-light);
+}
+
+.wrapper {
+	background: var(--secondary);
+	opacity: 0.9;
+	padding: 1rem;
+	color: whitesmoke;
+}
+
+a {
+	color: var(--secondary);
+	&:hover, :visited {
+		color: darken()
+	}
+}
