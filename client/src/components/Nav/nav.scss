@@ -1,0 +1,17 @@
+@import "../../assets/scss/variables.scss";
+
+.navbar {
+    flex-grow: 1;
+    font-family: 'Oxygen', sans-serif;
+    .nav {   
+        background: var(--secondary);
+    }
+    .brand {
+        flex-grow: 1;
+        font-size: 1rem;
+    }
+    .logo {
+        margin-right: 0.5rem;
+        width: 2rem;
+    }
+}

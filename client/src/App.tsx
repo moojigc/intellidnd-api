@@ -1,29 +1,28 @@
 import React from 'react';
+
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { CssBaseline } from '@material-ui/core';
-import { connect } from 'react-redux';
+import { CssBaseline, ThemeProvider } from '@material-ui/core';
+import Nav from './components/Nav'
+import Guide from './pages/Guide';
+
 import './App.scss';
-import Guide from './pages/Guide/Guide';
+import { theme } from './utils/theme';
 
 function App() {
+    const preferredTheme = theme('light')
     return (
         <Router>
-			<CssBaseline/>
-            <Switch>
-                <Route exact path="/">
-                    <Guide />
-                </Route>
-            </Switch>
+            <ThemeProvider theme={preferredTheme}>
+                <CssBaseline/>
+                <Nav/>
+                <Switch>
+                    <Route exact path="/">
+                        <Guide />
+                    </Route>
+                </Switch>
+            </ThemeProvider>
         </Router>
     );
 }
-
-// const mapStateToProps = (state: any) => ({
-// 	user: {
-// 		id: state.id,
-// 		username: state.username,
-// 		auth: state.auth
-// 	}
-// })
 
 export default App;

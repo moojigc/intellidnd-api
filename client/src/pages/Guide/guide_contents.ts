@@ -9,9 +9,9 @@ export default {
         },
         {
             name: '/d, /dice',
-            example: '> `/d 1d20, /dice d20+3d7+5',
+            example: '> `/d 1d20, /dice d20+3d7+5`',
             explanation:
-                `Either /d or /dice will work. Separate different rolls with a plus sign (+), and you can also add modifiers.\t> /d persuasion, /d charisma\tIf you set your character's stats, rolling for a particular skill or stat will automatically roll 1d20 plus the correct modifier.`
+                `Either /d or /dice will work. Separate different rolls with a plus sign (+), and you can also add modifiers.\n> \`/d persuasion, /d charisma\` - If you set your character's stats, rolling for a particular skill or stat will automatically roll 1d20 plus the correct modifier.`
         },
         {
             name: '/inventory, /inv',
@@ -19,17 +19,15 @@ export default {
         },
         {
             name: '/add *category*',
-            example: `Adds new items to specified category. Supports lists of items, and quantity, but not both at the same time.
-        e.g.explanation:  **/add gold 50** adds 50 to gold, **/add potions Health 2** will add Health x2, and **/add potions Health, Poison** will add Health and Poison.`
+            explanation: "Adds new items to specified category. Supports lists of items, and quantity, but not both at the same time. e.g., `/add gold 50` adds 50 to gold, `/add potions Health 2` will add Health x2, and `/add potions Health, Poison` will add Health and Poison."
         },
         {
             name: '/create',
-            example: `This command creates your character with an empty inventory. I recommend running /create then /login and use the website for initial setup.
-            explanation: This bot will set your nickname in the server as the player name, or your username if you do not have a nickname set.`
+            explanation: `This command creates your character with an empty inventory. I recommend running /create then /login and use the website for initial setup. This bot will set your nickname in the server as the player name, or your username if you do not have a nickname set.`
         },
         {
             name: '/create prepack gold# silver# DM',
-            example: '`/create prepack 100 10 1 dm`',
+            example: '> `/create prepack 100 10 1 dm`',
             explanation:
                 'This will generate a character that has 100 gold, 10 silver, 1 copper, and the bot will send you direct messages instead of in-channel replies (which is the default behaviour). This will also prepack your inventory with `crowbar, hammer, pitons x10, torches x10, rations x10, feet of hempen rope x100`.'
         },
@@ -46,7 +44,7 @@ export default {
         },
         {
             name: '/overwrite',
-            example: '> `/overwrite weapons sword',
+            example: '> `/overwrite weapons sword`',
             explanation:
                 'This example will delete your weapons category and replace it with Sword x1. This command overwrites EVERYTHING in the specified category. Use with care.'
         },
@@ -57,7 +55,7 @@ export default {
         {
             name: 'Money',
             explanation:
-                'When dealing with money, there are 3 possible commands.\t> `/overwrite gold 50` will overwrite any previous amount and hardcode your current gold to 50.\t> `/add gold 50` will add to the current amount.\t> `/remove gold 50` will subtract from the current amount.'
+                'When dealing with money, there are 3 possible commands.\n> `/overwrite gold 50` will overwrite any previous amount and hardcode your current gold to 50.\n> `/add gold 50` will add to the current amount.\n> `/remove gold 50` will subtract from the current amount.'
         },
         {
             name: '/login',
@@ -70,7 +68,7 @@ export default {
         {
             name: 'Your Data',
             explanation:
-                `What data from Discord does this bot store? \t- Your Discord user ID \t- Your Discord server's ID \t- Your nickname in that server (defaults to username) \t- The last 25 commands you gave the bot`
+                `What data from Discord does this bot store? \n- Your Discord user ID \n- Your Discord server's ID \n- Your nickname in that server (defaults to username) \n- The last 25 commands you gave the bot`
         }
     ]
 };
