@@ -2,7 +2,14 @@
 
 .navbar {
     flex-grow: 1;
-    font-family: 'Oxygen', sans-serif;
+    font-family: var(--fancy-font);
+    .toolbar {
+        justify-content: space-between;
+    }
+    .nav-left {
+        display: flex;
+        align-items: center;
+    }
     .nav {   
         background: var(--secondary);
     }
@@ -13,5 +20,11 @@
     .logo {
         margin-right: 0.5rem;
         width: 2rem;
+    }
+    a {
+        color: white;
+        &:hover {
+            color: darken(white, 10);
+        }
     }
 }

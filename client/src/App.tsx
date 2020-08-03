@@ -7,6 +7,8 @@ import Guide from './pages/Guide';
 
 import './App.scss';
 import { theme } from './utils/theme';
+import Inventory from './pages/Inventory';
+import Login from './pages/Login';
 
 function App() {
     const preferredTheme = theme('light')
@@ -18,6 +20,12 @@ function App() {
                 <Switch>
                     <Route exact path="/">
                         <Guide />
+                    </Route>
+                    <Route exact path="/inventory">
+                        <Inventory />
+                    </Route>
+                    <Route exact path="/login">
+                        <Login/>
                     </Route>
                 </Switch>
             </ThemeProvider>

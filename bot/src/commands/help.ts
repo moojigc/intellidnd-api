@@ -1,6 +1,9 @@
-const { MessageEmbed } = require("discord.js");
+import { MessageEmbed, Message } from 'discord.js'
 
-const help = async (message) => {
+/**
+ * Sends guide on the channel message is sent in
+ */
+export default function help(message: Message) {
 	let helpEmbed = new MessageEmbed()
 		.setTitle("IntelliDnD Bot Guide")
 		.setDescription(
@@ -96,5 +99,3 @@ const help = async (message) => {
 		.setFooter("Both author: Moojig Battsogt");
 	message.channel.send(helpEmbed);
 };
-
-module.exports = help;

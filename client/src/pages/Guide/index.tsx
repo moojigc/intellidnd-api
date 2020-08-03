@@ -12,12 +12,8 @@ const Guide = () => {
                 <Typography variant='h1' component='h1'>
                     Welcome to IntelliDnD
                 </Typography>
-                <p>
-                    manage your D&D character with ease
-                </p>
-                <p>
-                    integrated with a Discord bot
-                </p>
+                <p>manage your D&D character with ease</p>
+                <p>integrated with a Discord bot</p>
             </Hero>
             <Container className='guide' maxWidth='lg'>
                 <Wrapper>
@@ -25,9 +21,10 @@ const Guide = () => {
                     {contents.commands.map(({ name, example, explanation }) => (
                         <React.Fragment>
                             <h2>{name}</h2>
-
-                            <Markdown source={example} />
-                            <Markdown source={explanation} />
+                            {example && <Markdown source={example} />}
+                            {explanation.map((e) => (
+                                <Markdown source={e} />
+                            ))}
                         </React.Fragment>
                     ))}
                 </Wrapper>

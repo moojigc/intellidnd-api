@@ -1,6 +1,6 @@
 {
   "name": "intellidnd",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "A Discord bot for handling inventory in DnD campaigns.",
   "main": "server/build/server.bundle.js",
   "engines": {
@@ -15,7 +15,7 @@
     "server": "ts-node-dev --project ./tsconfig.server.json --respawn server/src/index.ts",
     "open": "code . & npm run start",
     "start": "npm run sass && concurrently \"npm run server\" \"npm run client\" \"npm run sass:watch\"",
-    "bot": "ts-node-dev bot/src",
+    "bot": "ts-node-dev --project ./tsconfig.bot.json --respawn bot/src/index.ts",
     "build": "tsc --project ./tsconfig.server.json server/src && tsc --project ./tsconfig.bot.json bot/src && cd client && npm run build",
     "test": "jest"
   },

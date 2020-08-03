@@ -30,6 +30,6 @@ export interface IGuildPopulated extends IGuildBase {
 	players: IPlayer[];
 }
 
-interface IGuildModel extends Model<IGuild> {}
+export interface IGuildModel extends Model<IGuild> {}
 
 export const Guild = mongoose.model<IGuild, IGuildModel>('Guild', GuildSchema);

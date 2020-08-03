@@ -29,4 +29,4 @@ passport.deserializeUser((obj, done) => {
 	done(null, obj);
 });
 
-module.exports = passport;
+export default passport;

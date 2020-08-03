@@ -125,20 +125,18 @@ interface IPlayerBase extends Document {
 
 export interface IPlayer extends IPlayerBase {
 	createInventory(
-		prepack?: 'prepack',
-		goldCoins?: number,
-		silverCoins?: number,
-		copperCoins?: number
+		args: [string, number, number, number]
 	): IPlayerBase['inventory'];
 	writeChangelog(command: string): IPlayerBase['changelog'];
 }
 
-PlayerSchema.methods.createInventory = function (prepack, goldCoins, silverCoins, copperCoins) {
+PlayerSchema.methods.createInventory = function (args) {
+	let [prepack, goldCoins, silverCoins, copperCoins] = args;
 	if (prepack === 'prepack') {
 		let prepackaged = {
-			gold: parseInt(goldCoins ? goldCoins : 0),
-			silver: parseInt(silverCoins ? silverCoins : 0),
-			copper: parseInt(copperCoins ? copperCoins : 0),
+			gold: parseInt(goldCoins ?? 0),
+			silver: parseInt(silverCoins ?? 0),
+			copper: parseInt(copperCoins ?? 0),
 			platinum: 0,
 			electrum: 0,
 			potions: [],
