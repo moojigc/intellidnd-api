@@ -186,9 +186,9 @@ PlayerSchema.methods.createInventory = function (args) {
 };
 
 PlayerSchema.methods.writeChangelog = function (command) {
-	this.lastUpdated = Date.now();
+	this.lastUpdated = new Date();
 	let change = {
-		on: Date.now(),
+		on: new Date(),
 		command: command
 	};
 	if (this.changelog.length > 19) {

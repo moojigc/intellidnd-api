@@ -48,7 +48,8 @@ const create = async ({
         });
         player.writeChangelog(message.content);
 		player.createInventory([args[0], parseInt(args[1]), parseInt(args[2]), parseInt(args[3])]);
-		console.log(player);
+        console.log(player);
+        console.log(currentGuild)
         let dbPlayer = await Player.create(player);
         if (!currentGuild) {
             await Guild.create({

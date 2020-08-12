@@ -17,6 +17,7 @@
     "start": "npm run sass && concurrently \"npm run server\" \"npm run client\" \"npm run sass:watch\"",
     "bot": "ts-node-dev --project ./tsconfig.bot.json --respawn bot/src/index.ts",
     "build": "tsc --project ./tsconfig.server.json server/src && tsc --project ./tsconfig.bot.json bot/src && cd client && npm run build",
+    "build-bot": "tsc --project ./tsconfig.bot.json",
     "test": "jest"
   },
   "repository": {

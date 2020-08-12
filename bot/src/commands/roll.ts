@@ -76,7 +76,7 @@ const roll = ({ message, player, discordMember, args }: RollParams) => {
     };
 	let { rollName, rolls, modifiers, noPlayerData } = getRollDetails(args);
 	
-	if (modifiers.filter(m => m === NaN).length > 0) return message.channel.send("One or more modifiers is not a number.");
+	// if (modifiers.filter(m => isNaN(m)).length > 0) return message.channel.send("One or more modifiers is not a number.");
 
     // If user tries to enter in a saved roll but doesn't have a player setup
     if (noPlayerData)

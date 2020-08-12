@@ -1,145 +1,175 @@
 import { Message } from 'discord.js';
-import { IPlayer } from '../../../server/src/models/Player';
+import { IPlayer, Player } from '../../../server/src/models/Player';
 
 import { Item } from './index';
-import utils from '../utils';
+import utils, { isCoin, isValidCategory } from '../utils';
+
+const removeCoins = (thisCoin: string, removedItem: string) => {
+	return +thisCoin + -removedItem;
+};
+
+/**
+ * Non-money items
+ */
+const removeFromCategory = (
+	thisCategory: { name: string; quantity: number }[],
+	inputString: string
+) => {
+	// Split up input into arrays separated by any commas
+	let inputArr = inputString.split(',').map((item) => item.trim());
+	let oldCategory = thisCategory.map(
+		(item) => new Item(item.name, +item.quantity)
+	);
+	// Map all input, separated by commas, to new Item objects
+	const removedItemMap = inputArr
+		.map((input) => {
+			let [name] = input.split(' ').filter((item) => isNaN(+item));
+			let [quantity] = input.split(' ').filter((item) => !isNaN(+item));
+			if (!quantity) return new Item(name, 1);
+			else return new Item(name, +quantity);
+		})
+		.filter((item) => !!item);
+
+	// Check against existing objects
+	let changedBoolean = false;
+	let remaining = oldCategory
+		.map((old) => {
+			// For every index of oldCategory, check its .name property against each item in removedItemMap
+			let matches = removedItemMap.filter(
+				(removed) => removed.name === old.name
+			);
+			// Return old if no matches found
+			if (matches.length === 0) return old;
+			else {
+				changedBoolean = true;
+				let [reducedItem] = matches.map((match) => {
+					return old.removeQuantity(match.quantity);
+				});
+				// If item quantity is now zero (or null), i.e. totally gone, return null
+				if (reducedItem.quantity === 0 || isNaN(reducedItem.quantity))
+					return null;
+				else return reducedItem;
+			}
+		})
+		.filter((item) => !!item);
+	if (remaining.length === oldCategory.length && !changedBoolean) {
+		return { items: oldCategory, changed: false };
+	} else if (remaining.length === 0) {
+		return { items: [], changed: true, removed: removedItemMap };
+	} else {
+		return { items: remaining, changed: true, removed: removedItemMap };
+	}
+};
+
 /**
  * Remove items or coins
  */
-export default async function removeItem(message: Message, args: string[], player: IPlayer) {
-    const { userEntry, coins, createResponseEmbed } = utils(
-            message
-        ),
-        [cat] = args,
-        removedItemArr = args.slice(1),
-        [removedItem] = removedItemArr;
-    if (!cat) {
-        // End script here if no category specified
-        createResponseEmbed(
-            'send',
-            'invalid',
-            'Remove what? Must specify /remove gold 10, /remove weapon staff, etc...',
-            player
-        );
-        return player;
-    } else if ((coins.isCoin(cat) && isNaN(Number(removedItem))) || (coins.isCoin(cat) && !removedItem)) {
-        // Users fails to specify an amount
-        createResponseEmbed(
-            'send',
-            'invalid',
-            `You didn't specify an amount of ${cat} to remove.`,
-            player
-        );
-    } else if (coins.isCoin(cat)) {
-        const removeCoins = (thisCoin) => {
-            let newAmount = parseInt(thisCoin) - parseInt(removedItem);
-            if (newAmount < 0) {
-                createResponseEmbed('send', 'invalid', `You don't have enough ${cat}!`, player);
-                return thisCoin;
-            } else {
-                createResponseEmbed(
-                    'send',
-                    'success',
-                    `Removed ${removedItem} ${cat} from *${player.name}'s* wallet.`,
-                    player
-                );
-                return newAmount;
-            }
-        };
-        if (!removedItem) {
-            createResponseEmbed('send', 'invalid', `Remove how much ${cat}?`, player);
-        } else {
-            player.inventory[cat] = removeCoins(player.inventory[cat]);
-        }
-    } else if (userEntry.isValid(cat) && removedItem === undefined) {
-        // No item specified
-        createResponseEmbed(
-            'send',
-            'invalid',
-            `You didn't specify an item to remove from *${cat}*.`,
-            player
-        );
-    } else {
-        // Non-money items
-        const removeFromCategory = (thisCategory, inputString) => {
-            // Split up input into arrays separated by any commas
-            let inputArr = inputString.split(',').map((item) => item.trim());
-            let oldCategory = thisCategory
-                .slice()
-                .map((item) => new Item(item.name, parseInt(item.quantity)));
-            // Map all input, separated by commas, to new Item objects
-            const removedItemMap = inputArr
-                .map((input) => {
-                    let [name] = input.split(' ').filter((item) => isNaN(item));
-                    let [quantity] = input.split(' ').filter((item) => !isNaN(item));
-                    if (!quantity) return new Item(name, NaN);
-                    else return new Item(name, parseInt(quantity));
-                })
-                .filter((item) => !!item);
-
-            // Check against existing objects
-            let changedBoolean = false;
-            let remaining = oldCategory
-                .map((old) => {
-                    // For every index of oldCategory, check its .name property against each item in removedItemMap
-                    let matches = removedItemMap.filter((removed) => removed.name === old.name);
-                    // Return old if no matches found
-                    if (matches.length === 0) return old;
-                    else {
-                        changedBoolean = true;
-                        let [reducedItem] = matches.map((match) => {
-                            return old.removeQuantity(match.quantity);
-                        });
-                        // If item quantity is now zero (or null), i.e. totally gone, return null
-                        if (reducedItem.quantity === 0 || isNaN(reducedItem.quantity)) return null;
-                        else return reducedItem;
-                    }
-                })
-                .filter((item) => !!item);
-
-            if (remaining.length === oldCategory.length && !changedBoolean) {
-                createResponseEmbed(
-                    'send',
-                    'invalid',
-                    `Error: *${removedItemArr.join(
-                        ' '
-                    )}* not found in ${cat}. Check spelling if your input should have matched an item.`,
-                    player
-                );
-                return oldCategory;
-            } else if (remaining.length === 0) {
-                return null;
-            } else {
-                return remaining;
-            }
-        };
-        // Calling removal on each category
-        if (!userEntry.isValid(cat)) {
-            createResponseEmbed(
-                'send',
-                'invalid',
-                `The only valid categories are ${userEntry.array.join(', ')}.`,
-                player
+export default async function remove(
+	message: Message,
+	args: string[],
+	player: IPlayer
+): Promise<void> {
+	const { createResponseEmbed } = utils(message),
+		[cat] = args,
+		removedItemArr = args.slice(1),
+		[removedItem] = removedItemArr,
+		allRemovedItems = removedItemArr.join(' ');
+	// Validate user input
+	console.log(
+		`${player.inventory[cat]} - ${+removedItem} = ${
+			player.inventory[cat] - +removedItem
+		}`
+	);
+	const [valid, response] = ((): [boolean, string] => {
+		if (!cat || !isValidCategory(cat))
+			return [
+				false,
+				'Remove what? Must specify /remove gold 10, /remove weapon staff, etc...',
+			];
+		switch (isCoin(cat)) {
+			case true: {
+				if (isNaN(+removedItem))
+					return [
+						false,
+						`Can't remove **${removedItem}** from ${cat}. Reroll for intelligence, lol.`,
+					];
+				else if (!removedItem)
+					return [false, `Remove how much from ${cat}?`];
+				else if (+removedItem > player.inventory[cat])
+					return [
+						false,
+						`You don't have enough ${cat}. Get more coins!`,
+					];
+				else return [true, `Removed ${removedItem} from ${cat}.`];
+			}
+			default:
+			case false: {
+				if (!removedItem) return [false, `Remove what from ${cat}?`];
+				else return [true, ''];
+			}
+		}
+	})();
+	if (!valid) {
+		createResponseEmbed('send', 'invalid', response, player);
+		return;
+	}
+	switch (isCoin(cat)) {
+		case true:
+			{
+				await Player.updateOne(
+					{ _id: player._id },
+					{
+						inventory: {
+							...player.inventory,
+							[cat]: removeCoins(
+								player.inventory[cat],
+								removedItem
+							),
+						},
+					}
+				);
+				await createResponseEmbed('send', 'success', response, player);
+			}
+			break;
+		default:
+		case false: {
+			let { items, changed, removed } = removeFromCategory(
+				player.inventory[cat],
+				removedItemArr.join(' ')
             );
-        } else if (!removedItem) {
-            createResponseEmbed('send', 'invalid', `Remove what from ${cat}?`, player);
-        } else {
-            createResponseEmbed(
-                'send',
-                'success',
-                `Removed **${removedItem}** from *${player.name}'s* ${cat}.`,
-                player
-            );
-            player.inventory[cat] = removeFromCategory(
-                player.inventory[cat],
-                removedItemArr.join(' ')
-            );
-            await player.updateOne({
-                inventory: player.inventory,
-                lastUpdated: Date.now(),
-                changelog: player.writeChangelog(message.content)
-            });
-        }
-    }
-    return player;
+            console.log(items);
+            console.log({
+                [cat]: items,
+                ...player.inventory
+            })
+			if (!changed) {
+				createResponseEmbed(
+					'send',
+					'invalid',
+					`Error: **${allRemovedItems}** not found in ${cat}. Check spelling if your input should have matched an item.`,
+					player
+				);
+			} else {
+				await Player.updateOne(
+					{ _id: player._id },
+					{
+						inventory: {
+							...player.inventory,
+							[cat]: items,
+						},
+						lastUpdated: new Date(),
+						changelog: player.writeChangelog(message.content),
+					}
+				);
+				createResponseEmbed(
+					'send',
+					'success',
+					`Removed ${removed
+						.map((r) => r.toString)
+						.join(', ')} from ${cat}.`,
+					player
+				);
+			}
+		}
+	}
 }

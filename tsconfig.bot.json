@@ -1,5 +1,7 @@
 {
     "extends": "./tsconfig.base.json",
-    "include": ["bot/src/*", "server/src/models/*"],
-    "outFile": "./bot/build/index.js"
+    "include": ["bot/src/**/*", "server/src/models"],
+    "compilerOptions": {
+        "outDir": "./bot/build"
+    },
 }

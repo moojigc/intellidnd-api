@@ -12,7 +12,7 @@ export default async function webLogin(message: Message, player: IPlayer) {
 	}, process.env.TOKEN_SECRET, { expiresIn: '7d' });
     const url = isDev ? 'http://localhost:3200/login/' : 'https://intellidnd/login/'
     let embed = new MessageEmbed().setDescription(
-		`To manage ${player.name} on intellidnd.com, you can [click on this special link](${url + token}) that will allow you to login and manage ${player.name}'s data. You can create an account if you don't have one.`
+		`To manage **${player.name}** on *intellidnd.com*, you can [click on this special link](${url + token}?from=discord) that will allow you to login and manage ${player.name}'s data.\n\nYou can create an account if you don't have one.`
     );
     message.author.send(embed);
 }
