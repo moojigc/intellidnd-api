@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import { Client, MessageEmbed, TextChannel } from "discord.js";
 import moment from "moment";
-import { Player, Guild } from "../../server/src/models";
+import { Player, Guild } from "../server/models";
 import { connect } from "mongoose";
 const client = new Client({ disableMentions: "everyone" });
 import utils, { checkPermissions, returnConditionsMet } from "./utils";

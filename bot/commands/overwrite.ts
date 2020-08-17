@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { IPlayer } from '../../../server/src/models/Player';
+import { IPlayer } from '../../server/models/Player';
 import utils, { isValidCategory, isCoin, categories } from '../utils';
 
 /**

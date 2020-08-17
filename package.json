@@ -1,24 +1,25 @@
 {
   "name": "intellidnd",
   "version": "2.0.0",
-  "description": "A Discord bot for handling inventory in DnD campaigns.",
-  "main": "server/build/server.bundle.js",
+  "description": "A cross-platform application to help you manage your D&D character.",
+  "main": "server/src/index.js",
   "engines": {
     "node": "12.13.0",
     "npm": "6.12.0"
   },
   "scripts": {
-    "sass": "ts-node client/src/assets/scss/variable_compiler.ts",
-    "sass:watch": "nodemon --exec ts-node client/src/assets/scss/variable_compiler.ts --watch client/src/App.scss",
+    "sass": "ts-node client/assets/scss/variable_compiler.ts",
+    "sass:watch": "nodemon --exec ts-node client/assets/scss/variable_compiler.ts --watch client/App.scss",
     "install": "cd client && npm install",
     "client": "cd client && npm start",
-    "server": "ts-node-dev --project ./tsconfig.server.json --respawn server/src/index.ts",
+    "server": "ts-node-dev --project ./tsconfig.server.json --respawn server/index.ts",
     "open": "code . & npm run start",
     "start": "npm run sass && concurrently \"npm run server\" \"npm run client\" \"npm run sass:watch\"",
-    "bot": "ts-node-dev --project ./tsconfig.bot.json --respawn bot/src/index.ts",
-    "build": "tsc --project ./tsconfig.server.json server/src && tsc --project ./tsconfig.bot.json bot/src && cd client && npm run build",
+    "bot": "ts-node-dev --project ./tsconfig.bot.json --respawn bot/index.ts",
+    "build": "tsc --project ./tsconfig.server.json server && tsc --project ./tsconfig.bot.json bot && cd client && npm run build",
     "build-bot": "tsc --project ./tsconfig.bot.json",
-    "test": "jest"
+    "copy": "cp -r bot/* ../temp/intellidnd-bot/bot",
+    "test": "echo 'No test' && exit 1"
   },
   "repository": {
     "type": "git",
@@ -46,9 +47,9 @@
     "passport-local": "^1.0.0"
   },
   "bugs": {
-    "url": "https://github.com/moojigc/DiscordBot/issues"
+    "url": "https://github.com/moojigc/intellidnd/issues"
   },
-  "homepage": "https://github.com/moojigc/DiscordBot#readme",
+  "homepage": "https://github.com/moojigc/intellidnd#readme",
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/bcryptjs": "^2.4.2",

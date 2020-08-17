@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { IPlayer } from '../../../server/src/models/Player';
+import { IPlayer } from '../../server/models/Player';
 
 const changelog = async (message: Message, player: IPlayer, moment: any) => {
     let readableLog = player.changelog.map(({ command, on }) => {

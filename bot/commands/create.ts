@@ -1,5 +1,5 @@
-import { IPlayer, IPlayerModel } from '../../../server/src/models/Player';
-import { IGuildModel, IGuild } from '../../../server/src/models/Guild';
+import { IPlayer, IPlayerModel } from '../../server/models/Player';
+import { IGuildModel, IGuild } from '../../server/models/Guild';
 import { GuildMember, Message } from 'discord.js';
 import utils from '../utils';
 

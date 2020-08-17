@@ -1,5 +1,5 @@
 import { Message, GuildMember } from 'discord.js';
-import { IPlayer } from '../../../server/src/models/Player';
+import { IPlayer } from '../../server/models/Player';
 import utils from '../utils';
 
 const dexRolls = {
@@ -47,7 +47,7 @@ const roll = ({ message, player, discordMember, args }: RollParams) => {
                 modifiers: mod !== 0 ? [mod] : [],
                 rollName: savedRoll,
                 rolls: ['1d20'],
-                noPlayerData: !!player
+                noPlayerData: !player
             };
         } else {
             let stringified = args.join(' ');

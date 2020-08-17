@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { MessageEmbed, Message } from 'discord.js';
-import { IPlayer } from '../../../server/src/models/Player';
+import { IPlayer } from '../../server/models/Player';
 const isDev = process.env.NODE_ENV === 'development'
 /**
  * Send DM with login link connecting account to intellidnd.com using token.

@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { IPlayer, Player } from '../../../server/src/models/Player';
+import { IPlayer, Player } from '../../server/models/Player';
 import utils from '../utils';
 
 const dm = async (message: Message, player: IPlayer) => {

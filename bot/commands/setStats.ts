@@ -1,6 +1,6 @@
 import utils from '../utils';
 import { Message } from 'discord.js';
-import { IPlayer } from '../../../server/src/models/Player';
+import { IPlayer } from '../../server/models/Player';
 
 /**
  * Set player stats

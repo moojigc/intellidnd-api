@@ -44,3 +44,5 @@ export const emailRegex = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2
 export function serverError(res: Response) {
     res.status(500).json(flash('error', 'Internal server error.')).end();
 }
+
+export { default as passport } from "./passport";

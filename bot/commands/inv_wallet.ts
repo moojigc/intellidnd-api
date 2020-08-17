@@ -1,6 +1,6 @@
 import utils from '../utils'
-import { IPlayer } from '../../../server/src/models/Player';
-import { IGuild } from '../../../server/src/models/Guild';
+import { IPlayer } from '../../server/models/Player';
+import { IGuild } from '../../server/models/Guild';
 import { Message } from 'discord.js';
 
 export default function (message: Message) {

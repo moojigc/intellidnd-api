@@ -1,6 +1,6 @@
 import utils, { isCoin, isValidCategory, categories } from '../utils';
 import { Message } from 'discord.js';
-import { IPlayer } from '../../../server/src/models/Player';
+import { IPlayer } from '../../server/models/Player';
 
 export class Item {
 	name: string;
