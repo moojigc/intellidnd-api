@@ -24,7 +24,7 @@ function App() {
                     <Route exact path="/inventory">
                         <Inventory />
                     </Route>
-                    <Route exact path="/login">
+                    <Route exact path={["/login, /login/:token"]}>
                         <Login/>
                     </Route>
                 </Switch>

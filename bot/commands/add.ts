@@ -1,22 +1,6 @@
 import utils, { isCoin, isValidCategory, categories } from '../utils';
 import { Message } from 'discord.js';
-import { IPlayer } from '../../server/models/Player';
-
-export class Item {
-	name: string;
-	quantity: number;
-	constructor(name: string, quantity: number) {
-		this.name = name;
-		this.quantity = quantity;
-	}
-	public removeQuantity(quantity: number) {
-		this.quantity -= quantity;
-		return this;
-	}
-	get toString() {
-		return `${this.quantity} ${this.name}${this.quantity > 1 ? 's' : ''}`;
-	}
-}
+import { IPlayer, Item } from '../../server/models';
 
 export function addQuantity(
 	newItemArr: string[],

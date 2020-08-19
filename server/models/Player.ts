@@ -5,23 +5,23 @@ const PlayerSchema = new Schema({
 	discordId: {
 		type: String,
 		required: true,
-		unique: true
+		unique: true,
 	},
 	name: {
 		type: String,
-		required: true
+		required: true,
 	},
 	guild: {
-		type: String
+		type: String,
 	},
 	guildId: {
 		type: String,
 		ref: 'Guild',
-		required: true
+		required: true,
 	},
 	notificationsToDM: {
 		type: Boolean,
-		default: false
+		default: false,
 	},
 	inventory: {
 		type: Object,
@@ -33,53 +33,37 @@ const PlayerSchema = new Schema({
 			silver: 0,
 			copper: 0,
 			platinum: 0,
-			electrum: 0
-		}
+			electrum: 0,
+		},
 	},
 	changelog: {
-		type: Array
+		type: Array,
 	},
 	lastUpdated: {
 		type: Date,
-		default: Date.now
+		default: Date.now,
 	},
 	webUserId: {
 		type: Schema.Types.ObjectId,
-		ref: 'User'
+		ref: 'User',
 	},
 	token: String,
 	initiative: {
 		type: Number,
-		default: 0
+		default: 0,
 	},
-	hp: {
-		type: Number,
-		default: 1
+	stats: {
+		type: Object,
+		default: {
+			hp: 10,
+			strength: 10,
+			dexterity: 10,
+			constitution: 10,
+			intelligence: 10,
+			wisdom: 10,
+			charisma: 10,
+		},
 	},
-	strength: {
-		type: Number,
-		default: 10
-	},
-	dexterity: {
-		type: Number,
-		default: 10
-	},
-	constitution: {
-		type: Number,
-		default: 10
-	},
-	intelligence: {
-		type: Number,
-		default: 10
-	},
-	wisdom: {
-		type: Number,
-		default: 10
-	},
-	charisma: {
-		type: Number,
-		default: 10
-	}
 });
 
 interface Item {
@@ -113,14 +97,16 @@ interface IPlayerBase extends Document {
 	lastUpdated: Date;
 	webUserId: IUser['_id'];
 	token: String;
-	initiative: number;
-	hp: number;
-	strength: number;
-	dexterity: number;
-	constitution: number;
-	intelligence: number;
-	wisdom: number;
-	charisma: number;
+	stats: {
+		initiative: number;
+		hp: number;
+		strength: number;
+		dexterity: number;
+		constitution: number;
+		intelligence: number;
+		wisdom: number;
+		charisma: number;
+	}
 }
 
 export interface IPlayer extends IPlayerBase {
@@ -144,29 +130,29 @@ PlayerSchema.methods.createInventory = function (args) {
 			misc: [
 				{
 					name: 'crowbar',
-					quantity: 1
+					quantity: 1,
 				},
 				{
 					name: 'hammer',
-					quantity: 1
+					quantity: 1,
 				},
 				{
 					name: 'pitons',
-					quantity: 10
+					quantity: 10,
 				},
 				{
 					name: 'torches',
-					quantity: 10
+					quantity: 10,
 				},
 				{
 					name: 'rations',
-					quantity: 10
+					quantity: 10,
 				},
 				{
 					name: 'feet of hempen rope',
-					quantity: 100
-				}
-			]
+					quantity: 100,
+				},
+			],
 		};
 		this.inventory = prepackaged;
 	} else {
@@ -178,7 +164,7 @@ PlayerSchema.methods.createInventory = function (args) {
 			electrum: 0,
 			potions: [],
 			weapons: [],
-			misc: []
+			misc: [],
 		};
 		this.inventory = empty;
 	}
@@ -189,7 +175,7 @@ PlayerSchema.methods.writeChangelog = function (command) {
 	this.lastUpdated = new Date();
 	let change = {
 		on: new Date(),
-		command: command
+		command: command,
 	};
 	if (this.changelog.length > 19) {
 		// Remove oldest changes
@@ -203,4 +189,7 @@ PlayerSchema.methods.writeChangelog = function (command) {
 
 export interface IPlayerModel extends Model<IPlayer> {}
 
-export const Player = mongoose.model<IPlayer, IPlayerModel>('Player', PlayerSchema);
+export const Player = mongoose.model<IPlayer, IPlayerModel>(
+	'Player',
+	PlayerSchema
+);

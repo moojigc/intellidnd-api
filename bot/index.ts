@@ -106,7 +106,7 @@ client.on("message", async (message) => {
 			case `inv`:
 			case `inventory`:
 				{
-					invWallet(message).showInventory(
+					await invWallet(message).showInventory(
 						currentPlayer,
 						currentGuild
 					);
@@ -115,7 +115,7 @@ client.on("message", async (message) => {
 				break;
 			case `wallet`:
 				{
-					invWallet(message).showWallet(currentPlayer, currentGuild);
+					await invWallet(message).showWallet(currentPlayer, currentGuild);
 				}
 
 				break;
@@ -165,7 +165,7 @@ client.on("message", async (message) => {
 							players: currentPlayer._id,
 						},
 					});
-					createResponseEmbed(
+					await createResponseEmbed(
 						"channel",
 						"success",
 						`Player ${recipientPlayer.displayName}'s inventory successfully deleted.`
@@ -190,16 +190,15 @@ client.on("message", async (message) => {
 					await changelog(message, currentPlayer, moment);
 				}
 				break;
-
 			case `login`:
 				{
-					webLogin(message, currentPlayer);
+					await webLogin(message, currentPlayer);
 				}
 				break;
 			case `d`:
 			case `dice`:
 				{
-					roll({
+					await roll({
 						message: message,
 						player: currentPlayer,
 						discordMember: recipientPlayer,
@@ -207,6 +206,7 @@ client.on("message", async (message) => {
 					});
 				}
 				break;
+			case `stats`:
 			case `stat`:
 				{
 					await setStats(message, args, currentPlayer);

@@ -1,8 +1,8 @@
 import passport from "passport"
-import bcrypt from "bcryptjs";
+import { compare } from "bcryptjs";
 import { Strategy } from "passport-local"
-import { User } from "../../models"
-import { IUser } from '../../models/User'
+import { User } from "../models"
+import { IUser } from '../models/User'
 
 passport.use(
 	new Strategy({ usernameField: "username" }, async (username, password, done) => {
@@ -11,7 +11,7 @@ passport.use(
 		if (!user) return done(null, false, { message: "Sorry, either the username or password you entered are incorrect." });
 		else {
 			// Check password
-			bcrypt.compare(password, user.password, (err, isMatch) => {
+			compare(password, user.password, (err, isMatch) => {
 				if (err) throw err;
 				if (isMatch) {
 					return done(null, user);

@@ -1,7 +1,6 @@
 import { Message } from 'discord.js';
-import { IPlayer, Player } from '../../server/models/Player';
+import { IPlayer, Player, Item } from '../../server/models';
 
-import { Item } from './index';
 import utils, { isCoin, isValidCategory } from '../utils';
 
 const removeCoins = (thisCoin: string, removedItem: string) => {

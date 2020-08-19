@@ -1,5 +1,7 @@
 {
     "extends": "./tsconfig.base.json",
-    "include": ["server/src/*"],
-    "outFile": "./server/build/index.js"
+    "include": ["server/**/**/*"],
+    "compilerOptions": {
+        "outDir": "./build"
+    }
 }

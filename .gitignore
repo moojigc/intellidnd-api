@@ -12,3 +12,5 @@
 .env
 /server/build
 /client/build
+*.js
+/build

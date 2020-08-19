@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
-import { crypt } from '../config/middleware';
+import { hashSync } from 'bcryptjs'
 import { IPlayer } from './Player';
 
 const UserSchema = new Schema({
@@ -44,8 +44,7 @@ const UserSchema = new Schema({
 });
 
 UserSchema.methods.encryptPass = async function () {
-	this.password = await crypt(this.password);
-	return this.password
+	return hashSync(this.password, 15);
 };
 
 export interface IUserBase extends Document {

@@ -1,8 +1,8 @@
 import moment from 'moment';
 import { MessageEmbed, Message } from 'discord.js';
-import { IPlayer } from '../../../server/src/models/Player';
+import { IPlayer } from '../../server/models/Player';
 
-const capitalize = (input: string, ...exceptions: string[]) => {
+export const capitalize = (input: string, ...exceptions: string[]) => {
 	let words = input.split(' ');
 	let keywords = ['of', 'a', 'the', 'an', 'to', ...exceptions];
 	let match = (word: string) =>

@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container, Typography, Grid, TextField, Button, makeStyles } from '@material-ui/core';
 import { Formik, Field, Form, FormikProps } from 'formik'
 import Hero from '../../components/Hero';
 import { Wrapper } from '../../components/MiniComponents';
+import { useParams } from 'react-router-dom';
+// import Axios from 'axios';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -11,10 +13,23 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const Login = () => {
+    const { token } = useParams();
     const classes = useStyles()
     const handleFormSubmit = (values) => {
         console.log(values)
     }
+    useEffect(() => {
+        // Axios({
+        //     method: 'POST',
+        //     url: "/api/v1/login",
+        //     data: {
+        //         token: token,
+        //         username: 'asdf',
+        //         password: 'asdfajds'
+        //     }
+        // })
+    }, [])
+
     return (
         <Container maxWidth="md">
             <Hero>
