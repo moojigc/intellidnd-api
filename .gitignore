@@ -1,4 +1,4 @@
-/node_modules
+node_modules
 /test.js
 /nodemon
 /3monitors.code-workspace
@@ -14,3 +14,4 @@
 /client/build
 *.js
 /build
+.vscode

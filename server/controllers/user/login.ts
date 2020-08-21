@@ -1,4 +1,4 @@
-import { RequestWithUser, flash, passport } from '../../middleware';
+import { flash, passport } from '../../middleware';
 import { Response, NextFunction } from 'express';
 const guestUser = {
 	id: null,
@@ -11,7 +11,7 @@ const guestUser = {
  */
 const login = (req: RequestWithUser, res: Response, next: NextFunction) => {
 	if (req.user) req.logout();
-	if ((!req.body.username && !req.body.email) || !req.body.password)
+	if (!req.body.user || !req.body.password)
 		return res.json({
 			...flash('error', 'Missing fields.'),
 			user: guestUser,
@@ -19,7 +19,11 @@ const login = (req: RequestWithUser, res: Response, next: NextFunction) => {
 	req.session.cookie.maxAge = req.body.rememberMe
 		? 60000 * 60 * 24 * 7 * 26
 		: 60000 * 60 * 24;
-	passport.authenticate('local', function (err, user, info) {
+	passport.authenticate('local', { session: true }, (
+		err,
+		user,
+		info
+	) => {
 		if (err) {
 			console.log(err);
 			return res.json({
@@ -36,7 +40,7 @@ const login = (req: RequestWithUser, res: Response, next: NextFunction) => {
 				user: guestUser,
 				redirect: '/login',
 			});
-		} 
+		}
 		// else if (!user.verified) {
 		// 	return res
 		// 		.json({
@@ -49,7 +53,7 @@ const login = (req: RequestWithUser, res: Response, next: NextFunction) => {
 		// 		})
 		// 		.end();
 		// }
-		req.logIn(user, function (err) {
+		req.login(user, function (err) {
 			if (err) {
 				return next(err);
 			}
@@ -60,7 +64,7 @@ const login = (req: RequestWithUser, res: Response, next: NextFunction) => {
 					email: user.email,
 					auth: true,
 				},
-				...flash('success', `Welcome, ${req.body.username}!`),
+				...flash('success', `Welcome, ${user.username}!`),
 				redirect: '/',
 			});
 		});
@@ -71,5 +75,5 @@ export default {
 	route: '/login',
 	isAuth: false,
 	method: 'post',
-	callback: login
+	callback: login,
 };

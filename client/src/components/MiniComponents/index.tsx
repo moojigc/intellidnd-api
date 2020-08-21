@@ -2,9 +2,14 @@ import React from 'react';
 import { Box, BoxProps } from '@material-ui/core';
 
 export const Wrapper = (props: BoxProps) => {
-    return (
-        <Box className="wrapper" {...props}>
-            {props.children}
-        </Box>
-    );
+	return (
+		<Box
+			{...props}
+			className={
+				props.className ? `wrapper ${props.className}` : 'wrapper'
+			}
+		>
+			{props.children}
+		</Box>
+	);
 };

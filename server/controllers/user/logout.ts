@@ -1,15 +1,27 @@
-import { RequestWithUser, flash, serverError } from '../../middleware';
-import jwt from 'jsonwebtoken';
+import { flash } from '../../middleware';
 import { Response } from 'express';
-import { Player, User } from '../../models';
-import { hashSync } from 'bcryptjs';
+
+const response = {
+    redirect: "/",
+    user: {
+        username: 'Guest',
+        auth: false
+    }
+}
 
 const logout = async (req: RequestWithUser, res: Response) => {
-    req.logOut();
-    res.json({
-        message: `You are now logged out.`,
-        redirect: '/login'
-    }).end();
+    if (!req.isAuthenticated()) {
+        res.json({
+            ...flash('error', 'You were never logged in.'),
+            ...response
+        })
+    } else {
+        req.logOut();
+        res.json({
+            ...flash('success', 'You are now logged out.'),
+            ...response
+        }).end();
+    }
 };
 
 export default {

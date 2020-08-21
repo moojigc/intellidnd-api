@@ -1,8 +1,6 @@
-import { RequestWithUser, flash, serverError } from '../../middleware';
+import { flash, serverError } from '../../middleware';
 import { Response } from 'express';
-import { Player, User } from '../../models';
-import { Types } from 'mongoose';
-const { ObjectId } = Types;
+import { Player } from '../../models';
 
 const getAllCharacters = async (req: RequestWithUser, res: Response) => {
     try {
@@ -19,7 +17,7 @@ const getAllCharacters = async (req: RequestWithUser, res: Response) => {
 }
 
 export default {
-    route: '/',
+    route: '/all',
     method: 'get',
     isAuth: true,
     callback: getAllCharacters

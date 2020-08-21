@@ -1,5 +1,4 @@
 import {
-	RequestWithUser,
 	flash,
 	passport,
 	serverError,
@@ -12,17 +11,16 @@ const { ObjectId } = Types;
 
 const addCharacter = async (req: RequestWithUser, res: Response) => {
 	const respond = (type: 'error' | 'success', message: string) =>
-		res.json({
-			...flash(type, message),
-			redirect: '/characters/add',
-		});
+		res.json(
+			flash(type, message, '/characters/add'),
+		);
 	try {
 		let { id, name } = jwt.verify(
 			req.query.token as string,
 			process.env.TOKEN_SECRET
 		) as { id: string; name: string };
 		if (!req.query.token) {
-			respond( 'error', 'Token is required.');
+			flash(res, 'error', 'Token is required.');
 			return;
 		}
 		let playerData = await Player.findOne({

@@ -1,4 +1,4 @@
-import { RequestWithUser, flash, serverError } from '../../middleware';
+import { flash, serverError } from '../../middleware';
 import { Response } from 'express';
 import { Player, User } from '../../models';
 import { Types } from 'mongoose';

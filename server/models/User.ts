@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
-import { hashSync } from 'bcryptjs'
+import { hashSync } from 'bcryptjs';
 import { IPlayer } from './Player';
 
 const UserSchema = new Schema({
@@ -8,39 +8,45 @@ const UserSchema = new Schema({
 		trim: true,
 		unique: true,
 		required: false,
-		match: [/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/, 'Not a valid email.']
+		match: [
+			/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/,
+			'Not a valid email.',
+		],
 	},
 	username: {
 		type: String,
 		unique: true,
 		trim: true,
 		required: true,
-		validate: [({ length }) => length >= 3, 'Username must be longer.']
+		validate: [({ length }) => length >= 3, 'Username must be longer.'],
 	},
 	password: {
 		type: String,
 		trim: true,
 		required: true,
-		validate: [({ length }) => length >= 8, 'Password must be at least 8 characters.']
+		validate: [
+			({ length }) => length >= 8,
+			'Password must be at least 8 characters.',
+		],
 	},
 	players: [
 		{
 			type: Schema.Types.ObjectId,
-			ref: 'IPlayer'
-		}
+			ref: 'Player',
+		},
 	],
 	defaultPlayer: {
 		type: Schema.Types.ObjectId,
-		ref: 'IPlayer'
+		ref: 'Player',
 	},
 	createdAt: {
 		type: Date,
-		default: Date.now
+		default: Date.now,
 	},
 	updatedAt: {
 		type: Date,
-		default: Date.now
-	}
+		default: Date.now,
+	},
 });
 
 UserSchema.methods.encryptPass = async function () {

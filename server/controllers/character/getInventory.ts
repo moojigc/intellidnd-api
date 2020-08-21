@@ -1,5 +1,5 @@
-import { RequestWithUser, isAuth, serverError } from '../../middleware';
-import { Response, NextFunction } from 'express';
+import { serverError } from '../../middleware';
+import { Response } from 'express';
 import { User, Player } from '../../models';
 import { Types } from 'mongoose';
 

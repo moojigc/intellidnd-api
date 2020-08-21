@@ -1,16 +1,17 @@
 .hero {
-    background: var(--primary);
-    opacity: 0.95;
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    h1 {
-        font-family: var(--fancy-font);
-        letter-spacing: 1rem;
-        text-transform: lowercase;
-    }
-    p {
-        font-size: 2rem;
-        margin: 0;
-    }
+	background: var(--primary);
+	opacity: 0.95;
+	position: relative;
+	z-index: 2;
+	text-align: center;
+	box-shadow: inset 0px 0px 17px 10px rgba(0, 0, 0, 0.316);
+	h1 {
+		font-family: var(--fancy-font);
+		letter-spacing: 1rem;
+		text-transform: lowercase;
+	}
+	p {
+		font-size: 2rem;
+		margin: 0;
+	}
 }

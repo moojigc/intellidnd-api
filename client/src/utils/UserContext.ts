@@ -4,7 +4,7 @@ import { createContext } from "react";
  * user data from the server
  */
 const UserContext = createContext({
-	_id: "",
+	id: "",
 	email: "",
 	username: "",
 	auth: false

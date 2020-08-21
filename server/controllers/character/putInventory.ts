@@ -1,4 +1,4 @@
-import { RequestWithUser, isAuth } from '../../middleware';
+import { isAuth } from '../../middleware';
 import { Response, NextFunction } from 'express';
 import { serverError } from '../../middleware';
 import { Player } from '../../models';

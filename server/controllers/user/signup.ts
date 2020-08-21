@@ -1,4 +1,4 @@
-import { RequestWithUser, flash, serverError } from '../../middleware';
+import { flash, serverError } from '../../middleware';
 import jwt from 'jsonwebtoken';
 import { Response } from 'express';
 import { Player, User } from '../../models';

@@ -1,36 +1,36 @@
-import React from 'react';
-
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
-import Nav from './components/Nav'
-import Guide from './pages/Guide';
+import { connect, Provider } from 'react-redux';
 
 import './App.scss';
 import { theme } from './utils/theme';
-import Inventory from './pages/Inventory';
-import Login from './pages/Login';
+import AppRouter from './Routes';
+import { getStatus, getAllCharacters } from './store';
 
-function App() {
-    const preferredTheme = theme('light')
-    return (
-        <Router>
-            <ThemeProvider theme={preferredTheme}>
-                <CssBaseline/>
-                <Nav/>
-                <Switch>
-                    <Route exact path="/">
-                        <Guide />
-                    </Route>
-                    <Route exact path="/inventory">
-                        <Inventory />
-                    </Route>
-                    <Route exact path={["/login, /login/:token"]}>
-                        <Login/>
-                    </Route>
-                </Switch>
-            </ThemeProvider>
-        </Router>
-    );
+function App({ user, getStatus, getAllCharacters }) {
+	const preferredTheme = theme('light');
+	const [isMounted, setMounted] = useState(false);
+	// const [user, setUser] = useState({})
+
+	useEffect(() => {
+		getStatus().then((_res) => setMounted(true));
+	}, []);
+
+	return (
+		<ThemeProvider theme={preferredTheme}>
+			<CssBaseline />
+			{isMounted && <AppRouter user={user} />}
+		</ThemeProvider>
+	);
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+	user: state.user,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+	getStatus: () => dispatch(getStatus()),
+	getAllCharacters: () => dispatch(getAllCharacters()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

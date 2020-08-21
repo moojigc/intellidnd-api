@@ -1,9 +1,8 @@
-import a from './addCharacter';
-import b from './changeDefaultCharacter';
 import c from './login';
 import d from './logout';
 import e from './signup';
+import f from './getStatus'
 
-const combined = [a, b, c, d, e];
+const combined = [c, d, e, f];
 
 export default combined;

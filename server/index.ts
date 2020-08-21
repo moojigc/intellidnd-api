@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import connectMongo from 'connect-mongodb-session';
 import passport from './middleware/passport';
 import compression from 'compression';
-import router from './routes';
+import { characterRouter, userRouter } from './routes';
 import cors from 'cors';
 import { resolve } from 'path';
 import * as dotenv from 'dotenv';
@@ -36,22 +36,22 @@ const Store = new MongoDBStore({
 Store.on('error', (error) => console.log(error));
 
 const app = express();
-PROD && app.use(express.static(resolve(__dirname, '..', 'client', 'build')));
-!PROD && app.use(cors({ origin: 'http://localhost:3200' }));
+PROD && app.use(express.static(resolve('client', 'build')));
+!PROD && app.use(cors({ origin: 'localhost:*', credentials: true }));
 app.use(express.urlencoded({ extended: true }))
 	.use(express.json())
 	// Session middleware
 	.use(
 		session({
-			secret: process.env.SESS_SECRET || 'deku',
+			secret: process.env.SESS_SECRET,
 			resave: true,
-			saveUninitialized: false,
+			saveUninitialized: true,
 			store: Store,
 			cookie: {
-				domain: PROD
-					? 'https://intellidnd.com'
-					: 'http://localhost:3200',
+				maxAge: 60000 * 60 * 24,
+				// domain: PROD ? 'intellidnd.com' : 'localhost',
 				sameSite: true,
+				httpOnly: true,
 				secure: 'auto',
 			},
 		})
@@ -59,15 +59,27 @@ app.use(express.urlencoded({ extended: true }))
 	.use(passport.initialize())
 	.use(passport.session())
 	.use(morgan('dev'))
-	.use('/api/v1', router)
 	.use(compression());
+
+userRouter(app);
+characterRouter(app);
+
+app.all('/api/v1/*', (req, res) => {
+	res.status(404).json({
+		flash: { message: `Sorry, ${req.path} doesn't exist!`, type: 'error' },
+	}).end();
+});
 
 PROD &&
 	app.get('*', (_, res) => {
-		res.sendFile(resolve(__dirname, '..', 'client', 'build', 'index.html'));
+		res.sendFile(resolve('client', 'build', 'index.html'));
 	});
 app.listen(PORT, () => {
 	console.log(
-		`Online at ${PROD ? 'https://intellidnd.com' : `http://${networkInterfaces().wifi0[0].address}:${PORT}`}`
+		`Online at ${
+			PROD
+				? 'https://intellidnd.com'
+				: `http://${networkInterfaces().wifi0[0].address}:${PORT}`
+		}`
 	);
 });

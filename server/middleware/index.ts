@@ -1,30 +1,49 @@
 import { Request, Response, NextFunction } from 'express';
 
-export interface RequestWithUser extends Request {
-	user: string | number;
+// interface RequestWithUser extends Request {
+// 	user: string | number;
+// }
+
+declare global {
+	interface RequestWithUser extends Request {
+		user: string | number;
+	}
 }
 
 export const flash = (
-	type: 'error' | 'success',
-	message: string,
-	redirect?: string
+	...args:
+		| [Response, 'error' | 'success', string, string?]
+		| ['error' | 'success', string, string?]
 ) => {
-	return {
-		flash: {
-			message,
-			type,
-		},
-		redirect: redirect,
-	};
+	switch (typeof args[0] !== 'string') {
+		case true:
+			return (args[0] as Response).json({
+				flash: {
+					type: args[1],
+					message: args[2]
+				},
+				redirect: args[3]
+			});
+		default: 
+			return {
+				flash: {
+					type: args[0],
+					message: args[1]
+				},
+				redirect: args[2]
+			}
+	}
 };
 
 export function isAuth(req: Request, res: Response, next: NextFunction): void {
-	switch (!!req.user || req.user) {
+	switch (req.isAuthenticated()) {
 		case true:
 			next();
+			break;
 		default:
 		case false:
-			res.status(401).json(flash('error', 'Authentication error.')).end();
+			// res.status(401).json(flash('error', 'Authentication error.')).end();
+			flash(res, 'error', 'Authentication error.')
 			return;
 	}
 }

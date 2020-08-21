@@ -6,12 +6,18 @@
     .toolbar {
         justify-content: space-between;
     }
-    .nav-left {
-        display: flex;
-        align-items: center;
-    }
     .nav {   
         background: var(--secondary);
+        .left {
+            display: flex;
+            align-items: center;
+        }
+        .right {
+            display: flex;
+            div:not(:last-of-type) {
+                margin-right: 0.5rem;
+            }
+        }
     }
     .brand {
         flex-grow: 1;

@@ -3,7 +3,7 @@ export default {
         'Commands are *not* case-sensitive. Members with kick/ban permission can run commands on other users by **@mentions** immediately after the command. For example, **/add @tomNook gold 1000** will add 1000 gold to @tomNook. This works for every command.',
     commands: [
         {
-            name: '/stat',
+            name: '/stat, /stats',
             example: '> `/stat charisma 16`',
             explanation: [
                 `Use this command to modify your characters' stats. If you use the \`create\` command, all will be 10 by default.`
