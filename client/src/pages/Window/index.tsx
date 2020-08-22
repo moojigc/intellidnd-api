@@ -1,24 +1,35 @@
-import React, { useState, useLayoutEffect, HTMLProps } from 'react';
+import React, { useState, useLayoutEffect, HTMLProps, useEffect } from 'react';
 import Footer from '../../components/Footer';
-import { Container, Fade } from '@material-ui/core';
-import { Wrapper } from '../../components/MiniComponents';
+import {
+	Container,
+	Fade,
+	useMediaQuery,
+	ContainerProps,
+} from '@material-ui/core';
+import { Wrapper, AlertMessage } from '../../components/MiniComponents';
 import { connect } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
-const Window = (props: HTMLProps<any> & any) => {
-	const { children, state, custom } = props;
+const Window = (
+	props: HTMLProps<any> & {
+		custom?: any;
+		state?: never;
+		ContainerProps?: ContainerProps;
+	}
+) => {
+	const isMobile = useMediaQuery('(max-width: 900px)');
+	const { children, state, custom, ContainerProps } = props;
 	const { pathname } = useLocation();
 	const [position, setPosition] = useState('fixed');
-	const count = React.useRef(0);
 	useLayoutEffect(() => {
-		console.log(state.character, `count ${++count.current}`);
 		setPosition(
 			document.body.scrollHeight > window.innerHeight ? 'static' : 'fixed'
 		);
-	}, [state, pathname, custom]);
+	}, [pathname, custom]);
 	return (
 		<React.Fragment>
-			<Container>
+			<AlertMessage />
+			<Container disableGutters={isMobile} {...ContainerProps}>
 				<Fade in={true} timeout={400}>
 					<Wrapper className={props.className}>{children}</Wrapper>
 				</Fade>

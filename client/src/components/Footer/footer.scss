@@ -1,5 +1,12 @@
 footer {
+	a {
+		text-decoration: none;
+		&:hover {
+			text-decoration: underline;
+		}
+	}
 	background: var(--secondary);
+	font-family: var(--fancy-font);
 	width: 100%;
 	display: flex;
 	justify-content: space-between;

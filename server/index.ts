@@ -65,9 +65,14 @@ userRouter(app);
 characterRouter(app);
 
 app.all('/api/v1/*', (req, res) => {
-	res.status(404).json({
-		flash: { message: `Sorry, ${req.path} doesn't exist!`, type: 'error' },
-	}).end();
+	res.status(404)
+		.json({
+			flash: {
+				message: `Sorry, can't ${req.method} ${req.path} or ${req.path} doesn't exist.`,
+				type: 'error',
+			},
+		})
+		.end();
 });
 
 PROD &&

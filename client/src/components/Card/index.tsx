@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { TextField } from '@material-ui/core';
 
 interface CardProps {
@@ -7,6 +7,7 @@ interface CardProps {
 		name: string;
 		quantity: number;
 	}[];
+	children: ReactNode;
 }
 
 const Card = (props: CardProps) => {

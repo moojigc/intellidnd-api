@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Login from '../pages/Login';
 import Guide from '../pages/Guide';
 import Dashboard from '../pages/Dashboard';
@@ -10,6 +10,8 @@ import {
 	Redirect,
 } from 'react-router-dom';
 import Page, { PathProps } from '../pages/Page';
+import Window from '../pages/Window';
+import AddCharacter from '../pages/AddCharacter';
 
 interface RouteProps extends PathProps {
 	path: string | string[];
@@ -24,14 +26,18 @@ const ROUTES: { public: RouteProps[]; private: RouteProps[] } = {
 			Component: Login,
 		},
 		{
-			title: 'welcome to intellidnd',
+			title: 'Welcome to IntelliDnD',
 			path: '/guide',
 			Component: Guide,
 			HeroText: () => (
-				<React.Fragment>
-					<p>manage your D&D character with ease</p>
-					<p>integrated with a Discord bot</p>
-				</React.Fragment>
+				<div style={{ fontSize: window.innerWidth * 0.002 + 'rem' }}>
+					<p style={{ fontSize: 'inherit' }}>
+						manage your D&D character with ease
+					</p>
+					<p style={{ fontSize: 'inherit' }}>
+						integrated with a Discord bot
+					</p>
+				</div>
 			),
 			TypographyProps: {
 				style: {
@@ -43,6 +49,12 @@ const ROUTES: { public: RouteProps[]; private: RouteProps[] } = {
 	],
 	private: [
 		{
+			title: 'Add Character',
+			path: '/add-character',
+			Component: AddCharacter,
+		},
+		{
+			optOut: true,
 			title: 'Dashboard',
 			path: ['/', '/dashboard'],
 			Component: Dashboard,
@@ -57,7 +69,14 @@ const ROUTES: { public: RouteProps[]; private: RouteProps[] } = {
 const AppRouter = ({ user }: { user: { auth: boolean } }) => {
 	return (
 		<Router>
-			<Nav />
+			<Nav
+				pages={ROUTES.private
+					.filter(({ title }) => title !== 'Dashboard')
+					.map((r) => ({
+						path: r.path,
+						title: r.title,
+					}))}
+			/>
 			<Switch>
 				{ROUTES.private.map(
 					(
@@ -98,17 +117,22 @@ const AppRouter = ({ user }: { user: { auth: boolean } }) => {
 							HeroText,
 							TypographyProps,
 							optOut,
+							redirect,
 						},
 						i
 					) => (
 						<Route exact path={path} key={i}>
-							<Page
-								optOut={optOut}
-								title={title}
-								Component={Component}
-								HeroText={HeroText}
-								TypographyProps={TypographyProps}
-							/>
+							{redirect ? (
+								<Redirect to={redirect} />
+							) : (
+								<Page
+									optOut={optOut}
+									title={title}
+									Component={Component}
+									HeroText={HeroText}
+									TypographyProps={TypographyProps}
+								/>
+							)}
 						</Route>
 					)
 				)}

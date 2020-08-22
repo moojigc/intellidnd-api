@@ -43,6 +43,7 @@ a {
 	:visited {
 		color: darken($primary, 10);
 	}
+	word-break: break-all;
 }
 
 code {

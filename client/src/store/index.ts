@@ -1,6 +1,5 @@
 import user from './user';
-import character from './character'
-import logError from './error'
+import character from './character';
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 import thunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
@@ -21,5 +20,5 @@ const store = createStore(reducer, middleware);
 
 export default store;
 export * from './user';
-export * from './character'
-export * from './error'
+export * from './character';
+export * from './error';

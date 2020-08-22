@@ -1,9 +1,5 @@
-import {
-	flash,
-	passport,
-	serverError,
-} from '../../middleware';
-import { Response, NextFunction } from 'express';
+import { flash, passport, serverError } from '../../middleware';
+import { Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { Player, User } from '../../models';
 import { Types } from 'mongoose';
@@ -11,9 +7,7 @@ const { ObjectId } = Types;
 
 const addCharacter = async (req: RequestWithUser, res: Response) => {
 	const respond = (type: 'error' | 'success', message: string) =>
-		res.json(
-			flash(type, message, '/characters/add'),
-		);
+		res.json(flash(type, message, '/characters/add'));
 	try {
 		let { id, name } = jwt.verify(
 			req.query.token as string,
@@ -37,7 +31,7 @@ const addCharacter = async (req: RequestWithUser, res: Response) => {
 			if (characterCheck.length > 0) {
 				respond(
 					'error',
-					`${req.body.characterName} has already been added to your character list.`,
+					`${req.body.characterName} has already been added to your character list.`
 				);
 				return;
 			}

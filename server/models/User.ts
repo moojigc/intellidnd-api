@@ -79,8 +79,8 @@ UserSchema.statics.getAllPlayers = async function (id) {
 	return await this.findById(id).populate('players');
 };
 export interface IUserModel extends Model<IUser> {
-	getDefaultPlayer(id: string | Schema.Types.ObjectId): Promise<IUserPlayer>;
-	getAllPlayers(id: string | Schema.Types.ObjectId): Promise<IUserAllPlayers>;
+	getDefaultPlayer(id: string | number): Promise<IUserPlayer>;
+	getAllPlayers(id: string | number): Promise<IUserAllPlayers>;
 }
 
 export const User = mongoose.model<IUser, IUserModel>('User', UserSchema);

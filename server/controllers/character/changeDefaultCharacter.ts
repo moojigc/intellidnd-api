@@ -39,7 +39,7 @@ const changeDefaultCharacter = async (req: RequestWithUser, res: Response) => {
 };
 
 export default {
-	route: '/characters',
+	route: '/default',
 	isAuth: true,
 	method: 'put',
 	callback: changeDefaultCharacter,

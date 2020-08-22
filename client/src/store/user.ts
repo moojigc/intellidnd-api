@@ -22,15 +22,14 @@ type UserDetails = {
 	auth: boolean;
 	createdAt?: Date;
 	updatedAt?: Date;
+	characterToken?: string;
 };
 
-type User = UserDispatchActions & UserDetails;
+export type User = UserDispatchActions & UserDetails;
 
 type Dispatch = (arg: User) => {};
 
 const userAction = (action: User) => action;
-
-export const logout = () => {};
 
 export const getStatus = () => async (dispatch: Dispatch) => {
 	const user = await (async () => {
@@ -53,10 +52,20 @@ export const login = (details: User) => async (dispatch: Dispatch) => {
 	let res = await request({
 		data: details,
 		method: 'POST',
-		url: 'user/login',
+		url: `user/login?token=${details.characterToken}`,
 	});
 	storage({ key: 'user', data: res.user });
 	dispatch(userAction({ ...res.user, type: 'LOGGED_IN' }));
+	return res;
+};
+
+export const logout = () => async (dispatch: Dispatch) => {
+	let res = await request({
+		method: 'GET',
+		url: 'user/logout',
+	});
+	storage({ key: 'user', data: res.user });
+	dispatch(userAction({ ...res.user, type: 'LOGGED_OUT' }));
 	return res;
 };
 
@@ -64,6 +73,11 @@ export default function (state: UserDetails = defaultState, action: User) {
 	const user = { ...action };
 	delete user.type;
 	switch (action.type) {
+		case 'LOGGED_OUT':
+			return {
+				...state,
+				...user,
+			};
 		case 'LOGGED_IN':
 			return {
 				...state,

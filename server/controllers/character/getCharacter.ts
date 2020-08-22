@@ -1,4 +1,4 @@
-import { flash, serverError } from '../../middleware';
+import { flash, serverError, mapInventory } from '../../middleware';
 import { Response } from 'express';
 import { Player, IPlayer, User } from '../../models';
 import { Types } from 'mongoose';
@@ -46,19 +46,28 @@ const getCharacters = async (req: RequestWithUser, res: Response) => {
 				}
 				break;
 			default: {
-				const user = await User.findOne({ _id: req.user });
-				const characters = await Player.find({ webUserId: req.user });
-				const [defaultPlayer] = characters.filter((c) =>
-					ObjectId(user.defaultPlayer).equals(c._id)
+				const user = await User.findOne({ _id: req.user }).populate(
+					'players'
 				);
+				const defaultPlayer = user.players
+					.filter((c) =>
+						ObjectId(user.defaultPlayer).equals(c._id)
+					)[0]
+					.toObject();
+				let inventory = mapInventory(defaultPlayer);
+				defaultPlayer.inventory = inventory;
 				res.json({
 					...flash(
 						'success',
-						`${characters.length} character(s) found.`
+						`${user.players.length} character(s) found.`
 					),
 					characters: {
 						default: defaultPlayer,
-						all: characters,
+						all: (user.players as any[]).map((c) => {
+							let obj = c.toObject();
+							obj.inventory = mapInventory(c);
+							return obj;
+						}),
 					},
 				});
 			}

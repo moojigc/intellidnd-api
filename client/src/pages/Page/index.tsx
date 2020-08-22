@@ -1,20 +1,17 @@
-import React, { useEffect, useLayoutEffect, useState, useRef } from 'react';
+import React, { useEffect } from 'react';
 import Hero from '../../components/Hero';
 import {
 	Typography,
-	Container,
 	TypographyVariant,
 	TypographyStyle,
 } from '@material-ui/core';
-import { Wrapper } from '../../components/MiniComponents';
-import Footer from '../../components/Footer';
 import { useLocation } from 'react-router-dom';
-import { connect, ConnectedComponent } from 'react-redux';
+import { ConnectedComponent } from 'react-redux';
 import { Character } from '../../store';
 
 export interface PathProps {
 	optOut?: boolean;
-	Component: (() => JSX.Element) | ConnectedComponent<any, any>;
+	Component: ((any: any) => JSX.Element) | ConnectedComponent<any, any>;
 	title: string;
 	HeroText?: () => JSX.Element;
 	TypographyProps?: {
@@ -29,7 +26,6 @@ export interface PathProps {
  * Handles events and layout for every page on pathname change
  */
 const Page = ({
-	character,
 	Component,
 	title,
 	HeroText,
@@ -64,8 +60,4 @@ const Page = ({
 	);
 };
 
-const mapStateToProps = (state) => ({
-	character: state.character,
-});
-
-export default connect(mapStateToProps)(Page);
+export default Page;

@@ -1,7 +1,14 @@
 import request from '../utils/request';
 
+const defaultItem = {
+	name: '',
+	quantity: 0,
+};
+
 const defaultState: { default: CharacterDetails; all?: CharacterDetails[] } = {
 	default: {
+		_id: '',
+		name: '',
 		stats: {
 			initiative: 0,
 			hp: 0,
@@ -12,16 +19,36 @@ const defaultState: { default: CharacterDetails; all?: CharacterDetails[] } = {
 			wisdom: 0,
 			charisma: 0,
 		},
-		inventory: {
-			potions: [],
-			weapons: [],
-			misc: [],
-			gold: 0,
-			silver: 0,
-			copper: 0,
-			platinum: 0,
-			electrum: 0,
-		},
+		inventory: [
+			{
+				potions: [],
+			},
+			{
+				weapons: [],
+			},
+			{
+				misc: [],
+			},
+			{
+				money: [
+					{
+						gold: 0,
+					},
+					{
+						silver: 0,
+					},
+					{
+						copper: 0,
+					},
+					{
+						platinum: 0,
+					},
+					{
+						electrum: 0,
+					},
+				],
+			},
+		],
 		webUserId: '',
 		notificationsToDM: false,
 		changelog: [{}],
@@ -41,9 +68,13 @@ type CharacterDispatchActions = {
 		| 'GOT_INVENTORY'
 		| 'GOT_DEFAULT'
 		| 'GOT_ALL_CHARACTERS'
-		| 'GOT_CHARACTERS';
+		| 'GOT_CHARACTERS'
+		| 'PERM_SWITCHED_DEFAULT_CHARACTER'
+		| 'TEMP_SWITCHED_DEFAULT_CHARACTER';
 };
-interface CharacterDetails {
+export interface CharacterDetails {
+	_id: string;
+	name: string;
 	webUserId: string;
 	stats: {
 		initiative: number;
@@ -56,16 +87,36 @@ interface CharacterDetails {
 		charisma: number;
 	};
 	notificationsToDM: boolean;
-	inventory: {
-		potions: Item[];
-		weapons: Item[];
-		misc: Item[];
-		gold: number;
-		silver: number;
-		copper: number;
-		platinum: number;
-		electrum: number;
-	};
+	inventory: [
+		{
+			potions: Item[] | never[];
+		},
+		{
+			weapons: Item[] | never[];
+		},
+		{
+			misc: Item[] | never[];
+		},
+		{
+			money: [
+				{
+					gold: number;
+				},
+				{
+					silver: number;
+				},
+				{
+					copper: number;
+				},
+				{
+					platinum: number;
+				},
+				{
+					electrum: number;
+				}
+			];
+		}
+	];
 	changelog: [
 		{
 			on?: Date;
@@ -99,9 +150,36 @@ export const getDefaultCharacter = () => async (dispatch: Dispatch) => {
 
 export const getCharacters = () => async (dispatch: Dispatch) => {
 	let res = await request({ url: 'characters', method: 'GET' });
-	console.log(res.characters);
 	dispatch(characterAction({ ...res.characters, type: 'GOT_CHARACTERS' }));
 	return res.characters;
+};
+
+export const setDefaultCharacter = (
+	character: CharacterDetails,
+	post?: boolean
+) => async (dispatch: Dispatch) => {
+	if (post) {
+		let res = await request({
+			url: `characters/default`,
+			method: 'POST',
+			data: { id: character._id },
+		});
+		dispatch(
+			characterAction({
+				...res.character,
+				type: 'PERM_SWITCHED_DEFAULT_CHARACTER',
+			})
+		);
+		return res.character;
+	} else {
+		dispatch(
+			characterAction({
+				default: character,
+				type: 'TEMP_SWITCHED_DEFAULT_CHARACTER',
+			})
+		);
+		return character;
+	}
 };
 
 export default function (
@@ -122,6 +200,16 @@ export default function (
 				default: character.default,
 			};
 		case 'GOT_CHARACTERS':
+			return {
+				...state,
+				...character,
+			};
+		case 'TEMP_SWITCHED_DEFAULT_CHARACTER':
+			return {
+				...state,
+				...character,
+			};
+		case 'PERM_SWITCHED_DEFAULT_CHARACTER':
 			return {
 				...state,
 				...character,

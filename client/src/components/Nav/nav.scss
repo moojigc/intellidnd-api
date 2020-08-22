@@ -1,36 +1,37 @@
-@import "../../assets/scss/variables.scss";
+@import '../../assets/scss/variables.scss';
 
 .navbar {
-    flex-grow: 1;
-    font-family: var(--fancy-font);
-    .toolbar {
-        justify-content: space-between;
-    }
-    .nav {   
-        background: var(--secondary);
-        .left {
-            display: flex;
-            align-items: center;
-        }
-        .right {
-            display: flex;
-            div:not(:last-of-type) {
-                margin-right: 0.5rem;
-            }
-        }
-    }
-    .brand {
-        flex-grow: 1;
-        font-size: 1rem;
-    }
-    .logo {
-        margin-right: 0.5rem;
-        width: 2rem;
-    }
-    a {
-        color: white;
-        &:hover {
-            color: darken(white, 10);
-        }
-    }
+	flex-grow: 1;
+	font-family: var(--fancy-font);
+	.toolbar {
+		justify-content: space-between;
+	}
+	.nav {
+		background: var(--secondary);
+		.left {
+			display: flex;
+			align-items: center;
+		}
+		.right {
+			display: flex;
+			a,
+			button:not(:last-of-type) {
+				margin-right: 0.5rem;
+			}
+		}
+	}
+	.brand {
+		flex-grow: 1;
+		font-size: 1rem;
+	}
+	.logo {
+		margin-right: 0.5rem;
+		width: 2rem;
+	}
+	a {
+		color: white;
+		&:hover {
+			color: darken(white, 10);
+		}
+	}
 }
