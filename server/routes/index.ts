@@ -14,11 +14,12 @@
 // import j from '../controllers/character/putInventory';
 import { Router } from 'express';
 import { isAuth as isPrivate } from '../middleware';
-import user from '../controllers/user'
-import character from '../controllers/character'
+import user from '../controllers/user';
+import character from '../controllers/character';
 // const user = [a, b, c, d, e, f];
 // const character = [g, h, i, j];
-const prefix = 'api/v1'
+const prefix = 'api/v1';
+const colorLog = (color, message): string => color + message + '\x1b[0m';
 
 // const loop = (router: Router, controller: any[], otherPrefix: string) => {
 // 	for (let i=0; i<controller.length; i++) {
@@ -30,15 +31,32 @@ const prefix = 'api/v1'
 // export const userRouter = (router: Router) => loop(router, user, 'user');
 // export const characterRouter = (router: Router) => loop(router, character, 'characters');
 
-export const userRouter = (router: Router) => user.forEach(({ method, isAuth, callback, route }) => {
-	console.log(`router.${method}("/${prefix}/user${route}")`);
-	router[method](`/${prefix}/user${route}`, isAuth ? [isPrivate, callback] : callback);
-});
+export const userRouter = (router: Router) =>
+	user.forEach(({ method, isAuth, callback, route }) => {
+		console.log(
+			colorLog('\x1b[47m\x1b[30m', method.toUpperCase()),
+			colorLog('\x1b[36m', `/${prefix}/user${route}`),
+			isAuth
+				? colorLog('\x1b[31m', 'private')
+				: colorLog('\x1b[32m', 'public')
+		);
+		router[method](
+			`/${prefix}/user${route}`,
+			isAuth ? [isPrivate, callback] : callback
+		);
+	});
 
-export const characterRouter = (router: Router) => character.forEach(({ method, isAuth, callback, route }) => {
-	console.log(`router.${method}("/${prefix}/characters${route}")`);
-	router[method](
-		`/${prefix}/characters${route}`,
-		isAuth ? [isPrivate, callback] : callback
-	);
-});
+export const characterRouter = (router: Router) =>
+	character.forEach(({ method, isAuth, callback, route }) => {
+		console.log(
+			colorLog('\x1b[47m\x1b[30m', method.toUpperCase()),
+			colorLog('\x1b[36m', `/${prefix}/character${route}`),
+			isAuth
+				? colorLog('\x1b[31m', 'private')
+				: colorLog('\x1b[32m', 'public')
+		);
+		router[method](
+			`/${prefix}/characters${route}`,
+			isAuth ? [isPrivate, callback] : callback
+		);
+	});

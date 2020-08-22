@@ -14,9 +14,9 @@ import { networkInterfaces } from 'os';
 dotenv.config();
 const MongoDBStore = connectMongo(session),
 	PORT = process.env.PORT,
+	PROD = process.env.NODE_ENV === 'production',
 	MONGODB_URI =
-		process.env.MONGODB_URI || 'mongodb://localhost/dnd-inventory',
-	PROD = process.env.NODE_ENV === 'production';
+		process.env.MONGODB_URI || 'mongodb://localhost/dnd-inventory';
 
 mongoose
 	.connect(MONGODB_URI, {
@@ -84,7 +84,9 @@ app.listen(PORT, () => {
 		`Online at ${
 			PROD
 				? 'https://intellidnd.com'
-				: `http://${networkInterfaces().wifi0[0].address}:${PORT}`
+				: `http://\x1b[33m${
+						networkInterfaces().wifi0[0].address
+				  }\x1b[0m:${PORT}`
 		}`
 	);
 });
