@@ -50,7 +50,7 @@ export const characterRouter = (router: Router) =>
 	character.forEach(({ method, isAuth, callback, route }) => {
 		console.log(
 			colorLog('\x1b[47m\x1b[30m', method.toUpperCase()),
-			colorLog('\x1b[36m', `/${prefix}/character${route}`),
+			colorLog('\x1b[36m', `/${prefix}/characters${route}`),
 			isAuth
 				? colorLog('\x1b[31m', 'private')
 				: colorLog('\x1b[32m', 'public')

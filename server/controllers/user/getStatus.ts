@@ -14,8 +14,9 @@ const getStatus = async (req: Request, res: Response) => {
 					updatedAt: user.updatedAt,
 					email: user.email,
 					auth: true,
-					expiration: req.session.cookie.expires
-				}
+					expiration: req.session.cookie.expires,
+					defaultPlayer: user.defaultPlayer,
+				},
 			});
 		} else {
 			res.json({

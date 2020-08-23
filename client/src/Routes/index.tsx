@@ -10,7 +10,6 @@ import {
 	Redirect,
 } from 'react-router-dom';
 import Page, { PathProps } from '../pages/Page';
-import Window from '../pages/Window';
 import AddCharacter from '../pages/AddCharacter';
 
 interface RouteProps extends PathProps {
@@ -30,14 +29,10 @@ const ROUTES: { public: RouteProps[]; private: RouteProps[] } = {
 			path: '/guide',
 			Component: Guide,
 			HeroText: () => (
-				<div style={{ fontSize: window.innerWidth * 0.002 + 'rem' }}>
-					<p style={{ fontSize: 'inherit' }}>
-						manage your D&D character with ease
-					</p>
-					<p style={{ fontSize: 'inherit' }}>
-						integrated with a Discord bot
-					</p>
-				</div>
+				<React.Fragment>
+					<h2>manage your D&D character with ease</h2>
+					<h2>integrated with a Discord bot</h2>
+				</React.Fragment>
 			),
 			TypographyProps: {
 				style: {

@@ -1,3 +1,5 @@
+import { useMediaQuery } from '@material-ui/core';
+
 export const capitalize = (input: string, ...exceptions: string[]) => {
 	let words = input.split(' ');
 	let keywords = ['of', 'a', 'the', 'an', 'to', ...exceptions];
@@ -10,3 +12,5 @@ export const capitalize = (input: string, ...exceptions: string[]) => {
 	});
 	return caps.join(' ');
 };
+
+export const useCheckMobile = () => useMediaQuery('(max-width: 900px)');

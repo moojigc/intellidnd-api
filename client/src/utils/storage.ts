@@ -1,4 +1,4 @@
-import { devError } from "../store";
+import { devError } from '../utils/error';
 
 /**
  * Handle setting sessionStorage or locaLStorage
@@ -25,7 +25,7 @@ const handleStorage = ({
 			}
 		}
 	} catch (error) {
-		devError(error)
+		devError(error);
 	}
 };
 

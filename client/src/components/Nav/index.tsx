@@ -5,10 +5,11 @@ import {
 	AppBar,
 	Toolbar,
 	IconButton,
-	Typography,
+	Typography as T,
 	Button,
 	Menu,
 	MenuItem,
+	makeStyles,
 } from '@material-ui/core';
 import { logout } from '../../store';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
@@ -36,6 +37,16 @@ const ButtonLink = ({
 	</Link>
 );
 
+const useStyles = makeStyles((theme) => ({
+	root: {
+		background: theme.palette.secondary.light,
+		color: theme.palette.secondary.contrastText,
+	},
+	account: {
+		color: theme.palette.primary.light,
+	},
+}));
+
 const Nav = ({
 	user,
 	logout,
@@ -43,8 +54,9 @@ const Nav = ({
 }: {
 	user;
 	logout: () => Promise<any>;
-	pages: { path; title }[];
+	pages: { path; title: string }[];
 }) => {
+	const classes = useStyles();
 	const history = useHistory();
 	const handleLogout = (e) => {
 		e.preventDefault();
@@ -80,6 +92,7 @@ const Nav = ({
 									{(popupState) => (
 										<React.Fragment>
 											<Button
+												className={classes.account}
 												style={{ fontSize: '1rem' }}
 												color="primary"
 												variant="outlined"
@@ -89,6 +102,7 @@ const Nav = ({
 											</Button>
 											<Menu
 												MenuListProps={{
+													className: classes.root,
 													style: {
 														display: 'flex',
 														flexDirection: 'column',
@@ -96,40 +110,31 @@ const Nav = ({
 													},
 												}}
 												{...bindMenu(popupState)}
-												anchorOrigin={{
-													horizontal: 'center',
-													vertical: 'bottom',
-												}}
+												getContentAnchorEl={null}
 												transformOrigin={{
-													horizontal: 'center',
-													vertical: 'top',
+													horizontal: 'left',
+													vertical: -43,
 												}}
 											>
 												<MenuItem
-													component={() => (
-														<ButtonLink
-															to="/logout"
-															onClick={
-																handleLogout
-															}
-															variant="text"
-														>
-															Sign Out
-														</ButtonLink>
-													)}
-												/>
+													onClick={handleLogout}
+												>
+													<T>SIGN OUT</T>
+												</MenuItem>
 												{pages.map(
 													({ path, title }) => (
 														<MenuItem
-															component={() => (
-																<ButtonLink
-																	to={path}
-																	variant="text"
-																>
-																	{title}
-																</ButtonLink>
-															)}
-														/>
+															key={path}
+															onClick={() => {
+																history.push(
+																	path
+																);
+															}}
+														>
+															<T>
+																{title.toUpperCase()}
+															</T>
+														</MenuItem>
 													)
 												)}
 											</Menu>

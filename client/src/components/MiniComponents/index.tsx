@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, BoxProps, Button } from '@material-ui/core';
+import { Box, BoxProps, Button, Slide } from '@material-ui/core';
 import { Check, Close } from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -20,7 +20,7 @@ export const Wrapper = (props: BoxProps) => {
  * Listens to history state and displays any message passed to history state
  */
 export const AlertMessage = () => {
-	const [display, setDisplay] = useState(true);
+	const [display, setDisplay] = useState(false);
 	const history = useHistory();
 	const [histState, setHistState] = useState({
 		message: null,
@@ -28,7 +28,7 @@ export const AlertMessage = () => {
 	});
 	useEffect(() => {
 		history.listen(() => {
-			if (history.action === 'PUSH') {
+			if (history.action === 'PUSH' || history.action === 'REPLACE') {
 				console.log(
 					'message is ' + (history.location.state as any)?.message
 				);
@@ -36,21 +36,29 @@ export const AlertMessage = () => {
 			}
 		});
 	}, [history.location.state]);
+	useEffect(() => {
+		setDisplay(histState.message !== null);
+	}, [histState.message]);
 	return (
-		<div
-			className={`alert ${histState?.type || ''}`}
-			style={{ display: histState?.message && display ? 'flex' : 'none' }}
+		<Slide
+			direction="right"
+			in={display}
+			mountOnEnter
+			unmountOnExit
+			timeout={400}
 		>
-			<Check fontSize="inherit" />
-			<span
-				className={histState?.type || ''}
-				style={{ marginLeft: '0.5rem' }}
-			>
-				{histState?.message}
-			</span>
-			<Button className="x" onClick={() => setDisplay(false)}>
-				<Close fontSize="inherit" />
-			</Button>
-		</div>
+			<div className={`alert ${histState?.type || ''}`}>
+				<Check fontSize="inherit" />
+				<span
+					className={histState?.type || ''}
+					style={{ marginLeft: '0.5rem' }}
+				>
+					{histState?.message}
+				</span>
+				<Button className="x" onClick={() => setDisplay(false)}>
+					<Close fontSize="inherit" />
+				</Button>
+			</div>
+		</Slide>
 	);
 };

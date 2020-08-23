@@ -14,7 +14,8 @@ const Footer = ({ position }) => {
 				</a>
 			</div>
 			<div>
-				<Link to="/guide">See Guide</Link>{' '}
+				<Link to="/guide">See Guide</Link>
+				{' | '}
 				<a
 					href="https://github.com/moojigc/intellidnd"
 					rel="noopener noreferrer"

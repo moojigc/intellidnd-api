@@ -1,5 +1,5 @@
-import axios, { AxiosRequestConfig } from 'axios'
-import { devError } from '../store';
+import axios, { AxiosRequestConfig } from 'axios';
+import { devError } from '../utils/error';
 
 const request = async (options: AxiosRequestConfig) => {
 	try {
@@ -7,8 +7,8 @@ const request = async (options: AxiosRequestConfig) => {
 			...options,
 			withCredentials: true,
 			url: `/api/v1/${options.url}`,
-        });
-        return data;
+		});
+		return data;
 	} catch (error) {
 		devError(error);
 		return {

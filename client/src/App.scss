@@ -8,9 +8,11 @@
 @import './components/Footer/footer.scss';
 @import './components/Card/card.scss';
 
+@import './pages/Dashboard/dashboard.scss';
 @import './pages/Guide/guide.scss';
 
 :root {
+	line-height: 1;
 	font-size: 20px;
 	--test: #00000047;
 	--primary: #9b59b6;
@@ -30,15 +32,16 @@
 
 body {
 	background-image: url('/assets/images/primary-logo-sm.png');
-	background-size: 100%;
-	background-repeat: repeat-x;
+	background-repeat: repeat-y;
+	background-size: 100vw;
 	background-blend-mode: soft-light;
 	font-family: 'Roboto', sans-serif;
 	background-color: var(--purple-light);
+	// overflow-y: auto;
 }
 
 a {
-	color: $primary;
+	color: var(--purple-light);
 	&:hover,
 	:visited {
 		color: darken($primary, 10);

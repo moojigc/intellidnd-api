@@ -1,10 +1,5 @@
 import request from '../utils/request';
 
-const defaultItem = {
-	name: '',
-	quantity: 0,
-};
-
 const defaultState: { default: CharacterDetails; all?: CharacterDetails[] } = {
 	default: {
 		_id: '',
@@ -55,7 +50,6 @@ const defaultState: { default: CharacterDetails; all?: CharacterDetails[] } = {
 	},
 	all: [],
 };
-
 interface Item {
 	name: string;
 	value?: number;
@@ -156,17 +150,17 @@ export const getCharacters = () => async (dispatch: Dispatch) => {
 
 export const setDefaultCharacter = (
 	character: CharacterDetails,
-	post?: boolean
+	put?: boolean
 ) => async (dispatch: Dispatch) => {
-	if (post) {
+	if (put) {
 		let res = await request({
 			url: `characters/default`,
-			method: 'POST',
+			method: 'PUT',
 			data: { id: character._id },
 		});
 		dispatch(
 			characterAction({
-				...res.character,
+				default: character,
 				type: 'PERM_SWITCHED_DEFAULT_CHARACTER',
 			})
 		);
@@ -207,12 +201,12 @@ export default function (
 		case 'TEMP_SWITCHED_DEFAULT_CHARACTER':
 			return {
 				...state,
-				...character,
+				default: character.default,
 			};
 		case 'PERM_SWITCHED_DEFAULT_CHARACTER':
 			return {
 				...state,
-				...character,
+				default: character.default,
 			};
 		default:
 			return state;

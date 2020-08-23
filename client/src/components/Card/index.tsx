@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { TextField } from '@material-ui/core';
+import { TextField, makeStyles, useTheme } from '@material-ui/core';
 
 interface CardProps {
 	title: string;
@@ -7,17 +7,33 @@ interface CardProps {
 		name: string;
 		quantity: number;
 	}[];
-	children: ReactNode;
+	children?: ReactNode;
+	className?: string;
 }
 
 const Card = (props: CardProps) => {
-	let { title, items } = props;
+	const { title, items, children, className } = props;
+	const theme = useTheme();
+
 	return (
-		<div className="card">
-			<div className="title">{title}</div>
-			{items?.map(({ name, quantity }) => (
-				<TextField defaultValue={name} />
-			))}
+		<div className={className ? `card ${className}` : 'card'}>
+			<div
+				className="title"
+				style={{
+					// color: theme.palette.getContrastText(
+					color: theme.palette.secondary.main,
+					width: '100%',
+					// ),
+				}}
+			>
+				{title}
+			</div>
+			<div className="inputs">
+				{items?.map(({ name, quantity }, i) => (
+					<TextField key={i} label="item" defaultValue={name} />
+				))}
+				{children}
+			</div>
 		</div>
 	);
 };

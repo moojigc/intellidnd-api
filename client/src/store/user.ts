@@ -23,13 +23,14 @@ type UserDetails = {
 	createdAt?: Date;
 	updatedAt?: Date;
 	characterToken?: string;
+	defaultPlayer?: string;
 };
 
 export type User = UserDispatchActions & UserDetails;
 
 type Dispatch = (arg: User) => {};
 
-const userAction = (action: User) => action;
+export const userAction = (action: User) => action;
 
 export const getStatus = () => async (dispatch: Dispatch) => {
 	const user = await (async () => {
@@ -52,7 +53,9 @@ export const login = (details: User) => async (dispatch: Dispatch) => {
 	let res = await request({
 		data: details,
 		method: 'POST',
-		url: `user/login?token=${details.characterToken}`,
+		url: details.characterToken
+			? `user/login?token=${details.characterToken}`
+			: 'user/login',
 	});
 	storage({ key: 'user', data: res.user });
 	dispatch(userAction({ ...res.user, type: 'LOGGED_IN' }));
@@ -67,6 +70,16 @@ export const logout = () => async (dispatch: Dispatch) => {
 	storage({ key: 'user', data: res.user });
 	dispatch(userAction({ ...res.user, type: 'LOGGED_OUT' }));
 	return res;
+};
+
+export const updateUserDefaultCharacter = (id) => (dispatch: Dispatch) => {
+	dispatch(
+		userAction({
+			defaultPlayer: id,
+			type: 'SET_DEFAULT_CHARACTER',
+			auth: true,
+		})
+	);
 };
 
 export default function (state: UserDetails = defaultState, action: User) {
@@ -84,6 +97,11 @@ export default function (state: UserDetails = defaultState, action: User) {
 				...user,
 			};
 		case 'GOT_STATUS':
+			return {
+				...state,
+				...user,
+			};
+		case 'SET_DEFAULT_CHARACTER':
 			return {
 				...state,
 				...user,

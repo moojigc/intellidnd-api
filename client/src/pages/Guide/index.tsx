@@ -2,6 +2,7 @@ import React from 'react';
 import contents from '../../content/guide_contents';
 import Markdown from 'react-markdown';
 import Window from '../Window';
+import { Typography } from '@material-ui/core';
 
 const Guide = () => {
 	return (
@@ -9,7 +10,7 @@ const Guide = () => {
 			<Markdown source={contents.description} />
 			{contents.commands.map(({ name, example, explanation }) => (
 				<React.Fragment key={name}>
-					<h2>{name}</h2>
+					<h3>{name}</h3>
 					{example && <Markdown source={example} />}
 					{explanation.map((e) => (
 						<Markdown source={e} />
