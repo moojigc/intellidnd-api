@@ -49,7 +49,7 @@ const UserSchema = new Schema({
 	},
 });
 
-UserSchema.methods.encryptPass = async function () {
+UserSchema.methods.encryptPass = function () {
 	return hashSync(this.password, 15);
 };
 
@@ -63,14 +63,15 @@ export interface IUserBase extends Document {
 }
 
 export interface IUser extends IUserBase {
-	players: IPlayer['_id'][] | IPlayer[];
-	defaultPlayer: IPlayer['_id'] | IPlayer;
+	players?: IPlayer['_id'][] | IPlayer[];
+	defaultPlayer?: IPlayer['_id'] | IPlayer;
 }
 export interface IUserPlayer extends IUserBase {
-	defaultPlayer: IPlayer;
+	defaultPlayer?: IPlayer;
 }
 export interface IUserAllPlayers extends IUserBase {
-	players: IPlayer[];
+	players?: IPlayer[];
+	defaultPlayer?: IPlayer['_id'];
 }
 UserSchema.statics.getDefaultPlayer = async function (id) {
 	return await this.findById(id).populate('defaultPlayer');

@@ -20,10 +20,12 @@ const Window = (
 	const isMobile = useMediaQuery('(max-width: 900px)');
 	const { children, state, custom, ContainerProps } = props;
 	const { pathname } = useLocation();
-	const [position, setPosition] = useState('fixed');
+	const [position, setPosition] = useState('sticky');
 	useLayoutEffect(() => {
 		setPosition(
-			document.body.scrollHeight > window.innerHeight ? 'static' : 'fixed'
+			document.body.scrollHeight > window.innerHeight
+				? 'static'
+				: 'sticky'
 		);
 	}, [pathname, custom]);
 	return (

@@ -3,18 +3,18 @@ import { IPlayer } from './Player';
 
 const GuildSchema = new Schema({
 	name: {
-		type: String
+		type: String,
 	},
 	players: [
 		{
 			type: Schema.Types.ObjectId,
-			ref: 'Player'
-		}
+			ref: 'Player',
+		},
 	],
 	discordId: {
 		type: String,
-		unique: true
-	}
+		unique: true,
+	},
 });
 
 interface IGuildBase extends Document {
@@ -23,7 +23,7 @@ interface IGuildBase extends Document {
 }
 
 export interface IGuild extends IGuildBase {
-	players: IPlayer['_id'];
+	players: IPlayer['_id'][];
 }
 
 export interface IGuildPopulated extends IGuildBase {

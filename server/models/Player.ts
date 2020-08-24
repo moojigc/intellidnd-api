@@ -1,5 +1,6 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
-import { IUser } from './User';
+import mongoose, { Schema, Document, Model, Types } from 'mongoose';
+import { IUser, User } from './User';
+import { Guild } from './Guild';
 
 const PlayerSchema = new Schema({
 	discordId: {
@@ -106,7 +107,7 @@ interface IPlayerBase extends Document {
 		intelligence: number;
 		wisdom: number;
 		charisma: number;
-	}
+	};
 }
 
 export interface IPlayer extends IPlayerBase {
@@ -186,6 +187,46 @@ PlayerSchema.methods.writeChangelog = function (command) {
 	}
 	return this.changelog;
 };
+
+PlayerSchema.post('deleteOne', (doc, next) => {
+	User.findOneAndUpdate(
+		{ players: doc._id },
+		{
+			$pull: {
+				players: doc._id,
+			},
+		}
+	).then((res) => {
+		if (Types.ObjectId(res.defaultPlayer).equals(doc._id)) {
+			User.updateOne(
+				{ _id: res._id },
+				{
+					defaultPlayer: null,
+				}
+			)
+				.then(() => {
+					Guild.updateOne(
+						{ players: doc._id },
+						{
+							$pull: {
+								players: doc._id,
+							},
+						}
+					);
+				})
+				.then(() => next());
+		} else {
+			Guild.updateOne(
+				{ players: doc._id },
+				{
+					$pull: {
+						players: doc._id,
+					},
+				}
+			).then(() => next());
+		}
+	});
+});
 
 export interface IPlayerModel extends Model<IPlayer> {}
 

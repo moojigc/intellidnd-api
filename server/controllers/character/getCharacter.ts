@@ -46,14 +46,15 @@ const getCharacters = async (req: RequestWithUser, res: Response) => {
 				}
 				break;
 			default: {
-				const user = await User.findOne({ _id: req.user }).populate(
-					'players'
-				);
-				const defaultPlayer = user.players
-					.filter((c) =>
+				const user = await User.getAllPlayers(req.user);
+				const defaultPlayer = (() => {
+					let [dbDefault] = user.players.filter((c) =>
 						ObjectId(user.defaultPlayer).equals(c._id)
-					)[0]
-					.toObject();
+					);
+					if (!dbDefault) return user.players[0].toObject();
+					else return dbDefault.toObject();
+				})();
+				console.log(user);
 				let inventory = mapInventory(defaultPlayer);
 				defaultPlayer.inventory = inventory;
 				res.json({
@@ -63,7 +64,7 @@ const getCharacters = async (req: RequestWithUser, res: Response) => {
 					),
 					characters: {
 						default: defaultPlayer,
-						all: (user.players as any[]).map((c) => {
+						all: (user.players as any[])?.map((c) => {
 							let obj = c.toObject();
 							obj.inventory = mapInventory(c);
 							return obj;
@@ -78,7 +79,7 @@ const getCharacters = async (req: RequestWithUser, res: Response) => {
 };
 
 export default {
-	route: '',
+	route: '/',
 	method: 'get',
 	isAuth: true,
 	callback: getCharacters,

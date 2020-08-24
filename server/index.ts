@@ -32,6 +32,7 @@ mongoose
 const Store = new MongoDBStore({
 	uri: MONGODB_URI,
 	collection: 'user-sessions',
+	expires: 60000 * 60 * 24,
 });
 Store.on('error', (error) => console.log(error));
 

@@ -8,22 +8,21 @@ const commands = /stat|dice|d|login|inventory|inv|wallet|create|deleteplayer|int
  */
 export default function returnConditionsMet(message: Message) {
 	const command = message.content.split('/')[1]?.split(' ')[0];
-	switch (message.channel?.type === 'dm' && !message.author.bot) {
-		case true: 
-		{
+	switch (message.channel?.type === 'dm') {
+		case true: {
 			const regexTest = /stupid|bad|bot|悪|わるい/i.test(message.content);
-			message.author
-				.send(
-					regexTest
-						? `:poop:僕は悪いボットではないよ！`
-						: `Messages to this bot are not monitored. If you have any issues or feature requests, please go to https://github.com/moojigc/DiscordBot/issues.`
-				)
-				.catch(console.error);
+			!message.author.bot &&
+				message.author
+					.send(
+						regexTest
+							? `:poop:僕は悪いボットではないよ！`
+							: `Messages to this bot are not monitored. If you have any issues or feature requests, please go to https://github.com/moojigc/DiscordBot/issues.`
+					)
+					.catch(console.error);
 			return true;
 		}
 		default:
-		case false:
-		{
+		case false: {
 			const channel = new GuildChannel(message.guild, {
 				id: message.channel.id,
 			});
@@ -36,7 +35,9 @@ export default function returnConditionsMet(message: Message) {
 			)
 				return true;
 			else if (
-				!channel?.permissionsFor(message.guild.me).has('SEND_MESSAGES') ||
+				!channel
+					?.permissionsFor(message.guild.me)
+					.has('SEND_MESSAGES') ||
 				message.content.split('')[0] !== '/' ||
 				!commands.test(command)
 			)

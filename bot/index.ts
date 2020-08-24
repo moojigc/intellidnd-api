@@ -1,11 +1,11 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
-import { Client, MessageEmbed, TextChannel } from "discord.js";
-import moment from "moment";
-import { Player, Guild } from "../server/models";
-import { connect } from "mongoose";
-const client = new Client({ disableMentions: "everyone" });
-import utils, { checkPermissions, returnConditionsMet } from "./utils";
+import { Client, MessageEmbed, TextChannel } from 'discord.js';
+import moment from 'moment';
+import { Player, Guild } from '../server/models';
+import { connect } from 'mongoose';
+const client = new Client({ disableMentions: 'everyone' });
+import utils, { checkPermissions, returnConditionsMet } from './utils';
 import {
 	add,
 	changelog,
@@ -18,22 +18,27 @@ import {
 	roll,
 	overwrite,
 	remove,
-} from "./commands";
+	deleteCharacter,
+} from './commands';
 
-connect(process.env.MONGODB_URI || "mongodb://localhost/dnd-inventory", {
+connect(process.env.MONGODB_URI_PROD || 'mongodb://localhost/dnd-inventory', {
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
 	useCreateIndex: true,
-}).catch(console.error);
+})
+	.then((conn) =>
+		console.log(`Connected to ${conn.connection.db.databaseName}`)
+	)
+	.catch(console.error);
 
-client.once("ready", async () => {
+client.once('ready', async () => {
 	console.log(`${client.user.username} is ready!`);
 	try {
 		let link = await client.generateInvite([
-			"MANAGE_MESSAGES",
-			"SEND_MESSAGES",
-			"READ_MESSAGE_HISTORY",
-			"EMBED_LINKS",
+			'MANAGE_MESSAGES',
+			'SEND_MESSAGES',
+			'READ_MESSAGE_HISTORY',
+			'EMBED_LINKS',
 		]);
 		console.log(link);
 	} catch (e) {
@@ -42,54 +47,54 @@ client.once("ready", async () => {
 });
 
 // Sends message upon invite to a guild
-client.on("guildCreate", async (guild) => {
+client.on('guildCreate', async (guild) => {
 	try {
-        // Filters for the first text channel the bot has permission to send messages in
-		let [firstTextChannel] = guild.channels.cache.filter((c) =>
-			c.permissionsFor(guild.me).has("SEND_MESSAGES") && c.type === 'text'
-        );
-        if (!firstTextChannel) return;
-		let channel = new TextChannel(guild, { id: firstTextChannel[1].id });
-		channel.send(
-			"Hello! To see a list of commands, run **/intellidnd**."
+		// Filters for the first text channel the bot has permission to send messages in
+		let [firstTextChannel] = guild.channels.cache.filter(
+			(c) =>
+				c.permissionsFor(guild.me).has('SEND_MESSAGES') &&
+				c.type === 'text'
 		);
+		if (!firstTextChannel) return;
+		let channel = new TextChannel(guild, { id: firstTextChannel[1].id });
+		channel.send('Hello! To see a list of commands, run **/intellidnd**.');
 	} catch (error) {
 		console.error(error);
 	}
 });
 
-client.on("message", async (message) => {
+client.on('message', async (message) => {
 	try {
-        if (returnConditionsMet(message)) return;
+		if (returnConditionsMet(message)) return;
 		const command = message.content
 				.toLowerCase()
-				.split("/")[1]
-				?.split(" ")[0],
+				.split('/')[1]
+				?.split(' ')[0],
 			{ createResponseEmbed } = utils(message),
 			{ args, recipientPlayer, insufficientPerms } = checkPermissions(
 				message
 			);
 		if (insufficientPerms)
 			return createResponseEmbed(
-				"channel",
-				"invalid",
+				'channel',
+				'invalid',
 				`User <@${message.author.id}> does not have sufficient privileges for this action.`
 			);
 		let currentGuild = await Guild.findOne({ discordId: message.guild.id });
 		let currentPlayer = await Player.findOne({
 			discordId: recipientPlayer.id + message.guild.id,
 		});
-		// commands usable by anyone
+		/** commands usable by anyone */
 		const allUserCommands = (input: string) =>
-			/create|intellidnd|dice|d/.test(input);
+			['create', 'intellidnd', 'dice', 'd'].includes(input);
 		if (
 			!currentPlayer &&
 			!allUserCommands(command) &&
-			recipientPlayer.displayName !== "@everyone"
+			recipientPlayer.displayName !== '@everyone'
 		)
 			return createResponseEmbed(
-				"channel",
-				"invalid",
+				'channel',
+				'invalid',
 				`No data for ${recipientPlayer.displayName}. Run \`/create\` to start an inventory for this player.`
 			);
 		// Auto change names
@@ -115,7 +120,10 @@ client.on("message", async (message) => {
 				break;
 			case `wallet`:
 				{
-					await invWallet(message).showWallet(currentPlayer, currentGuild);
+					await invWallet(message).showWallet(
+						currentPlayer,
+						currentGuild
+					);
 				}
 
 				break;
@@ -159,17 +167,7 @@ client.on("message", async (message) => {
 				break;
 			case `deleteplayer`:
 				{
-					await currentPlayer.remove();
-					await currentGuild.updateOne({
-						$pull: {
-							players: currentPlayer._id,
-						},
-					});
-					await createResponseEmbed(
-						"channel",
-						"success",
-						`Player ${recipientPlayer.displayName}'s inventory successfully deleted.`
-					);
+					await deleteCharacter(message, currentPlayer, currentGuild);
 				}
 
 				break;
@@ -219,16 +217,19 @@ client.on("message", async (message) => {
 	} catch (err) {
 		console.error(err);
 		let errorEmbed = new MessageEmbed()
-			.setColor("RED")
+			.setColor('RED')
 			.setTitle(`Something went wrong!`)
 			.setDescription(
 				`Hi **${message.author.username}**,\nYou tried to execute: \`${message.content}\` but it returned the following error.`
 			)
 			.addField(
-				"Problem:",
+				'Problem:',
 				`\`${err}\`.\nIf you did not get any other error messages describing the issue in plain English, please submit this one to the [bot's GitHub repo](https://github.com/moojigc/DiscordBot/issues).`
 			)
-			.addField("At:", moment(message.createdTimestamp).format("MMMM Do, hh:mm a"));
+			.addField(
+				'At:',
+				moment(message.createdTimestamp).format('MMMM Do, hh:mm a')
+			);
 
 		if (!message.author.bot) message.author.send(errorEmbed);
 	}
