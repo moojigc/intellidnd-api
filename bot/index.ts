@@ -21,7 +21,7 @@ import {
 	deleteCharacter,
 } from './commands';
 
-connect(process.env.MONGODB_URI_PROD || 'mongodb://localhost/dnd-inventory', {
+connect(process.env.MONGODB_URI || 'mongodb://localhost/dnd-inventory', {
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
 	useCreateIndex: true,

@@ -56,26 +56,29 @@ const roll = ({ message, player, discordMember, args }: RollParams) => {
 				noPlayerData: !player,
 			};
 		} else {
-			let stringified = args.join(' ');
+			const stringified = args.join(' ');
+			console.log(args);
+			// This regex checks for a string in the format of number + d + number
+			const rollRegex = /(\d+)?d\d+/i;
 			// Split the string starting from first character matching either a number or the letter d, and then
 			// set delimiter to + OR -, and include them in the result
-			let rolls = stringified
-				.substring(stringified.search(/[0-9]|d/i))
-				.split(/(?=-)|(?=\+)|#/);
-			// This regex checks for a string in the format of number + d + number
-			let rollRegex = /(\d+)?d\d+/i;
-			return {
-				modifiers: rolls
-					.filter((r) => {
-						return !r.match(rollRegex) && Number(r) !== NaN;
-					})
-					.map((r) => parseInt(r)),
-				rolls: rolls
+			const allRolls = stringified
+					.substring(stringified.search(/[0-9]|d/i))
+					.split(/(?=-)|(?=\+)|#/),
+				rolls = allRolls
 					.map((r) => {
-						let match = r.match(rollRegex);
+						const match = r.match(rollRegex);
 						return match ? match[0] : null;
 					})
-					.filter((r) => !!r),
+					.filter((r) => r !== null);
+
+			return {
+				modifiers: allRolls
+					.filter((r) => {
+						return !r.match(rollRegex) && !isNaN(parseInt(r));
+					})
+					.map((r) => parseInt(r)),
+				rolls: rolls.length > 0 ? rolls : ['d20'],
 				rollName: stringified.split(/#/)[1],
 			};
 		}
@@ -143,7 +146,7 @@ const roll = ({ message, player, discordMember, args }: RollParams) => {
 		}
 	};
 	if (!message) {
-		return reply;
+		return;
 	} else {
 		if (args.join(' ').match(/-s/i))
 			message.channel.send(

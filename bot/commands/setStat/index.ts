@@ -48,6 +48,14 @@ const setStats = async (message: Message, args: string[], player: IPlayer) => {
 
 	if (!value || !property) {
 		await displayStats(message, player, property);
+	} else if (isNaN(+value)) {
+		createResponseEmbed(
+			'send',
+			'invalid',
+			`${property} must be a number.`,
+			player
+		);
+		return;
 	}
 
 	let [isValidProp, propName] = ((): [boolean, string] => {
@@ -69,7 +77,7 @@ const setStats = async (message: Message, args: string[], player: IPlayer) => {
 			await player.updateOne({
 				stats: {
 					...player.stats,
-					[propName]: value,
+					[propName]: +value,
 				},
 			});
 			createResponseEmbed(
