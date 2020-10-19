@@ -4,6 +4,13 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import { makeStyles } from '@material-ui/core';
+
+const useStyles = makeStyles((theme) => ({
+	root: {
+		background: theme.palette.primary.light,
+	},
+}));
 
 const Dialog = ({
 	title,
@@ -19,16 +26,28 @@ const Dialog = ({
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	buttons: Array<JSX.Element>;
 	DialogProps?: DialogProps;
-}) => (
-	<MuiDialog {...DialogProps} open={open} onClose={() => setOpen(false)}>
-		{title && <DialogTitle id="alert-dialog-title">{title}</DialogTitle>}
-		<DialogContent>
-			<DialogContentText id="alert-dialog-description">
-				{children}
-			</DialogContentText>
-		</DialogContent>
-		<DialogActions>{buttons.map((b) => b)}</DialogActions>
-	</MuiDialog>
-);
+}) => {
+	const classes = useStyles();
+	return (
+		<MuiDialog
+			{...DialogProps}
+			PaperProps={{
+				className: classes.root,
+			}}
+			open={open}
+			onClose={() => setOpen(false)}
+		>
+			{title && (
+				<DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+			)}
+			<DialogContent>
+				<DialogContentText id="alert-dialog-description">
+					{children}
+				</DialogContentText>
+			</DialogContent>
+			<DialogActions>{buttons.map((b) => b)}</DialogActions>
+		</MuiDialog>
+	);
+};
 
 export default Dialog;

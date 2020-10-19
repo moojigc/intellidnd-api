@@ -27,7 +27,6 @@ const Login = ({
 	const classes = useStyles();
 	const handleFormSubmit = async (values) => {
 		let res = await login({ ...values, characterToken });
-		console.log({ ...res.flash });
 		history.push(res.redirect, { ...res.flash });
 	};
 	return (

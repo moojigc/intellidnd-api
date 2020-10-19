@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, BoxProps, Button, Slide } from '@material-ui/core';
 import { Check, Close } from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
+import { History } from 'history';
 
 export const Wrapper = (props: BoxProps) => {
 	return (
@@ -21,39 +22,33 @@ export const Wrapper = (props: BoxProps) => {
  */
 export const AlertMessage = () => {
 	const [display, setDisplay] = useState(false);
-	const history = useHistory();
-	const [histState, setHistState] = useState({
-		message: null,
-		type: null,
-	});
+	const history = useHistory() as History<{
+		message: string;
+		type: 'success' | 'error';
+	}>;
 	useEffect(() => {
-		history.listen(() => {
-			if (history.action === 'PUSH' || history.action === 'REPLACE') {
-				console.log(
-					'message is ' + (history.location.state as any)?.message
-				);
-				setHistState(history.location.state as any);
-			}
+		history.listen((location) => {
+			console.log(
+				`this should be displaying: ${location.state !== null}`
+			);
+			setDisplay(
+				location.state?.message !== '' ||
+					location.state?.message! == null
+					? true
+					: false
+			);
 		});
+		return () => {};
 	}, [history.location.state]);
-	useEffect(() => {
-		setDisplay(histState.message !== null);
-	}, [histState.message]);
 	return (
-		<Slide
-			direction="right"
-			in={display}
-			mountOnEnter
-			unmountOnExit
-			timeout={400}
-		>
-			<div className={`alert ${histState?.type || ''}`}>
+		<Slide direction="right" in={display} mountOnEnter timeout={400}>
+			<div className={`alert ${history.location.state?.type || ''}`}>
 				<Check fontSize="inherit" />
 				<span
-					className={histState?.type || ''}
+					className={history.location.state?.type || ''}
 					style={{ marginLeft: '0.5rem' }}
 				>
-					{histState?.message}
+					{history.location.state?.message}
 				</span>
 				<Button className="x" onClick={() => setDisplay(false)}>
 					<Close fontSize="inherit" />

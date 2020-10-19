@@ -13,11 +13,14 @@
 }
 
 .stats {
+	min-width: unset;
+	width: 10rem;
 	margin-top: 1rem;
 	.inputs {
 		display: grid;
 		gap: 0.25rem;
 		grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+		max-height: unset;
 	}
 }
 

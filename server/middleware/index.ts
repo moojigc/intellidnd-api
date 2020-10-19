@@ -42,8 +42,8 @@ export function isAuth(
 			break;
 		default:
 		case false:
-			// res.status(401).json(flash('error', 'Authentication error.')).end();
-			flash(res, 'error', 'Authentication error.');
+			res.status(401).json(flash('error', 'Authentication error.')).end();
+			// flash(res, 'error', 'Authentication error.');
 			return;
 	}
 }
@@ -75,3 +75,10 @@ export const mapInventory = (character: IPlayer) =>
 				),
 			};
 	});
+
+export const mapStats = (stats: IPlayer['stats']) =>
+	Object.entries(stats).map(([key, value]) => ({
+		[key]: +value,
+	}));
+
+export { default as Open5e } from './open5e';

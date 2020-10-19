@@ -1,4 +1,4 @@
-import { flash, serverError, mapInventory } from '../../middleware';
+import { flash, serverError, mapInventory, mapStats } from '../../middleware';
 import { Response } from 'express';
 import { Player, IPlayer, User } from '../../models';
 import { Types } from 'mongoose';
@@ -57,6 +57,7 @@ const getCharacters = async (req: RequestWithUser, res: Response) => {
 				console.log(user);
 				let inventory = mapInventory(defaultPlayer);
 				defaultPlayer.inventory = inventory;
+				defaultPlayer.stats = mapStats(defaultPlayer.stats);
 				res.json({
 					...flash(
 						'success',
@@ -67,6 +68,7 @@ const getCharacters = async (req: RequestWithUser, res: Response) => {
 						all: (user.players as any[])?.map((c) => {
 							let obj = c.toObject();
 							obj.inventory = mapInventory(c);
+							obj.stats = mapStats(c.stats);
 							return obj;
 						}),
 					},

@@ -57,6 +57,7 @@ export const login = (details: User) => async (dispatch: Dispatch) => {
 			? `user/login?token=${details.characterToken}`
 			: 'user/login',
 	});
+	console.table(res);
 	storage({ key: 'user', data: res.user });
 	dispatch(userAction({ ...res.user, type: 'LOGGED_IN' }));
 	return res;
@@ -84,7 +85,7 @@ export const updateUserDefaultCharacter = (id) => (dispatch: Dispatch) => {
 
 export default function (state: UserDetails = defaultState, action: User) {
 	const user = { ...action };
-	delete user.type;
+
 	switch (action.type) {
 		case 'LOGGED_OUT':
 			return {

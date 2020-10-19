@@ -4,16 +4,29 @@ const defaultState: { default: CharacterDetails; all?: CharacterDetails[] } = {
 	default: {
 		_id: '',
 		name: '',
-		stats: {
-			initiative: 0,
-			hp: 0,
-			strength: 0,
-			dexterity: 0,
-			constitution: 0,
-			intelligence: 0,
-			wisdom: 0,
-			charisma: 0,
-		},
+		stats: [
+			{
+				hp: 0,
+			},
+			{
+				strength: 0,
+			},
+			{
+				dexterity: 0,
+			},
+			{
+				constitution: 0,
+			},
+			{
+				intelligence: 0,
+			},
+			{
+				wisdom: 0,
+			},
+			{
+				charisma: 0,
+			},
+		],
 		inventory: [
 			{
 				potions: [],
@@ -70,16 +83,29 @@ export interface CharacterDetails {
 	_id: string;
 	name: string;
 	webUserId: string;
-	stats: {
-		initiative: number;
-		hp: number;
-		strength: number;
-		dexterity: number;
-		constitution: number;
-		intelligence: number;
-		wisdom: number;
-		charisma: number;
-	};
+	stats: [
+		{
+			hp: number;
+		},
+		{
+			strength: number;
+		},
+		{
+			dexterity: number;
+		},
+		{
+			constitution: number;
+		},
+		{
+			intelligence: number;
+		},
+		{
+			wisdom: number;
+		},
+		{
+			charisma: number;
+		}
+	];
 	notificationsToDM: boolean;
 	inventory: [
 		{
@@ -176,10 +202,7 @@ export const setDefaultCharacter = (
 	}
 };
 
-export default function (
-	state = defaultState,
-	action: { default: Character; all: Character[] } & CharacterDispatchActions
-) {
+export default function (state = defaultState, action: Character) {
 	const character = { ...action };
 	delete character.type;
 	switch (action.type) {

@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core';
 import { logout } from '../../store';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
-import { AccountCircle } from '@material-ui/icons';
+import { AccountCircle, MenuBook, MenuOpenSharp } from '@material-ui/icons';
 
 const ButtonLink = ({
 	children,
@@ -21,8 +21,8 @@ const ButtonLink = ({
 	variant,
 	onClick,
 }: {
-	children;
-	to;
+	children: React.ReactChildren | string;
+	to: string;
 	variant?: 'text' | 'outlined';
 	onClick?: (...args: any) => void;
 }) => (
@@ -61,8 +61,7 @@ const Nav = ({
 	const handleLogout = (e) => {
 		e.preventDefault();
 		logout().then((res) => {
-			console.log(res);
-			history.push('/guide', { ...res?.flash });
+			history.push('/guide', { ...res.flash });
 		});
 	};
 	return (
@@ -95,10 +94,9 @@ const Nav = ({
 												className={classes.account}
 												style={{ fontSize: '1rem' }}
 												color="primary"
-												variant="outlined"
 												{...bindTrigger(popupState)}
 											>
-												<AccountCircle />
+												<MenuBook />
 											</Button>
 											<Menu
 												MenuListProps={{

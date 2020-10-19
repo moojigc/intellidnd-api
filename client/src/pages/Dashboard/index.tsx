@@ -23,6 +23,8 @@ import { capitalize, useCheckMobile } from '../../utils';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import Hero from '../../components/Hero';
 import Dialog from '../../components/Dialog';
+import { AlertMessage } from '../../components/MiniComponents';
+import { keys } from 'lodash';
 
 const Dashboard = ({
 	user,
@@ -33,14 +35,12 @@ const Dashboard = ({
 }: {
 	user: User;
 	character: Character;
-	getCharacters: () => Promise<{
-		characters: Character;
-	}>;
+	getCharacters: () => Promise<Character>;
 	setDefaultCharacter: (
 		c: CharacterDetails,
 		put?: boolean
 	) => CharacterDetails | Promise<CharacterDetails>;
-	updateUserDefaultCharacter: (id) => void;
+	updateUserDefaultCharacter: (id: string) => void;
 }) => {
 	const isMobile = useCheckMobile();
 	const [isMounted, setMounted] = useState(false),
@@ -61,7 +61,7 @@ const Dashboard = ({
 		setDialogOpen(false);
 	};
 	useEffect(() => {
-		getCharacters().then((_res) => {
+		getCharacters().then((res) => {
 			setMounted(true);
 		});
 	}, []);
@@ -75,17 +75,20 @@ const Dashboard = ({
 					{
 						onClick: () => handleConfirmNewDefault(false),
 						text: 'Cancel',
+						color: 'default',
 					},
 					{
 						onClick: () => handleConfirmNewDefault(true),
 						text: 'Confirm',
 						variant: 'contained',
+						color: 'secondary',
 					},
-				].map(({ onClick, text, variant }, i) => (
+				].map(({ onClick, text, variant, color }, i) => (
 					<Button
 						variant={(variant as any) || 'text'}
 						onClick={onClick}
 						key={i}
+						color={color as any}
 					>
 						{text}
 					</Button>
@@ -96,7 +99,11 @@ const Dashboard = ({
 					{user.username}'s dashboard
 				</Typography>
 			</Hero>
-			<Window custom={isMounted} className="dashboard">
+			<Window
+				custom={isMounted}
+				className="dashboard"
+				ContainerProps={{ maxWidth: 'xl' }}
+			>
 				<Grid
 					container
 					justify={isMobile ? 'center' : 'space-between'}
@@ -171,49 +178,72 @@ const Dashboard = ({
 						</div>
 					)}
 				</Grid>
-				<Card title="Stats" className="stats">
-					{Object.entries(
-						character.default?.stats as CharacterDetails['stats']
-					).map(([key, value]) => (
-						<TextField
-							defaultValue={value}
-							label={key}
-							variant="filled"
-						/>
-					))}
-				</Card>
 				{isMounted ? (
-					<Grid container className="grid">
-						{character.default?.inventory.map((cat, i) => {
-							let key = Object.keys(cat)[0];
-							let values = Object.values(cat)[0];
-							return key === 'money' ? (
-								<Card title="Money" key={key}>
-									<Grid container direction="column">
-										{cat['money'].map((m) => (
-											<TextField
-												variant="filled"
-												color="primary"
-												label={Object.keys(m)[0]}
-												defaultValue={
-													Object.values(m)[0]
-												}
-											/>
-										))}
-									</Grid>
-								</Card>
-							) : (
-								<Card
-									title={capitalize(Object.keys(cat)[0])}
-									items={
-										(values.length && values) || [
-											{ name: 'None', quantity: 0 },
-										]
-									}
-									key={i}
-								/>
-							);
-						})}
+					<Grid container>
+						<Grid item lg={2}>
+							<Card
+								noTitle
+								className="stats"
+								flexDirection="column"
+							>
+								{character.default?.stats.map((stat) => {
+									let [key] = Object.keys(stat);
+									let [value] = Object.values(stat);
+									return (
+										<TextField
+											fullWidth
+											defaultValue={value}
+											label={key}
+											variant="filled"
+											key={key}
+										/>
+									);
+								})}
+							</Card>
+						</Grid>
+						<Grid item lg={10}>
+							<Grid container className="grid">
+								{character.default?.inventory.map((cat, i) => {
+									let key = Object.keys(cat)[0];
+									let values = Object.values(cat)[0];
+									return key === 'money' ? (
+										<Card title="Money" key={key}>
+											<Grid container direction="column">
+												{cat['money'].map((m, i) => (
+													<TextField
+														fullWidth
+														variant="filled"
+														color="primary"
+														label={
+															Object.keys(m)[0]
+														}
+														defaultValue={
+															Object.values(m)[0]
+														}
+														key={i}
+													/>
+												))}
+											</Grid>
+										</Card>
+									) : (
+										<Card
+											title={capitalize(
+												Object.keys(cat)[0]
+											)}
+											items={
+												(values.length && values) || [
+													{
+														name: 'None',
+														quantity: 0,
+													},
+												]
+											}
+											key={i}
+										/>
+									);
+								})}
+							</Grid>
+						</Grid>
 					</Grid>
 				) : (
 					<div style={{ display: 'flex', justifyContent: 'center' }}>

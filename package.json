@@ -18,7 +18,7 @@
     "bot": "nodemon --exec ts-node --project ./tsconfig.bot.json bot/index.ts --watch bot -e *.ts",
     "build": "concurrently \"tsc --project ./tsconfig.server.json\" \"tsc --project ./tsconfig.bot.json && cd client && npm run build\"",
     "build:bot": "tsc --project ./tsconfig.bot.json",
-    "copy": "cp -r bot/* ../temp/intellidnd-bot/bot && cp -r server/* ../temp/intellidnd-bot/server",
+    "copy": "cp -r bot/* ../temp/intellidnd-bot/bot && cp -r server/models/* ../temp/intellidnd-bot/server/models",
     "cleanup": "find . -name \"*.js\" -type f -delete",
     "test": "echo \"No test\" && exit 1",
     "start:prod": "node build/server/index.js"

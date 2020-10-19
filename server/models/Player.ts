@@ -3,6 +3,75 @@ import { IUser, User } from './User';
 import { Guild } from './Guild';
 
 const PlayerSchema = new Schema({
+	age: Number,
+	gender: String,
+	alignment: String,
+	height: Number,
+	weight: Number,
+	faith: String,
+	hair: String,
+	eyes: String,
+	skin: String,
+	level: {
+		required: true,
+		type: Number,
+		default: 1,
+	},
+	class: {
+		type: String,
+	},
+	xp: {
+		type: Number,
+	},
+	race: {
+		type: String,
+	},
+	maxHp: {
+		type: Number,
+		default: 1,
+	},
+	armor: {
+		type: Object,
+		default: {
+			class: {
+				base: 0,
+				shield: 0,
+				dex: 0,
+				magic: 0,
+				misc: 0,
+			},
+			type: null,
+			proficiency: {
+				light: false,
+				medium: false,
+				heavy: false,
+				shields: false,
+			},
+		},
+	},
+	skills: {
+		type: Array,
+		default: [
+			{ name: 'Athletics', modifier: 0 },
+			{ name: 'Acrobatics', modifier: 0 },
+			{ name: 'Sleight of Hand', modifier: 0 },
+			{ name: 'Stealth', modifier: 0 },
+			{ name: 'Arcana', modifier: 0 },
+			{ name: 'History', modifier: 0 },
+			{ name: 'Investigation', modifier: 0 },
+			{ name: 'Nature', modifier: 0 },
+			{ name: 'Religion', modifier: 0 },
+			{ name: 'Animal Handling', modifier: 0 },
+			{ name: 'Insight', modifier: 0 },
+			{ name: 'Medicine', modifier: 0 },
+			{ name: 'Perception', modifier: 0 },
+			{ name: 'Survival', modifier: 0 },
+			{ name: 'Deception', modifier: 0 },
+			{ name: 'Intimidation', modifier: 0 },
+			{ name: 'Performance', modifier: 0 },
+			{ name: 'Persuasion', modifier: 0 },
+		],
+	},
 	discordId: {
 		type: String,
 		required: true,
@@ -14,15 +83,26 @@ const PlayerSchema = new Schema({
 	},
 	guild: {
 		type: String,
-	},
-	guildId: {
-		type: String,
 		ref: 'Guild',
-		required: true,
 	},
 	notificationsToDM: {
 		type: Boolean,
 		default: false,
+	},
+	deathSaves: {
+		type: Array,
+		default: [],
+	},
+	resistances: {
+		type: Array,
+		default: {
+			strength: 0,
+			dexterity: 0,
+			constitution: 0,
+			intelligence: 0,
+			wisdom: 0,
+			charisma: 0,
+		},
 	},
 	inventory: {
 		type: Object,
@@ -63,6 +143,28 @@ const PlayerSchema = new Schema({
 			intelligence: 10,
 			wisdom: 10,
 			charisma: 10,
+		},
+	},
+	weapons: {
+		type: Object,
+		default: {
+			simple: false,
+			martial: false,
+			other: false,
+		},
+	},
+	languages: {
+		type: Array,
+		default: [],
+	},
+	tools: {
+		type: Array,
+		default: [],
+	},
+	actions: {
+		type: Object,
+		default: {
+			attacks: [],
 		},
 	},
 });

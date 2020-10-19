@@ -38,9 +38,8 @@ const login = (req: RequestWithUser, res: Response, next: NextFunction) => {
 				}
 				if (!user) {
 					return res.json({
-						...flash('error', 'User not found.'),
+						...flash('error', 'User not found.', '/login'),
 						user: guestUser,
-						redirect: '/login',
 					});
 				}
 				// else if (!user.verified) {
