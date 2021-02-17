@@ -8,12 +8,37 @@ const { Guild, Player } = require("../models"),
 			loggedOut: req.user ? false : true,
 			loggedIn: req.user ? true : false
 		};
-	};
+	},
+	axios = require('axios').default;
 /**
  *
  * @param {import("express").Express} app
  */
 module.exports = (app) => {
+	app.get("/proxy", async (req, res) => {
+
+		const token = req.query.token;
+
+		if (token !== process.env.PROXY_TOKEN) {
+
+			res.status(401).json({ message: 'unauthorized' }).end();
+			return;
+		}
+
+		try {
+			
+			const { data } = await axios({
+				method: 'GET',
+				url: req.query.url
+			});
+		}
+		catch (error) {
+		
+			res.status(error.response.status || 400).json(error.response.data).end();
+		}
+
+		res.status(200).json(data).end();
+	});
 	app.get("/demo", async (req, res) => {
 		try {
 			let player = await (await Player.findOne({ discordId: "123" })).toObject();

@@ -9,3 +9,4 @@
 .vscode/launch.json
 .eslintrc.json
 /public/dist
+.env

@@ -1,11 +1,15 @@
-const express = require("express"),
-	exphbs = require("express-handlebars"),
+const express = require("express"), dotenv = require('dotenv');
+dotenv.config();
+
+const exphbs = require("express-handlebars"),
 	session = require("express-session"),
 	mongoose = require("mongoose"),
 	MongoDBStore = require("connect-mongodb-session")(session),
 	passport = require("./config/passport"),
 	flash = require("connect-flash"),
 	compression = require("compression"),
+	cors = require("cors"),
+	morgan = require("morgan"),
 	PORT = process.env.PORT || 3001,
 	MONGODB_URI = process.env.MONGODB_URI || require("./private.json").dev.MONGODB_URI;
 
@@ -24,9 +28,13 @@ Store.on("error", (error) => console.log(error));
 
 const app = express();
 app.use(express.static("public"))
+	.use(cors({
+		origin: '*'
+	}))
 	.use(compression())
 	.use(express.urlencoded({ extended: true }))
 	.use(express.json())
+	.use(morgan("dev"))
 	// handlebars stuff
 	.engine("handlebars", exphbs({ defaultLayout: "main" }))
 	.set("view engine", "handlebars")
