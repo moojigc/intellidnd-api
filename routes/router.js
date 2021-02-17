@@ -9,13 +9,14 @@ const { Guild, Player } = require("../models"),
 			loggedIn: req.user ? true : false
 		};
 	},
-	axios = require('axios').default;
+	axios = require('axios').default,
+	cors = require("cors");
 /**
  *
  * @param {import("express").Express} app
  */
 module.exports = (app) => {
-	app.get("/proxy", async (req, res) => {
+	app.get("/proxy", cors({ origin: /(.*?)/ }), async (req, res) => {
 
 		const token = req.query.token;
 

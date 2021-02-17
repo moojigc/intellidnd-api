@@ -8,7 +8,6 @@ const exphbs = require("express-handlebars"),
 	passport = require("./config/passport"),
 	flash = require("connect-flash"),
 	compression = require("compression"),
-	cors = require("cors"),
 	morgan = require("morgan"),
 	PORT = process.env.PORT || 3001,
 	MONGODB_URI = process.env.MONGODB_URI || require("./private.json").dev.MONGODB_URI;
@@ -28,9 +27,6 @@ Store.on("error", (error) => console.log(error));
 
 const app = express();
 app.use(express.static("public"))
-	.use(cors({
-		origin: '*'
-	}))
 	.use(compression())
 	.use(express.urlencoded({ extended: true }))
 	.use(express.json())
