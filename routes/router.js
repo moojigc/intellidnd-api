@@ -31,13 +31,13 @@ module.exports = (app) => {
 				method: 'GET',
 				url: req.query.url
 			});
+
+			res.status(200).json(data).end();
 		}
 		catch (error) {
 		
 			res.status(error.response.status || 400).json(error.response.data).end();
 		}
-
-		res.status(200).json(data).end();
 	});
 	app.get("/demo", async (req, res) => {
 		try {
