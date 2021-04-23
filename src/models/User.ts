@@ -1,14 +1,17 @@
-import Sequelize, { DataTypes, Optional } from 'sequelize';
+import type { Token, TokenId } from './Token';
+
+import Sequelize, { DataTypes, Optional, WhereOptions } from 'sequelize';
 import Model from './Model';
 import bcrypt from 'bcryptjs';
-import type { Token, TokenId } from './Token';
-import type { UserRole, UserRoleId } from './UserRole';
+import { UserRole, UserRoleId } from './UserRole';
 
 export interface UserAttributes {
     id: string;
     username?: string;
     firstName?: string;
     lastName?: string;
+    phone?: string;
+    phoneVerifiedAt?: number;
     email: string;
     password: string;
     emailValidatedAt?: number;
@@ -36,6 +39,8 @@ export class User
     username?: string;
     firstName?: string;
     lastName?: string;
+    phone?: string;
+    phoneVerifiedAt?: number;
     email!: string;
     password!: string;
     emailValidatedAt?: number;
@@ -80,6 +85,35 @@ export class User
     hasRoles!: Sequelize.HasManyHasAssociationsMixin<UserRole, UserRoleId>;
     countRoles!: Sequelize.HasManyCountAssociationsMixin;
 
+    public async getRolesMap() {
+
+        const ret: Record<string, true> = {};
+        const roles = (this.roles || await this.getRoles());
+
+        for (const r of roles) {
+
+            ret[r.roleKey] = true;
+        }
+
+        return ret;
+    }
+
+    public getProfile() {
+
+        return {
+            id: this.id,
+            email: this.email,
+            username: this.username,
+            name: this.name,
+            firstName: this.firstName,
+            lastName: this.lastName,
+            roles: this.roles?.map(r => r.roleKey) || null,
+            createdAt: this.createdAt,
+            modifiedAt: this.modifiedAt,
+            lastLoginAt: this.lastLoginAt
+        }
+    }
+
     get name() {
 
         if (this.firstName) {
@@ -98,13 +132,37 @@ export class User
         }
     }
 
-    static initModel(sequelize: Sequelize.Sequelize): typeof User {
+    public static async lookup(lookup: string | WhereOptions<UserAttributes>) {
+
+        if (typeof lookup === 'string') {
+
+            lookup = { id: lookup };
+        }
+
+        return await this.findOne({
+            where: lookup,
+            include: {
+                model: UserRole,
+                as: 'roles'
+            }
+        });
+    }
+
+    public static initModel(sequelize: Sequelize.Sequelize): typeof User {
         User.init(
             {
                 id: {
                     type: DataTypes.STRING(40),
                     allowNull: false,
                     primaryKey: true,
+                    defaultValue: () => {
+
+                        const id = this.createId({ prefix: 'U', length: 30 })
+
+                        console.log(id)
+
+                        return id
+                    }
                 },
                 username: {
                     type: DataTypes.STRING(64),
@@ -123,6 +181,20 @@ export class User
                     type: DataTypes.STRING(64),
                     allowNull: false,
                     unique: 'email',
+                    validate: {
+                        isEmail: true
+                    }
+                },
+                phone: {
+                    type: DataTypes.STRING(20),
+                    allowNull: true,
+                    validate: {
+                        is: /\d{10}|\+(\d{11})/
+                    }
+                },
+                phoneVerifiedAt: {
+                    type: DataTypes.BIGINT.UNSIGNED,
+                    allowNull: true,
                 },
                 password: {
                     type: DataTypes.TEXT({ length: 'medium' }),

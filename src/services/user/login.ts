@@ -15,44 +15,31 @@ export default {
             email: 'email'
         }
     },
-    callback: async (data) => {
+    callback: async (data: Service.ServiceData<{
+        password: string;
+        username?: string;
+        email?: string;
+        remember?: boolean;
+    }>) => {
 
         const db = data.db;
         const key = data.payload.email ? 'email' : 'username';
         const identifier = data.payload.email || data.payload.username;
 
-        const user = await db.User.findOne({
-            where: {
-                [key]: identifier
-            }
+        const user = await db.User.lookup({
+            [key]: identifier
         });
 
-        if (!user) {
+        const match = bcrypt.compareSync(data.payload.password, user.password
+            || (data.payload.password + Date.now()).split('').reverse().join(''));
 
-            throw {
-                code: '112-01',
-                status: 400,
-                message: 'Invalid login.'
-            };
+        if (!user || !match) {
+
+            new data.SError('login-01', 401);
         }
         else if (!user.emailValidatedAt) {
 
-            throw {
-                code: '112-02',
-                status: 403,
-                message: 'Email address not yet verified, please check your inbox.'
-            };
-        }
-
-        const match = bcrypt.compareSync(data.payload.password, user.password);
-
-        if (!match) {
-
-            throw {
-                code: '113-01',
-                status: 400,
-                message: 'Invalid login.'
-            };
+            new data.SError('login-02', 403);
         }
 
         const now = Date.now();

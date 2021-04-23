@@ -1,7 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 import services from './utils/services';
 import requestIp from 'request-ip';
 import { initModels, initSequelize } from './models';
@@ -10,7 +10,7 @@ dotenv.config();
 const PROD = process.env.NODE_ENV !== 'development';
 const PORT = process.env.PORT;
 
-const sequelize = initSequelize();
+const sequelize = initSequelize(process.env);
 const models = initModels(sequelize);
 
 const app = express();

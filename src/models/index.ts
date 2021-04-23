@@ -9,16 +9,16 @@ import { Token } from './Token';
 import { User } from './User';
 import { Role } from './Role';
 import { UserRole } from './UserRole';
+import Code from './Code';
 
-const {
+export function initSequelize({
     INTELLIDND_DB_HOST,
     INTELLIDND_DB_NAME,
     INTELLIDND_DB_USER,
     INTELLIDND_DB_PASS,
     INTELLIDND_DB_DIALECT,
-} = process.env;
-
-export function initSequelize() {
+    DB_LOGGING
+}: NodeJS.ProcessEnv) {
 
     const log = (str: string) => {
         str = str
@@ -82,7 +82,7 @@ export function initSequelize() {
         password: INTELLIDND_DB_PASS,
         database: INTELLIDND_DB_NAME,
         dialect: INTELLIDND_DB_DIALECT as Dialect,
-        logging: log,
+        logging: DB_LOGGING ? log : false,
         logQueryParameters: true
     });
 
@@ -96,14 +96,19 @@ export function initModels(sequelize: Sequelize) {
     User.initModel(sequelize);
     Role.initModel(sequelize);
     UserRole.initModel(sequelize);
+    Code.initModel(sequelize);
 
     User.hasMany(UserRole, {
         foreignKey: 'userId',
         as: 'roles'
     });
     User.hasMany(Token, {
-        foreignKey: 'useId',
+        foreignKey: 'userId',
         as: 'tokens'
+    });
+    User.hasMany(Code, {
+        foreignKey: 'userId',
+        as: 'codes'
     });
     Token.belongsTo(User, {
         foreignKey: 'userId',
@@ -117,6 +122,10 @@ export function initModels(sequelize: Sequelize) {
         foreignKey: 'userId',
         as: 'user'
     });
+    Code.belongsTo(User, {
+        foreignKey: 'userId',
+        as: 'user'
+    });
 
-    return { Roll, Token, User, UserRole, Role };
+    return { Roll, Token, User, UserRole, Role, Code };
 }

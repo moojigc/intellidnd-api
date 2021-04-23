@@ -6,33 +6,23 @@ export default {
         required: {},
         optional: {},
     },
+    status: 204,
     method: 'patch',
     isPublic: false,
-    roles: ['unverified'],
-    callback: async ({ db, userId }) => {
-
-        const user = await db.User.findByPk(userId);
+    callback: async ({ user, SError }) => {
 
         if (!user) {
 
-            throw {
-                code: '111-01',
-                status: 404
-            };
+            throw new SError('verify-01', 403);
         }
         else if (user.emailValidatedAt) {
 
-            throw {
-                code: '111-02',
-                status: 400,
-                message: 'already verified'
-            };
+            throw new SError('verify-02', 403, 'Already verified');
         }
 
-        await user.update({
-            emailValidatedAt: Date.now(),
-        });
+        user.set('emailValidatedAt', Date.now());
+        await user.save();
 
-        return { ok: true };
+        return;
     }
 } as Service.Params;

@@ -8,20 +8,10 @@
     "npm": "7.8.0"
   },
   "scripts": {
-    "sass": "ts-node client/src/assets/scss/variable_compiler.ts",
-    "sass:watch": "nodemon --exec ts-node client/src/assets/scss/variable_compiler.ts --watch client/App.scss",
-    "install": "cd client && npm install",
-    "client": "cd client && npm start",
-    "server": "nodemon --exec ts-node --project ./tsconfig.server.json server/index.ts --watch server -e *.ts",
-    "open": "code . & npm run start",
-    "start": "concurrently \"npm run server\" \"npm run client\" \"npm run sass:watch\"",
-    "bot": "nodemon --exec ts-node --project ./tsconfig.bot.json bot/index.ts --watch bot -e *.ts",
-    "build": "concurrently \"tsc --project ./tsconfig.server.json\" \"tsc --project ./tsconfig.bot.json && cd client && npm run build\"",
-    "build:bot": "tsc --project ./tsconfig.bot.json",
-    "copy": "cp -r bot/* ../temp/intellidnd-bot/bot && cp -r server/models/* ../temp/intellidnd-bot/server/models",
-    "cleanup": "find . -name \"*.js\" -type f -delete",
-    "test": "echo \"No test\" && exit 1",
-    "start:prod": "node build/server/index.js"
+    "server": "nodemon --exec ts-node src/index.ts -e ts,json",
+    "start": "nodemon --exec ts-node src/index.ts -e ts,json",
+    "build": "tsc",
+    "test": "echo \"No test\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -33,26 +23,17 @@
     "@tsconfig/node12": "^1.0.7",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
-    "compression": "^1.7.4",
-    "connect-flash": "^0.1.1",
-    "connect-mongodb-session": "^2.3.2",
     "cors": "^2.8.5",
-    "discord.js": "^12.0.2",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "express-handlebars": "^4.0.4",
-    "express-session": "^1.17.1",
     "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.15",
-    "moment": "^2.24.0",
-    "mongoose": "^5.9.18",
     "morgan": "^1.10.0",
+    "mysql2": "^2.2.5",
     "nanoid": "^3.1.22",
-    "passport": "^0.4.1",
-    "passport-local": "^1.0.0",
+    "nodemailer": "^6.5.0",
     "request-ip": "^2.1.3",
     "sequelize": "^6.6.2",
-    "ts-node-dev": "^1.0.0-pre.57"
+    "twilio": "^3.61.0"
   },
   "bugs": {
     "url": "https://github.com/moojigc/intellidnd/issues"

@@ -18,11 +18,11 @@ export default async function ({
 
     if (!token) {
         
-        new SError('auth-01', 401);
+        throw new SError('auth-01', 401);
     }
-    else if (!/$(Bearer )/.test(token)) {
+    else if (!/^Bearer /.test(token)) {
 
-        new SError('auth-02', 400, 'Authorization header should be formatted as `Bearer [token]`');
+        throw new SError('auth-02', 400, 'Authorization header should be formatted as `Bearer [token]`');
     }
 
     try {
@@ -34,19 +34,18 @@ export default async function ({
     }
     catch (error) {
 
-        new SError('auth-03', 401, 'Invalid token');
+        throw new SError('auth-03', 401, 'Invalid token');
     }
 
     const lookup = await db.Token.findOne({
         where: {
             id: decoded.id
-        },
-        include: {}
+        }
     });
 
     if (!lookup) {
 
-        new SError('auth-04', 401);
+        throw new SError('auth-04', 401);
     }
 
     return { userId: lookup.userId, roles: lookup.roles };

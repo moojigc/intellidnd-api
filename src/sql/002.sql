@@ -1,0 +1,17 @@
+ALTER TABLE `user` 
+    ADD COLUMN `phone` VARCHAR(20),
+    ADD COLUMN `phoneVerifiedAt` BIGINT UNSIGNED;
+
+
+CREATE TABLE `code` (
+		data VARCHAR(40) NOT NULL,
+		type VARCHAR(20) NOT NULL,
+		userId VARCHAR(40) NOT NULL,
+		expiresAt BIGINT UNSIGNED,
+		createdAt BIGINT UNSIGNED,
+		FOREIGN KEY (userId) REFERENCES `user` (`id`) ON DELETE CASCADE
+	)
+    ENGINE=InnoDB
+    ROW_FORMAT=DYNAMIC
+    DEFAULT CHARSET=utf8mb4
+    COLLATE utf8mb4_unicode_ci;

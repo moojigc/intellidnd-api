@@ -31,11 +31,7 @@ export default {
 
         if (data.payload.password !== data.payload.verify) {
 
-            throw {
-                code: '107-01',
-                status: 400,
-                message: 'Passwords must match'
-            };
+            new data.SError('signup-01', 400, 'Passwords must match');
         }
 
         const transaction = await data.sql.transaction();
@@ -54,27 +50,12 @@ export default {
             roles: ['unverified']
         }, { transaction });
 
-        try {
-
-            await sendEmail({
-                body: `Verify email address at https://moojigbc.com/verify?token=${token.jwt}`,
-                to: user.email
-            });
-        }
-        catch (e) {
-
-            await transaction.rollback();
-
-            console.error(e);
-
-            throw {
-                code: '107-02',
-                status: 500,
-                message: 'error sending email'
-            };
-        }
-
         await transaction.commit();
+
+        await sendEmail({
+            body: `Verify email address at https://intellidnd.com/signup/verify?token=${token.jwt}`,
+            to: user.email
+        });
 
         return {
             name: user.name,

@@ -1,5 +1,5 @@
-import Sequelize, { ValidationErrorItem } from 'sequelize/types';
-import { Model as SqlModel, ValidationError } from 'sequelize';
+import Sequelize from 'sequelize/types';
+import { Model as SqlModel, ValidationError, ValidationErrorItem } from 'sequelize';
 import { customAlphabet } from 'nanoid';
 
 export default class Model<
@@ -7,21 +7,21 @@ export default class Model<
     TCreationAttributes extends {} = any
 > extends SqlModel<TModelAttributes, TCreationAttributes> {
 
-    public static createId({
-        prefix,
-        length = 48,
-        characters
-    }: {
+    public static createId(options?: {
         prefix?: string;
         length?: number;
         characters?: string;
-    } = {}) {
+    }) {
+
+        const { prefix, length, characters } = options || {};
 
         let ret = '';
 
         if (prefix) { ret += prefix; }
 
-        return customAlphabet(characters ?? '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', length);
+        ret += customAlphabet(characters ?? '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', length || 30)();
+
+        return ret;
     }
 
     public static async create<M extends Model<any, any>>(

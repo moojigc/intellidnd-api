@@ -1,8 +1,11 @@
-import { initModels } from '../models';
 import type { Request } from 'express';
-import type Open5e from '../externalServices/Open5e';
 import type { Sequelize, Op } from 'sequelize/types';
-import ServerError from '../utils/Error';
+
+import type Open5e from '../externalServices/Open5e';
+import type ServerError from '../utils/Error';
+import type { initModels } from '../models';
+import type { User } from '../models/User';
+import type { Twilio } from 'twilio';
 
 export namespace Service {
     export abstract class Params {
@@ -11,8 +14,8 @@ export namespace Service {
         roles?: string[];
         status?: number;
         payload?: {
-            required: Record<string, string | string[]>;
-            optional: Record<string, string | string[]> | 'any';
+            required: Record<string, string | string[]> | null;
+            optional: Record<string, string | string[]> | null;
         }
         method: 'get' | 'post' | 'delete' | 'put' | 'patch' | 'all';
         isPublic: boolean;
@@ -23,12 +26,13 @@ export namespace Service {
         Op: typeof Op;
         method: Request['method'];
         sql: Sequelize;
-        userId?: string;
+        user: User;
         param1?: string;
         param2?: string;
         payload: T;
         db: ReturnType<typeof initModels>;
         ext: {
+            twilio: Twilio;
             Open5e: typeof Open5e
         };
         SError: typeof ServerError; 

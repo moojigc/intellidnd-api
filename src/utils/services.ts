@@ -1,6 +1,8 @@
 import type { Sequelize } from 'sequelize/types';
 import type { Service } from '../types';
+import type { User } from '../models/User';
 
+import Twilio from 'twilio';
 import fs from 'fs';
 import { Op } from 'sequelize';
 import { Router } from 'express';
@@ -9,6 +11,7 @@ import verifyToken from './verifyToken';
 import Open5e from '../externalServices/Open5e';
 import { actions, backgrounds, colors, reset } from './print';
 import ServerError from './Error';
+import validate from './validate';
 
 const serviceFolder = __dirname.replace('utils', 'services');
 const prefix = '/' + (process.env.VERSION_PREFIX || 'v1');
@@ -17,7 +20,8 @@ export default function(data: {
     db: Service.ServiceData['db'],
     sql: Sequelize
 }) {
-
+    
+    const twilio = Twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
     const router = Router();
 
     const folders = fs.readdirSync(serviceFolder);
@@ -25,8 +29,14 @@ export default function(data: {
     for (const folder of folders) {
 
         const files = fs.readdirSync(serviceFolder + '/' + folder);
-
+        
         for (const file of files) {
+
+            if (!/.js|.ts/.test(file)) {
+
+                files.push(...fs.readdirSync(serviceFolder + '/' + folder + '/' + file).map(r => file + '/' + r));
+                continue;
+            }
 
             const service = require(serviceFolder + '/' + folder + '/' + file).default as Service.Params;
 
@@ -67,12 +77,14 @@ export default function(data: {
                 try {
 
                     const auth = {} as { userId: string; roles: string[] };
+                    let user: User;
 
                     if (!service.isPublic) {
 
                         const { userId, roles } = await verifyToken({ db: data.db, req, SError: ServerError });
                         auth.userId = userId;
                         auth.roles = roles;
+                        user = await data.db.User.lookup(auth.userId);
                     }
 
                     if (service.roles) {
@@ -95,19 +107,21 @@ export default function(data: {
                             };
                         }
                     }
+
+                    validate(service.payload, payload);
         
                     const response = await service.callback({
                         ...data,
                         Op: Op,
                         headers: req.headers,
                         method: req.method,
-                        userId: auth.userId || null,
-                        // @ts-ignore
+                        user: user,
                         ip: req.clientIp,
                         param1: req.params.param1,
                         param2: req.params.param2,
                         payload: payload,
                         ext: {
+                            twilio: twilio,
                             Open5e: Open5e
                         },
                         SError: ServerError
@@ -167,7 +181,7 @@ export default function(data: {
                     }
 
                     res.status(err.status || 500).json({
-                        code: err.code || '101-01',
+                        code: err.code || 'service-01',
                         message: err.message || fallbackMsg || null
                     }).end();
                 }
