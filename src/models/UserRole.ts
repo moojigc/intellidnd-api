@@ -26,10 +26,10 @@ export class UserRole
     createdAt!: number;
 
     // UserRole belongsTo Role via roleKey
-    roleKeyRole!: Role;
-    getRoleKeyRole!: Sequelize.BelongsToGetAssociationMixin<Role>;
-    setRoleKeyRole!: Sequelize.BelongsToSetAssociationMixin<Role, RoleId>;
-    createRoleKeyRole!: Sequelize.BelongsToCreateAssociationMixin<Role>;
+    role!: Role;
+    getRole!: Sequelize.BelongsToGetAssociationMixin<Role>;
+    setRole!: Sequelize.BelongsToSetAssociationMixin<Role, RoleId>;
+    createRole!: Sequelize.BelongsToCreateAssociationMixin<Role>;
     // UserRole belongsTo User via userId
     user!: User;
     getUser!: Sequelize.BelongsToGetAssociationMixin<User>;

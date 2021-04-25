@@ -8,7 +8,7 @@ export interface TokenAttributes {
     userId: string;
     createdAt: number;
     revokedAt?: number;
-    roles: any;
+    roles: string[];
 }
 
 export type TokenPk = 'id';
@@ -23,7 +23,7 @@ export class Token
     userId!: string;
     createdAt!: number;
     revokedAt?: number;
-    roles!: any;
+    roles!: string[];
 
     public static async create<T extends Model<any, any>>(
         this: Sequelize.ModelStatic<T>,
@@ -57,11 +57,23 @@ export class Token
         catch (e) {
 
             throw {
-                code: '108-01',
+                code: 'token-01',
                 status: 500,
                 message: e.errors && e.errors[0]?.message || e.original?.message || e.message || e
             };
         }
+    }
+    
+    public async getRolesMap() {
+
+        const ret: Record<string, true> = {};
+
+        for (const r of this.roles) {
+
+            ret[r] = true;
+        }
+
+        return ret;
     }
 
     // Token belongsTo User via userId

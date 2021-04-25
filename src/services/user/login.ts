@@ -1,5 +1,5 @@
-import { Service } from "../../types";
 import bcrypt from 'bcryptjs';
+import { Service } from '../../types';
 
 export default {
     route: '/login',
@@ -47,13 +47,18 @@ export default {
             lastLoginAt: now
         });
 
-        const expiresAt = data.payload.remember ? null : 1000 * 60 * 60 * 24;
+        const expiresAt = now + (data.payload.remember ? 0 : 1000 * 60 * 60 * 24);
         const token = await db.Token.create({
             expires: now + expiresAt,
             userId: user.id,
             roles: (await user.getRoles()).map(r => r.roleKey),
         });
         
-        return { token: token.jwt, expiresAt, name: user.name, email: user.email };
+        return {
+			token: token.jwt,
+			expiresAt: expiresAt,
+			name: user.name,
+			email: user.email,
+		};
     }
 } as Service.Params;

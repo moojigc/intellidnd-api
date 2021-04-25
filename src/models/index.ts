@@ -9,7 +9,12 @@ import { Token } from './Token';
 import { User } from './User';
 import { Role } from './Role';
 import { UserRole } from './UserRole';
+import { Character } from './Character';
+import { Inventory } from './Inventory';
 import Code from './Code';
+import Wallet from './Wallet';
+import { Item } from './Item';
+import GuildUser from './GuildUser';
 
 export function initSequelize({
     INTELLIDND_DB_HOST,
@@ -97,6 +102,11 @@ export function initModels(sequelize: Sequelize) {
     Role.initModel(sequelize);
     UserRole.initModel(sequelize);
     Code.initModel(sequelize);
+    Character.initModel(sequelize);
+    Inventory.initModel(sequelize);
+    Wallet.initModel(sequelize);
+    Item.initModel(sequelize);
+    GuildUser.initModel(sequelize);
 
     User.hasMany(UserRole, {
         foreignKey: 'userId',
@@ -126,6 +136,22 @@ export function initModels(sequelize: Sequelize) {
         foreignKey: 'userId',
         as: 'user'
     });
+    User.hasMany(Character, {
+        foreignKey: 'userId',
+        as: 'characters'
+    });
+    Character.hasOne(Inventory, {
+        foreignKey: 'characterId',
+        as: 'inventory'
+    });
+    Inventory.hasMany(Item, {
+        foreignKey: 'inventoryId',
+        as: 'items'
+    });
+    Inventory.hasOne(Wallet, {
+        foreignKey: 'inventoryId',
+        as: 'wallet'
+    })
 
-    return { Roll, Token, User, UserRole, Role, Code };
+    return { Roll, Token, User, UserRole, Role, Code, Character, Inventory, Wallet, Item, GuildUser };
 }

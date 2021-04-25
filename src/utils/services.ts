@@ -1,6 +1,6 @@
 import type { Sequelize } from 'sequelize/types';
+import type Redis from 'redis';
 import type { Service } from '../types';
-import type { User } from '../models/User';
 
 import Twilio from 'twilio';
 import fs from 'fs';
@@ -12,13 +12,15 @@ import Open5e from '../externalServices/Open5e';
 import { actions, backgrounds, colors, reset } from './print';
 import ServerError from './Error';
 import validate from './validate';
+import limiter from './rateLimiter';
 
 const serviceFolder = __dirname.replace('utils', 'services');
 const prefix = '/' + (process.env.VERSION_PREFIX || 'v1');
 
 export default function(data: {
     db: Service.ServiceData['db'],
-    sql: Sequelize
+    sql: Sequelize,
+    redis: Redis.RedisClient
 }) {
     
     const twilio = Twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
@@ -32,6 +34,8 @@ export default function(data: {
         
         for (const file of files) {
 
+            if (file[0] === '_') continue;
+    
             if (!/.js|.ts/.test(file)) {
 
                 files.push(...fs.readdirSync(serviceFolder + '/' + folder + '/' + file).map(r => file + '/' + r));
@@ -70,22 +74,16 @@ export default function(data: {
                 + reset
             );
 
-            router[service.method](prefix + service.route, async (req, res, next) => {
+            router[service.method](prefix + service.route,
+                verifyToken({ db: data.db, SError: ServerError, service }),
+                limiter(data.redis, service),
+                async (req, res, next) => {
 
-                const payload = req.method === 'GET' ? req.query : req.body;
+                const payload = (req.method === 'GET' ? req.query : req.body) || {};
+
+                delete req.query.token;
 
                 try {
-
-                    const auth = {} as { userId: string; roles: string[] };
-                    let user: User;
-
-                    if (!service.isPublic) {
-
-                        const { userId, roles } = await verifyToken({ db: data.db, req, SError: ServerError });
-                        auth.userId = userId;
-                        auth.roles = roles;
-                        user = await data.db.User.lookup(auth.userId);
-                    }
 
                     if (service.roles) {
 
@@ -93,7 +91,7 @@ export default function(data: {
 
                         for (const r of service.roles) {
 
-                            if (auth.roles.includes(r)) {
+                            if (r in req.roles) {
 
                                 ok = true;
                             }
@@ -101,10 +99,7 @@ export default function(data: {
 
                         if (!ok) {
 
-                            throw {
-                                code: '101-02',
-                                status: 401
-                            };
+                            throw new ServerError('service-02', 401);
                         }
                     }
 
@@ -115,7 +110,7 @@ export default function(data: {
                         Op: Op,
                         headers: req.headers,
                         method: req.method,
-                        user: user,
+                        user: req.user || null,
                         ip: req.clientIp,
                         param1: req.params.param1,
                         param2: req.params.param2,
@@ -164,17 +159,6 @@ export default function(data: {
                 }
                 catch (err) {
 
-                    const fallbackMsg = (() => {
-                        
-                        switch (err.status) {
-                            case 400: return 'bad request';
-                            case 401: return 'authentication error';
-                            case 403: return 'unauthorized';
-                            case 404: return 'not found';
-                            default: return 'unhandled exception';
-                        }
-                    })();
-
                     if (!err.status || err.status >= 500) {
 
                         console.log(err.stack);
@@ -182,7 +166,7 @@ export default function(data: {
 
                     res.status(err.status || 500).json({
                         code: err.code || 'service-01',
-                        message: err.message || fallbackMsg || null
+                        message: err.message || null
                     }).end();
                 }
                 // finally {

@@ -13,13 +13,17 @@ export namespace Service {
         callback: (data: ServiceData) => any;
         roles?: string[];
         status?: number;
+        rateLimit?: {
+            skipFailed?: boolean;
+            skipSuccessful?: boolean;
+        };
         payload?: {
             required: Record<string, string | string[]> | null;
             optional: Record<string, string | string[]> | null;
         }
         method: 'get' | 'post' | 'delete' | 'put' | 'patch' | 'all';
         isPublic: boolean;
-    };
+    }
     export interface ServiceData<T = any> {
         headers: Request['headers'];
         ip: string;
@@ -37,4 +41,4 @@ export namespace Service {
         };
         SError: typeof ServerError; 
     }
-};
+}

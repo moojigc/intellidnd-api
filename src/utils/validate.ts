@@ -28,7 +28,7 @@ export default function(service: {
 
         if (!allFields.includes(k) && service.optional !== null) {
 
-            throw new ServerError('validate-01', 400, `Invalid field: ${k}`);
+            throw new ServerError('validate-02', 400, `Invalid field: ${k}`);
         }
 
         if (k in required) {

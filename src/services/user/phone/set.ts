@@ -1,10 +1,13 @@
-import { Service } from '../../../types';
+import { Service } from "../../../types";
 
 export default {
     route: '/user/phone',
     method: 'post',
     status: 204,
     isPublic: false,
+    rateLimit: {
+        skipFailed: true
+    },
     payload: {
         required: {
             phone: 'string'
@@ -31,7 +34,7 @@ export default {
             await db.Code.destroy({
                 where: {
                     userId: user.id,
-                    type: 'verification'
+                    type: 'phone-verification'
                 },
                 transaction
             });

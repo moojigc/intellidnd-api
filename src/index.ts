@@ -5,6 +5,7 @@ import * as dotenv from 'dotenv';
 import services from './utils/services';
 import requestIp from 'request-ip';
 import { initModels, initSequelize } from './models';
+import Redis from 'redis';
 dotenv.config();
 
 const PROD = process.env.NODE_ENV !== 'development';
@@ -28,13 +29,18 @@ const app = express();
 	.use(morgan('dev'))
 	.use(services({
 		db: models,
-		sql: sequelize
+		sql: sequelize,
+		redis: Redis.createClient(
+			{
+				url: process.env.REDIS_URL
+			}
+		)
 	}))
 	.all('*', (req, res) => {
 		res.status(404)
 			.json({
 				message: `${req.method} ${req.path} not found`,
-				code: 'app-01'
+				code: 'server-01'
 			})
 			.end();
 	})

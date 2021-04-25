@@ -1,11 +1,9 @@
-import { Service } from '../../types';
-
-let status = 200;
+import { Service } from "../../types";
 
 export default {
     route: '/ping',
     method: 'all',
-    status: status,
+    status: 200,
     isPublic: true,
     payload: {
         required: {},

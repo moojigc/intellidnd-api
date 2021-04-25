@@ -155,14 +155,7 @@ export class User
                     type: DataTypes.STRING(40),
                     allowNull: false,
                     primaryKey: true,
-                    defaultValue: () => {
-
-                        const id = this.createId({ prefix: 'U', length: 30 })
-
-                        console.log(id)
-
-                        return id
-                    }
+                    defaultValue: () => this.createId({ prefix: 'U', length: 30 })
                 },
                 username: {
                     type: DataTypes.STRING(64),

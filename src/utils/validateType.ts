@@ -15,6 +15,10 @@ export default function(rules: { types: string | string[], field: string; }, dat
             ok = types.includes('string') && data !== '';
             if (!ok) {
 
+                ok = types.includes('email') && /^[^@\s]+@[^@\s\.]+\.[^@\.\s]+$/.test(data);
+            }
+            if (!ok) {
+
                 ok = types.filter(t => new RegExp(t, 'i').test(data)).length > 0;
             }
             break;

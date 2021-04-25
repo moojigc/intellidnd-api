@@ -1,4 +1,3 @@
-import { ValidationError } from 'sequelize';
 import { Service } from '../../types';
 import sendEmail from '../../utils/sendEmail';
 
@@ -32,6 +31,19 @@ export default {
         if (data.payload.password !== data.payload.verify) {
 
             new data.SError('signup-01', 400, 'Passwords must match');
+        }
+
+        const existing = await db.User.count({
+            where: {
+                [data.Op.or]: {
+                    email: data.payload.email,
+                    username: data.payload.username || ''
+                }
+            }
+        });
+
+        if (existing) {
+            throw new data.SError('signup-02', 403);
         }
 
         const transaction = await data.sql.transaction();

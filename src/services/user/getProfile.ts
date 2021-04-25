@@ -1,5 +1,4 @@
-import type { Model } from 'sequelize/types';
-import type { Service } from '../../types';
+import { Service } from "../../types";
 
 export default {
     route: '/profile',
