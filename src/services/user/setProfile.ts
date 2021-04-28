@@ -1,7 +1,7 @@
 import { Service } from "../../types";
 
 export default {
-    route: '/profile',
+    route: '/user/profile',
     method: 'patch',
     isPublic: false,
     payload: {

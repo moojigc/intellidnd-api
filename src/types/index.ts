@@ -7,8 +7,9 @@ import type { initModels } from '../models';
 import type { User } from '../models/User';
 import type { Twilio } from 'twilio';
 
+type PayloadType = 'string' | 'number' | 'integer' | 'null' | 'email' | 'boolean';
 export namespace Service {
-    export abstract class Params {
+    export interface Params {
         route: string;
         callback: (data: ServiceData) => any;
         roles?: string[];
@@ -17,9 +18,9 @@ export namespace Service {
             skipFailed?: boolean;
             skipSuccessful?: boolean;
         };
-        payload?: {
-            required: Record<string, string | string[]> | null;
-            optional: Record<string, string | string[]> | null;
+        payload: {
+            required: Record<string, PayloadType | PayloadType[]> | null;
+            optional: Record<string, PayloadType | PayloadType[]> | null;
         }
         method: 'get' | 'post' | 'delete' | 'put' | 'patch' | 'all';
         isPublic: boolean;
@@ -31,8 +32,8 @@ export namespace Service {
         method: Request['method'];
         sql: Sequelize;
         user: User;
-        param1?: string;
-        param2?: string;
+        param1: string;
+        param2: string;
         payload: T;
         db: ReturnType<typeof initModels>;
         ext: {

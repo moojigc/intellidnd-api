@@ -67,7 +67,7 @@ export default class Code
 
             throw new ServerError('code-01', 404, 'Code not found');
         }
-        else if (c.expiresAt <= Date.now()) {
+        else if (c.expiresAt && c.expiresAt <= Date.now()) {
 
             throw new ServerError('code-02', 401, 'Code is expired');
         }

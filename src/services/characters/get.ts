@@ -2,7 +2,7 @@ import { Service } from '../../types';
 import list from './_list';
 
 export default {
-    route: '/character/:param1',
+    route: '/characters/:param1',
     method: 'get',
     isPublic: false,
     payload: {

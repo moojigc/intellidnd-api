@@ -85,24 +85,6 @@ export default function(data: {
 
                 try {
 
-                    if (service.roles) {
-
-                        let ok = false;
-
-                        for (const r of service.roles) {
-
-                            if (r in req.roles) {
-
-                                ok = true;
-                            }
-                        }
-
-                        if (!ok) {
-
-                            throw new ServerError('service-02', 401);
-                        }
-                    }
-
                     validate(service.payload, payload);
         
                     const response = await service.callback({
@@ -111,9 +93,9 @@ export default function(data: {
                         headers: req.headers,
                         method: req.method,
                         user: req.user || null,
-                        ip: req.clientIp,
-                        param1: req.params.param1,
-                        param2: req.params.param2,
+                        ip: req.clientIp!,
+                        param1: req.params.param1 || '',
+                        param2: req.params.param2 || '',
                         payload: payload,
                         ext: {
                             twilio: twilio,

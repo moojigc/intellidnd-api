@@ -2,7 +2,7 @@ import { CharacterAttributes } from '../../models/Character';
 import { Service } from '../../types/index';
 
 export default {
-    route: '/character/:param1',
+    route: '/characters/:param1',
     method: 'patch',
     isPublic: false,
     payload: {

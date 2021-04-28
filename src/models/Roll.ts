@@ -29,7 +29,7 @@ export default class Roll
     createdAt: number;
     modifiedAt: number;
 
-    public static get(name: string, userId: string, guildId: string = null) {
+    public static get(name: string, userId: string, guildId?: string) {
 
         return this.findOne({
             where: {
@@ -40,7 +40,7 @@ export default class Roll
         });
     }
 
-    public static getAllByUserId(userId: string, guildId: string = null) {
+    public static getAllByUserId(userId: string, guildId?: string) {
 
         const where: {
             userId: string;

@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import { Service } from '../../types';
 
 export default {
-    route: '/login',
+    route: '/user/login',
     method: 'post',
     isPublic: true,
     payload: {
@@ -22,7 +22,7 @@ export default {
         remember?: boolean;
     }>) => {
 
-        const db = data.db;
+        const { db, SError } = data;
         const key = data.payload.email ? 'email' : 'username';
         const identifier = data.payload.email || data.payload.username;
 
@@ -30,16 +30,16 @@ export default {
             [key]: identifier
         });
 
-        const match = bcrypt.compareSync(data.payload.password, user.password
+        const match = bcrypt.compareSync(data.payload.password, user?.password
             || (data.payload.password + Date.now()).split('').reverse().join(''));
 
         if (!user || !match) {
 
-            new data.SError('login-01', 401);
+            throw new SError('login-01', 401);
         }
         else if (!user.emailValidatedAt) {
 
-            new data.SError('login-02', 403);
+            throw new SError('login-02', 403);
         }
 
         const now = Date.now();
@@ -47,9 +47,9 @@ export default {
             lastLoginAt: now
         });
 
-        const expiresAt = now + (data.payload.remember ? 0 : 1000 * 60 * 60 * 24);
+        const expiresAt = data.payload.remember ? 'sessionLong' : 'session';
         const token = await db.Token.create({
-            expires: now + expiresAt,
+            expires: expiresAt,
             userId: user.id,
             roles: (await user.getRoles()).map(r => r.roleKey),
         });

@@ -19,7 +19,7 @@ export default function limiter(redisClient: Redis.RedisClient, service: Service
                 return req.user.id;
             }
             else {
-                return req.clientIp;
+                return req.clientIp!;
             }
         },
         skipFailedRequests: service.rateLimit.skipFailed ?? true,

@@ -2,7 +2,7 @@ import { CharacterCreationAttributes } from '../../models/Character';
 import { Service } from '../../types/index';
 
 export default {
-    route: '/character',
+    route: '/characters',
     method: 'post',
     isPublic: false,
     payload: {
@@ -51,6 +51,7 @@ export default {
         }
 
         const char = await db.Character.create({
+            // @ts-ignore
             userId: user.id,
             ...payload
         });

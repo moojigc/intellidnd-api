@@ -1,13 +1,21 @@
 import nodemailer from 'nodemailer';
 import ServerError from './Error';
 
+const _originMap = {
+    'localhost:4000': 'http://localhost:5000',
+    'api.intellidnd.com': 'http://intellidnd.com'
+};
+
 export default async function sendEmail(options: {
     type?: string;
     body?: string;
     params?: Record<string, string>;
     to: string;
     subject?: string;
+    host?: string;
 }) {
+
+    console.log(options.host)
 
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
@@ -30,6 +38,8 @@ export default async function sendEmail(options: {
 
             throw new TypeError('Missing options.body');
         }
+
+        options.body = options.body.replace(/{host}/g, _originMap[options.host || 'api.intellidnd.com']);
 
         try {
 

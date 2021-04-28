@@ -2,9 +2,6 @@ import { Service } from "../../../types";
 
 export default {
     route: '/user/phone/verify/:param1',
-    param1: {
-        'code': 'string'
-    },
     method: 'patch',
     status: 204,
     isPublic: false,
@@ -18,8 +15,9 @@ export default {
 
         await db.Code.verify(user.id, param1);
 
-        user.set('phoneVerifiedAt', Date.now());
-        await user.save();
+        await user.update({
+            phoneVerifiedAt: Date.now()
+        });
 
         return;
     }

@@ -2,7 +2,7 @@ import { Service } from '../../types';
 import sendEmail from '../../utils/sendEmail';
 
 export default {
-    route: '/signup',
+    route: '/user/signup',
     method: 'post',
     isPublic: true,
     payload: {
@@ -30,7 +30,7 @@ export default {
 
         if (data.payload.password !== data.payload.verify) {
 
-            new data.SError('signup-01', 400, 'Passwords must match');
+            throw new data.SError('signup-01', 400, 'Passwords must match');
         }
 
         const existing = await db.User.count({
@@ -49,7 +49,7 @@ export default {
         const transaction = await data.sql.transaction();
 
         const user = await db.User.create({
-            username: data.payload.username || null,
+            username: data.payload.username,
             password: data.payload.password,
             email: data.payload.email,
             firstName: data.payload.firstName,
@@ -57,7 +57,7 @@ export default {
         }, { transaction });
 
         const token = await db.Token.create({
-            expires: 1000 * 60 * 60 * 24,
+            expires: 'verification',
             userId: user.id,
             roles: ['unverified']
         }, { transaction });
@@ -65,7 +65,7 @@ export default {
         await transaction.commit();
 
         await sendEmail({
-            body: `Verify email address at https://intellidnd.com/signup/verify?token=${token.jwt}`,
+            body: `Verify email address at {host}/signup/verify?token=${token.jwt}`,
             to: user.email
         });
 

@@ -2,7 +2,7 @@ import { CharacterCreationAttributes } from '../../models/Character';
 import { Service } from '../../types';
 
 export default {
-    route: '/character/:param1',
+    route: '/characters/:param1',
     method: 'delete',
     isPublic: false,
     status: 204,

@@ -13,8 +13,9 @@ export interface TokenAttributes {
 
 export type TokenPk = 'id';
 export type TokenId = Token[TokenPk];
-export type TokenCreationAttributes = Optional<TokenAttributes, TokenPk | 'createdAt' | 'jwt'> & { expires: number; };
+export type TokenCreationAttributes = Optional<TokenAttributes, TokenPk | 'createdAt' | 'roles' | 'jwt'> & { expires?: 'verification' | 'session' | 'sessionLong'; };
 
+// @ts-ignore
 export class Token
     extends Model<TokenAttributes, TokenCreationAttributes>
     implements TokenAttributes {
@@ -25,45 +26,46 @@ export class Token
     revokedAt?: number;
     roles!: string[];
 
-    public static async create<T extends Model<any, any>>(
-        this: Sequelize.ModelStatic<T>,
-        values: TokenCreationAttributes,
-        options?: Sequelize.CreateOptions<Token>
-    ): Promise<T> {
+    private static _expirationMap = {
+        verification: 1000 * 60 * 60,
+        session: 1000 * 60 * 60 * 24,
+        sessionLong: 1000 * 60 * 60 * 24 * 14
+    };
 
-        // @ts-ignore
+    /**
+     * @returns a flat object, not a Token instance
+     */
+    public static async generate({
+        userId,
+        roles,
+        expires
+    }: TokenCreationAttributes) {
+
         const id = this.createId();
 
         const token = jwt.sign({
             id: id,
-            roles: values.roles
-        }, process.env.TOKEN_SECRET, values.expires ? {
-            expiresIn: values.expires
+            userId: userId
+        }, process.env.TOKEN_SECRET!, expires ? {
+            expiresIn: this._expirationMap[expires]
         } : {});
 
-        delete values.expires;
+        await this.create({
+            id,
+            jwt: token,
+            userId,
+            roles
+        });
 
-        // @ts-ignore
-        const build = this.build({
+        return {
             id: id,
             jwt: token,
-            ...values,
-        }, options);
-
-        try {
-
-            return await build.save(options);
-        }
-        catch (e) {
-
-            throw {
-                code: 'token-01',
-                status: 500,
-                message: e.errors && e.errors[0]?.message || e.original?.message || e.message || e
-            };
+            userId: userId,
+            roles: roles,
+            expiresAt: expires ? this._expirationMap[expires] : null
         }
     }
-    
+
     public async getRolesMap() {
 
         const ret: Record<string, true> = {};
@@ -114,6 +116,7 @@ export class Token
                 roles: {
                     type: DataTypes.JSON,
                     allowNull: false,
+                    defaultValue: []
                 },
             },
             {

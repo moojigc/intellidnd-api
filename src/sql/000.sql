@@ -1,6 +1,6 @@
 CREATE TABLE user (
         id VARCHAR(40) NOT NULL,
-        username VARCHAR(255),
+        username VARCHAR(255) COLLATE utf8mb4_bin,
         firstName VARCHAR(255),
         lastName VARCHAR(255),
         email VARCHAR(255) NOT NULL,

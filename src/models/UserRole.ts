@@ -4,23 +4,20 @@ import type { Role, RoleId } from './Role';
 import type { User, UserId } from './User';
 
 export interface UserRoleAttributes {
-    id: string;
     roleKey: string;
     userId: string;
     createdAt: number;
 }
 
-export type UserRolePk = 'id';
-export type UserRoleId = UserRole[UserRolePk];
+export type UserRoleId = UserRole['userId'] & UserRole['roleKey']
 export type UserRoleCreationAttributes = Optional<
     UserRoleAttributes,
-    UserRolePk
+    'createdAt'
 >;
 
 export class UserRole
     extends Model<UserRoleAttributes, UserRoleCreationAttributes>
     implements UserRoleAttributes {
-    id!: string;
     roleKey!: string;
     userId!: string;
     createdAt!: number;
@@ -39,11 +36,6 @@ export class UserRole
     static initModel(sequelize: Sequelize.Sequelize): typeof UserRole {
         UserRole.init(
             {
-                id: {
-                    type: DataTypes.STRING(40),
-                    allowNull: false,
-                    primaryKey: true,
-                },
                 roleKey: {
                     type: DataTypes.STRING(128),
                     allowNull: false,
@@ -51,6 +43,7 @@ export class UserRole
                         model: 'role',
                         key: 'key',
                     },
+                    primaryKey: true
                 },
                 userId: {
                     type: DataTypes.STRING(128),
@@ -59,6 +52,7 @@ export class UserRole
                         model: 'user',
                         key: 'id',
                     },
+                    primaryKey: true
                 },
                 createdAt: {
                     type: DataTypes.BIGINT.UNSIGNED,
@@ -74,12 +68,6 @@ export class UserRole
                 indexes: [
                     {
                         name: 'PRIMARY',
-                        unique: true,
-                        using: 'BTREE',
-                        fields: [{ name: 'id' }],
-                    },
-                    {
-                        name: 'roleKey',
                         unique: true,
                         using: 'BTREE',
                         fields: [{ name: 'roleKey' }, { name: 'userId' }],

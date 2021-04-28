@@ -38,8 +38,8 @@ export default function ({
             try {
         
                 decoded = jwt.verify(
-                    req.headers['authorization'].replace('Bearer ', ''),
-                    process.env.TOKEN_SECRET
+                    req.headers['authorization']!.replace('Bearer ', ''),
+                    process.env.TOKEN_SECRET!
                 ) as typeof decoded;
             }
             catch (error) {
@@ -52,12 +52,13 @@ export default function ({
                     id: decoded.id
                 }
             });
-            const tokenRolesMap = lookup.getRolesMap();
 
             if (!lookup) {
         
                 throw new SError('auth-04', 401);
             }
+            
+            const tokenRolesMap = await lookup.getRolesMap();
             
             if (service.roles) {
                 
@@ -70,7 +71,14 @@ export default function ({
                 }
             }
             
-            req.user = await db.User.lookup(lookup.userId);
+            const user = await db.User.lookup(lookup.userId);
+
+            if (!user) {
+
+                throw new SError('auth-07', 401);
+            }
+            
+            req.user = user;
             req.roles = await req.user.getRolesMap();
             next();
         }

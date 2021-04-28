@@ -1,28 +1,31 @@
 import { Service } from "../../types";
 
 export default {
-    route: '/verify',
+    route: '/user/verify',
     payload: {
-        required: {},
-        optional: {},
+        required: null,
+        optional: null,
     },
     status: 204,
     method: 'patch',
     isPublic: false,
-    callback: async ({ user, SError }) => {
+    roles: ['unverified'],
+    callback: async ({ user, db }) => {
 
-        if (!user) {
+        if (!user.emailValidatedAt) {
 
-            throw new SError('verify-01', 403);
+            await user.update({
+                emailValidatedAt: Date.now()
+            });
         }
-        else if (user.emailValidatedAt) {
 
-            throw new SError('verify-02', 403, 'Already verified');
-        }
+        const token = await db.Token.create({
+            userId: user.id,
+            expires: 'session'
+        });
 
-        user.set('emailValidatedAt', Date.now());
-        await user.save();
-
-        return;
+        return {
+            token: token.jwt
+        };
     }
 } as Service.Params;
