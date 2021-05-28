@@ -1,4 +1,4 @@
-import Sequelize, { DataTypes, Optional } from 'sequelize';
+import Sequelize, { DataTypes, Op, Optional } from 'sequelize';
 import Model from './Model';
 import jwt from 'jsonwebtoken';
 import type { User, UserId } from './User';
@@ -7,13 +7,16 @@ export interface TokenAttributes {
     jwt: string;
     userId: string;
     createdAt: number;
-    revokedAt?: number;
+    expiresAt: number | null;
     roles: string[];
 }
 
 export type TokenPk = 'id';
 export type TokenId = Token[TokenPk];
-export type TokenCreationAttributes = Optional<TokenAttributes, TokenPk | 'createdAt' | 'roles' | 'jwt'> & { expires?: 'verification' | 'session' | 'sessionLong'; };
+export type TokenCreationAttributes = Optional<
+	TokenAttributes,
+	TokenPk | 'createdAt'
+>
 
 // @ts-ignore
 export class Token
@@ -23,7 +26,7 @@ export class Token
     jwt!: string;
     userId!: string;
     createdAt!: number;
-    revokedAt?: number;
+    expiresAt: number | null;
     roles!: string[];
 
     private static _expirationMap = {
@@ -39,7 +42,21 @@ export class Token
         userId,
         roles,
         expires
-    }: TokenCreationAttributes) {
+    }: {
+        userId: string;
+        roles: string[];
+        expires: 'verification' | 'session' | 'sessionLong'
+    }, transaction?: Sequelize.Transaction) {
+
+        await this.destroy({
+            where: {
+                expiresAt: {
+                    [Op.lt]: Date.now() 
+                },
+                userId: userId
+            },
+            transaction
+        });
 
         const id = this.createId();
 
@@ -54,8 +71,9 @@ export class Token
             id,
             jwt: token,
             userId,
+            expiresAt: expires ? this._expirationMap[expires] : null,
             roles
-        });
+        }, { transaction });
 
         return {
             id: id,
@@ -63,7 +81,7 @@ export class Token
             userId: userId,
             roles: roles,
             expiresAt: expires ? this._expirationMap[expires] : null
-        }
+        };
     }
 
     public async getRolesMap() {
@@ -109,7 +127,7 @@ export class Token
                     allowNull: false,
                     defaultValue: Date.now
                 },
-                revokedAt: {
+                expiresAt: {
                     type: DataTypes.BIGINT.UNSIGNED,
                     allowNull: true,
                 },

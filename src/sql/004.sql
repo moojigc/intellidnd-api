@@ -28,3 +28,5 @@ CREATE TABLE email (
     COLLATE utf8mb4_unicode_ci;
 
 INSERT INTO `role` (`key`, `displayName`) VALUES ('unverified', 'Unverified User');
+
+ALTER TABLE `token` ADD COLUMN `expiresAt` BIGINT UNSIGNED NULL;

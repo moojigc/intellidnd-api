@@ -19,9 +19,10 @@ export default {
             });
         }
 
-        const token = await db.Token.create({
+        const token = await db.Token.generate({
             userId: user.id,
-            expires: 'session'
+            expires: 'session',
+            roles: (await user.getRoles()).map(r => r.roleKey)
         });
 
         return {

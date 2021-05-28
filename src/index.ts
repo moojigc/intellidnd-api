@@ -6,6 +6,7 @@ import services from './utils/services';
 import requestIp from 'request-ip';
 import { initModels, initSequelize } from './models';
 import Redis from 'redis';
+import { exec } from 'child_process';
 dotenv.config();
 
 const PROD = process.env.NODE_ENV !== 'development';
@@ -13,9 +14,11 @@ const PORT = process.env.PORT;
 
 const sequelize = initSequelize(process.env);
 const models = initModels(sequelize);
+const redisClient = Redis.createClient({
+	url: process.env.REDIS_URL,
+});
 
 const app = express();
-
 	app.disable('x-powered-by')
 	.set('trust proxy', true)
 	.use(cors({
@@ -30,11 +33,7 @@ const app = express();
 	.use(services({
 		db: models,
 		sql: sequelize,
-		redis: Redis.createClient(
-			{
-				url: process.env.REDIS_URL
-			}
-		)
+		redis: redisClient
 	}))
 	.all('*', (req, res) => {
 		res.status(404)

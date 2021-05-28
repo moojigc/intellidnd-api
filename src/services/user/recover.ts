@@ -42,7 +42,7 @@ export default {
             }
         });
 
-        const token = await db.Token.create({
+        const token = await db.Token.generate({
             roles: ['unverified'],
             userId: user.id,
             expires: 'verification',

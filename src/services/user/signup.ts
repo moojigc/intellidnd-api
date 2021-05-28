@@ -56,11 +56,11 @@ export default {
             lastName: data.payload.lastName
         }, { transaction });
 
-        const token = await db.Token.create({
+        const token = await db.Token.generate({
             expires: 'verification',
             userId: user.id,
             roles: ['unverified']
-        }, { transaction });
+        }, transaction);
 
         await transaction.commit();
 

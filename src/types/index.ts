@@ -17,6 +17,9 @@ export namespace Service {
         rateLimit?: {
             skipFailed?: boolean;
             skipSuccessful?: boolean;
+            window?: number;
+            message?: string;
+            max?: number;
         };
         payload: {
             required: Record<string, PayloadType | PayloadType[]> | null;

@@ -27,9 +27,6 @@ export default {
             charisma: 'integer',
         }
     },
-    rateLimit: {
-        skipFailed: true
-    },
     callback: async ({
         db,
         user,

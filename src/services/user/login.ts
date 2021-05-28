@@ -15,6 +15,10 @@ export default {
             email: 'email'
         }
     },
+    rateLimit: {
+        skipSuccessful: true,
+        skipFailed: false
+    },
     callback: async (data: Service.ServiceData<{
         password: string;
         username?: string;
@@ -48,7 +52,7 @@ export default {
         });
 
         const expiresAt = data.payload.remember ? 'sessionLong' : 'session';
-        const token = await db.Token.create({
+        const token = await db.Token.generate({
             expires: expiresAt,
             userId: user.id,
             roles: (await user.getRoles()).map(r => r.roleKey),
