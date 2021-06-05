@@ -1,9 +1,9 @@
-import ServerError from "./Error";
+import serverError from "./Error";
 import validateType from "./validateType";
 
 export default function(service: {
-    required: Record<string, string | string[]> | null;
-    optional: Record<string, string | string[]> | null;
+    required?: Record<string, string | string[]>;
+    optional?: Record<string, string | string[]>;
 }, data: any) {
 
     const required = service.required || {};
@@ -18,7 +18,7 @@ export default function(service: {
 
         if (!(k in data)) {
 
-            throw new ServerError('validate-01', 400, `Required field: ${k}`);
+            throw serverError('validate-01', 400, `Required field: ${k}`);
         }
     }
 
@@ -28,7 +28,7 @@ export default function(service: {
 
         if (!allFields.includes(k) && service.optional !== null) {
 
-            throw new ServerError('validate-02', 400, `Invalid field: ${k}`);
+            throw serverError('validate-02', 400, `Invalid field: ${k}`);
         }
 
         if (k in required) {

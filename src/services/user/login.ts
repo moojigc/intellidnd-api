@@ -1,49 +1,50 @@
+import Service from '@utils/Service';
 import bcrypt from 'bcryptjs';
-import { Service } from '../../types';
 
-export default {
+export default new Service<{
+    password: string;
+    identifier: string;
+}>({
     route: '/user/login',
     method: 'post',
     isPublic: true,
     payload: {
         required: {
-            password: 'string'
+            password: 'string',
+            identifier: 'string'
         },
-        optional: {
-            remember: 'boolean',
-            username: 'string',
-            email: 'email'
-        }
     },
-    rateLimit: {
-        skipSuccessful: true,
-        skipFailed: false
-    },
-    callback: async (data: Service.ServiceData<{
-        password: string;
-        username?: string;
-        email?: string;
-        remember?: boolean;
-    }>) => {
+    // rateLimit: {
+    //     max: 5,
+    //     skipFailed: false,
+    //     skipSuccessful: true,
+    //     window: 1000 * 60 * 15
+    // },
+    async callback({ db, err, payload, Op }) {
+        
+        const where = /\d{10}/.test(payload.identifier)
+            ? { phone: payload.identifier }
+            : {
+                [Op.or]: {
+                    email: payload.identifier,
+                    username: payload.identifier,
+                }
+            }
 
-        const { db, SError } = data;
-        const key = data.payload.email ? 'email' : 'username';
-        const identifier = data.payload.email || data.payload.username;
+        const user = await db.User.lookup(where);
 
-        const user = await db.User.lookup({
-            [key]: identifier
-        });
-
-        const match = bcrypt.compareSync(data.payload.password, user?.password
-            || (data.payload.password + Date.now()).split('').reverse().join(''));
+        const match = bcrypt.compareSync(
+            payload.password, user?.password
+            || (payload.password + Date.now()).split('').reverse().join('')
+        );
 
         if (!user || !match) {
 
-            throw new SError('login-01', 401);
+            throw err('login-01', 401);
         }
         else if (!user.emailValidatedAt) {
 
-            throw new SError('login-02', 403);
+            throw err('login-02', 403);
         }
 
         const now = Date.now();
@@ -51,18 +52,24 @@ export default {
             lastLoginAt: now
         });
 
-        const expiresAt = data.payload.remember ? 'sessionLong' : 'session';
         const token = await db.Token.generate({
-            expires: expiresAt,
+            expires: 'session',
             userId: user.id,
             roles: (await user.getRoles()).map(r => r.roleKey),
         });
+
+        this.setInHeader = {
+            cookie: {
+                value: token.refreshToken,
+                maxAge: token.expiresAt
+            }
+        };
         
         return {
-			token: token.jwt,
-			expiresAt: expiresAt,
+			token: token.authToken,
+			expiresAt: token.expiresAt ? Date.now() + token.expiresAt : null,
 			name: user.name,
 			email: user.email,
 		};
-    }
-} as Service.Params;
+    },
+})

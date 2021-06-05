@@ -1,17 +1,13 @@
-import { Service } from "../../../types";
+import { Service } from '@utils/Service';
 
-export default {
+export default new Service<{
+    code: string;
+}>({
     route: '/user/phone/verify/:param1',
     method: 'patch',
-    status: 204,
     isPublic: false,
-    payload: {
-        required: {},
-        optional: {}
-    },
-    callback: async ({ user, param1, db }: Service.ServiceData<{
-        code: string;
-    }>) => {
+    payload: {},
+    callback: async ({ user, param1, db }) => {
 
         await db.Code.verify(user.id, param1);
 
@@ -21,4 +17,4 @@ export default {
 
         return;
     }
-} as Service.Params;
+});

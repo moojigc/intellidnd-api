@@ -30,10 +30,85 @@ export class Token
     roles!: string[];
 
     private static _expirationMap = {
-        verification: 1000 * 60 * 60,
-        session: 1000 * 60 * 60 * 24,
-        sessionLong: 1000 * 60 * 60 * 24 * 14
+        verification: {
+            refresh: 1000 * 60 * 60 * 24,
+            auth: 1000 * 60 * 60,
+        },
+        session: {
+            refresh: 1000 * 60 * 60 * 24 * 7,
+            auth: 1000 * 60 * 5
+        },
     };
+
+    public static async verifyRefresh(token: string) {
+
+        try {
+            console.log(token, process.env.REFRESH_SECRET)
+            const decoded = jwt.verify(token, process.env.REFRESH_SECRET!) as {
+                id: string;
+                userId: string;
+            };
+
+            console.log(decoded)
+
+            const saved = await this.findOne({
+                where: {
+                    id: decoded.id,
+                    expiresAt: {
+                        [Op.gt]: Date.now()
+                    }
+                }
+            });
+
+            if (!saved) {
+
+                return false;
+            }
+            
+            return decoded;
+        }
+        catch (e) {
+
+            return false;
+        }
+    }
+
+    private static _getJwt(payload: {
+        id: string;
+        userId: string;
+    } | {
+        userId: string;
+        roles: string;
+    }, type: 'refresh' | 'auth', expiresIn: number | null) {
+
+        const secret = {
+            refresh: 'REFRESH_SECRET',
+            auth: 'TOKEN_SECRET'
+        };
+        
+        return jwt.sign(
+			payload,
+			process.env[secret[type]]!,
+			expiresIn
+				? {
+                    expiresIn: expiresIn
+				  }
+				: {}
+		);
+    };
+
+    public static getAuthToken(payload: {
+        userId: string;
+        roles: string;
+    }) {
+
+        const token = this._getJwt(payload, 'auth', this._expirationMap.session.auth);
+
+        return {
+            token: token,
+            expiresAt: Date.now() + this._expirationMap.session.auth
+        };
+    }
 
     /**
      * @returns a flat object, not a Token instance
@@ -45,7 +120,7 @@ export class Token
     }: {
         userId: string;
         roles: string[];
-        expires: 'verification' | 'session' | 'sessionLong'
+        expires: 'verification' | 'session';
     }, transaction?: Sequelize.Transaction) {
 
         await this.destroy({
@@ -60,27 +135,42 @@ export class Token
 
         const id = this.createId();
 
-        const token = jwt.sign({
-            id: id,
-            userId: userId
-        }, process.env.TOKEN_SECRET!, expires ? {
-            expiresIn: this._expirationMap[expires]
-        } : {});
+        const refreshToken = this._getJwt(
+			{
+				id: id,
+				userId: userId,
+			},
+			'refresh',
+			expires
+				? Math.ceil(this._expirationMap[expires].refresh / 1000)
+				: null
+		);
+
+		const authToken = this._getJwt(
+			{
+				userId: userId,
+				roles: roles.join(','),
+			},
+			'auth',
+			Math.ceil(this._expirationMap[expires].auth / 1000)
+		);
 
         await this.create({
             id,
-            jwt: token,
+            jwt: refreshToken,
             userId,
-            expiresAt: expires ? this._expirationMap[expires] : null,
+            expiresAt: expires ? Date.now() + this._expirationMap[expires].refresh : null,
             roles
         }, { transaction });
 
         return {
             id: id,
-            jwt: token,
+            authToken: authToken,
+            refreshToken: refreshToken,
             userId: userId,
             roles: roles,
-            expiresAt: expires ? this._expirationMap[expires] : null
+            expiresAt: expires ? this._expirationMap[expires].auth : null,
+            sessionExpiresAt: this._expirationMap[expires].refresh
         };
     }
 

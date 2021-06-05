@@ -1,16 +1,12 @@
-import { Service } from "../../types";
+import { Service } from '@utils/Service';
 
-export default {
+export default new Service({
     route: '/user/verify',
-    payload: {
-        required: null,
-        optional: null,
-    },
-    status: 204,
+    payload: {},
     method: 'patch',
     isPublic: false,
     roles: ['unverified'],
-    callback: async ({ user, db }) => {
+    async callback({ user, db }) {
 
         if (!user.emailValidatedAt) {
 
@@ -25,8 +21,13 @@ export default {
             roles: (await user.getRoles()).map(r => r.roleKey)
         });
 
+        this.setInHeader = {
+            cookie: token.refreshToken
+        };
+
         return {
-            token: token.jwt
+            token: token.refreshToken,
+            expiresAt: token.expiresAt
         };
     }
-} as Service.Params;
+});;

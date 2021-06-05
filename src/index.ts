@@ -1,12 +1,12 @@
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
-import services from './utils/services';
+import services from './utils/initServices';
 import requestIp from 'request-ip';
 import { initModels, initSequelize } from './models';
 import Redis from 'redis';
-import { exec } from 'child_process';
 dotenv.config();
 
 const PROD = process.env.NODE_ENV !== 'development';
@@ -26,15 +26,16 @@ const app = express();
 		credentials: true,
 		methods: ['GET', 'PATCH', 'POST', 'DELETE']
 	}))
+	.use(cookieParser())
 	.use(express.urlencoded({ extended: true }))
 	.use(express.json())
 	.use(requestIp.mw())
-	.use(morgan('dev'))
 	.use(services({
 		db: models,
 		sql: sequelize,
 		redis: redisClient
 	}))
+	.use(morgan('dev'))
 	.all('*', (req, res) => {
 		res.status(404)
 			.json({

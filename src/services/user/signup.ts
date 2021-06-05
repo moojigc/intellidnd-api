@@ -1,7 +1,16 @@
-import { Service } from '../../types';
+import { Service } from '@utils/Service';
 import sendEmail from '../../utils/sendEmail';
+import bcrypt from 'bcryptjs';
 
-export default {
+export default new Service<{
+    email: string;
+    password: string;
+    verify: string;
+}, {
+    username: string;
+    firstName: string;
+    lastName: string;
+}>({
     route: '/user/signup',
     method: 'post',
     isPublic: true,
@@ -17,20 +26,13 @@ export default {
             lastName: 'string'
         }
     },
-    callback: async (data: Service.ServiceData<{
-        email: string;
-        password: string;
-        verify: string;
-        username?: string;
-        firstName?: string;
-        lastName?: string;
-    }>) => {
+    async callback(data) {
 
         const db = data.db;
 
         if (data.payload.password !== data.payload.verify) {
 
-            throw new data.SError('signup-01', 400, 'Passwords must match');
+            throw data.err('signup-01', 400, 'Passwords must match');
         }
 
         const existing = await db.User.count({
@@ -43,14 +45,14 @@ export default {
         });
 
         if (existing) {
-            throw new data.SError('signup-02', 403);
+            throw data.err('signup-02', 403);
         }
 
         const transaction = await data.sql.transaction();
 
         const user = await db.User.create({
             username: data.payload.username,
-            password: data.payload.password,
+            password: bcrypt.hashSync(data.payload.password),
             email: data.payload.email,
             firstName: data.payload.firstName,
             lastName: data.payload.lastName
@@ -65,16 +67,25 @@ export default {
         await transaction.commit();
 
         await sendEmail({
-            body: `Verify email address at {host}/signup/verify?token=${token.jwt}`,
+            body: `Verify email address at {host}/signup/verify?token=${token.refreshToken}`,
             to: user.email
         });
+
+        this.setInHeader = {
+            cookie: {
+                maxAge: token.expiresAt,
+                value: token.refreshToken
+            }
+        }
 
         return {
             name: user.name,
             username: user.username,
+            token: token.authToken,
+            expiresAt: token.expiresAt,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
         };
     }
-} as Service.Params;
+});

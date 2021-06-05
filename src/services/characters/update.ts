@@ -1,12 +1,11 @@
 import { CharacterAttributes } from '../../models/Character';
-import { Service } from '../../types/index';
+import { Service } from '@utils/Service';
 
-export default {
+export default new Service<{}, Omit<CharacterAttributes, 'userId' | 'createdAt' | 'modifiedAt' | 'id'>>({
     route: '/characters/:param1',
     method: 'patch',
     isPublic: false,
     payload: {
-        required: null,
         optional: {
             name: 'string',
             guildId: 'string',
@@ -32,8 +31,8 @@ export default {
         user,
         payload,
         param1,
-        SError
-    }: Service.ServiceData<Partial<CharacterAttributes>>) => {
+        err
+    }) => {
 
         const character = await db.Character.findOne({
             where: {
@@ -44,11 +43,11 @@ export default {
         
         if (!character) {
 
-            throw new SError('character_update-01', 404);
+            throw err('character_update-01', 404);
         }
 
         await character.update(payload);
 
         return character.get();
     }
-} as Service.Params;
+});

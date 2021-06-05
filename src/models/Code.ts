@@ -1,8 +1,8 @@
-import { Optional, ValidationErrorItem } from 'sequelize';
 import type Sequelize from 'sequelize';
 import type { Transaction } from 'sequelize/types';
+import { Optional, ValidationErrorItem } from 'sequelize';
 import { DataTypes } from 'sequelize';
-import ServerError from '../utils/Error';
+import err from '../utils/Error';
 import Model from './Model';
 
 export interface CodeAttributes {
@@ -65,11 +65,11 @@ export default class Code
 
         if (!c) {
 
-            throw new ServerError('code-01', 404, 'Code not found');
+            throw err('code-01', 404, 'Code not found');
         }
         else if (c.expiresAt && c.expiresAt <= Date.now()) {
 
-            throw new ServerError('code-02', 401, 'Code is expired');
+            throw err('code-02', 401, 'Code is expired');
         }
 
         await c.destroy();

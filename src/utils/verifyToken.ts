@@ -1,16 +1,17 @@
 import type ServerError from './Error';
 import type { Request, Response, NextFunction } from 'express';
-import type { Service } from '../types';
+import type { Service } from '@utils/Service';
+import type { ServiceData } from '@types';
 import jwt from 'jsonwebtoken';
 
 export default function ({
     db,
-    SError,
+    err,
     service
 }: {
-    db: Service.ServiceData['db'];
-    SError: typeof ServerError;
-    service: Service.Params;
+    db: ServiceData['db'];
+    err: typeof ServerError;
+    service: Service;
 }) {
 
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -22,17 +23,17 @@ export default function ({
         }
 
         const token = req.headers.authorization || req.query.token as string;
-        let decoded: { id: string; userId: string };
+        let decoded: { userId: string; roles?: string; };
         
         try {
             
             if (!token) {
                 
-                throw new SError('auth-01', 401, 'Authentication error');
+                throw err('auth-01', 401, 'Authentication error');
             }
             else if (req.headers.authorization && !/^Bearer /.test(token)) {
         
-                throw new SError('auth-02', 400, 'Authorization header should be formatted as `Bearer [token]`');
+                throw err('auth-02', 400, 'Authorization header should be formatted as `Bearer [token]`');
             }
         
             try {
@@ -44,42 +45,44 @@ export default function ({
             }
             catch (error) {
         
-                throw new SError('auth-03', 401, 'Invalid token');
-            }
-        
-            const lookup = await db.Token.findOne({
-                where: {
-                    id: decoded.id
-                }
-            });
-
-            if (!lookup) {
-        
-                throw new SError('auth-04', 401);
+                throw err('auth-03', 401, 'Invalid token');
             }
             
-            const tokenRolesMap = await lookup.getRolesMap();
-            
-            if (service.roles) {
-                
-                for (const r of service.roles) {
-                    
-                    if (!(r in tokenRolesMap)) {
-
-                        throw new SError('auth-06', 401);
-                    }
-                }
-            }
-            
-            const user = await db.User.lookup(lookup.userId);
+            const user = await db.User.lookup(decoded.userId);
 
             if (!user) {
 
-                throw new SError('auth-07', 401);
+                throw err('auth-07', 401);
             }
             
             req.user = user;
-            req.roles = await req.user.getRolesMap();
+
+            if (decoded.roles) {
+
+                req.roles = {};
+                decoded.roles.split(',').forEach(r => req.roles[r] = true);
+
+                if (user.emailValidatedAt) {
+
+                    req.roles['user'] = true;
+                }
+            }
+
+            let permitted = false;
+
+            for (const r of service.roles) {
+
+                if (r in req.roles) {
+
+                    permitted = true;
+                }
+            }
+
+            if (!permitted) {
+
+                throw err('auth_08', 401);
+            }
+
             next();
         }
         catch (e) {

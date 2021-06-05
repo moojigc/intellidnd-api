@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import ServerError from './Error';
+import serverError from './Error';
 
 const _originMap = {
     'localhost:4000': 'http://localhost:5000',
@@ -53,7 +53,7 @@ export default async function sendEmail(options: {
 
             console.log(e);
             
-            throw new ServerError('email-01', 500, 'Error sending email');
+            throw serverError('email-01', 500, 'Error sending email');
         }
     }
 }

@@ -1,36 +1,35 @@
-export default class ServerError extends Error {
+export default function serverError(
+	code = 'internal-01',
+	status = 500,
+	message?: string,
+	_original?: any
+) {
 
-	public message: string;
+	if (!message) {
 
-	constructor(
-		public code = 'internal-01',
-		public status = 500,
-		private _message?: string,
-		private _original?: any
-	) {
-		super();
+		message = (() => {
 
-		if (!this._message) {
-
-			this.message = (() => {
-
-				switch (this.status) {
-					case 400: return 'bad request';
-					case 401: return 'authentication error';
-					case 403: return 'unauthorized';
-					case 404: return 'not found';
-					default: return 'unhandled exception';
-				}
-			})();
-		}
-		else {
-
-			this.message = this._message;
-		}
-
-		if (this._original) {
-
-			console.error(this._original);
-		}
+			switch (status) {
+				case 400: return 'bad request';
+				case 401: return 'authentication error';
+				case 403: return 'unauthorized';
+				case 404: return 'not found';
+				default: return 'unhandled exception';
+			}
+		})();
 	}
+
+	if (_original) {
+
+		console.error(_original);
+	}
+
+	const error = new Error(message);
+
+	return {
+		code,
+		status,
+		message,
+		stack: error.stack
+	};
 }

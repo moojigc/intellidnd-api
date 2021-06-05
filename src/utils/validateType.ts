@@ -1,4 +1,4 @@
-import ServerError from './Error';
+import serverError from './Error';
 
 export default function(rules: { types: string | string[], field: string; }, data: any) {
 
@@ -35,6 +35,6 @@ export default function(rules: { types: string | string[], field: string; }, dat
 
     if (!ok) {
 
-        throw new ServerError('validate_type-01', 400, `${rules.field} must be type ${types}`);
+        throw serverError('validate_type-01', 400, `${rules.field} must be type ${types}`);
     }
 }

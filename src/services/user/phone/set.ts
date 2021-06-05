@@ -1,9 +1,10 @@
-import { Service } from "../../../types";
+import Service from '@utils/Service';
 
-export default {
+export default new Service<{
+    phone: string;
+}>({
     route: '/user/phone',
     method: 'post',
-    status: 204,
     isPublic: false,
     rateLimit: {
         skipFailed: true
@@ -12,11 +13,8 @@ export default {
         required: {
             phone: 'string'
         },
-        optional: {}
     },
-    callback: async ({ user, ext, payload, db, sql, SError }: Service.ServiceData<{
-        phone: string;
-    }>) => {
+    callback: async ({ user, ext, payload, db, sql, err }) => {
 
         payload.phone = payload.phone.split('').filter(r => /\d/.test(r)).join('').padStart(12, '+1');
 
@@ -51,11 +49,11 @@ export default {
 
             await transaction.rollback();
 
-            throw new SError('set_phone-01', 500, e.message, e);
+            throw err('set_phone-01', 500, e.message, e);
         }
 
         await transaction.commit();
 
         return;
     }
-} as Service.Params;
+});

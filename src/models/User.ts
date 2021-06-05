@@ -155,7 +155,7 @@ export class User
                     type: DataTypes.STRING(40),
                     allowNull: false,
                     primaryKey: true,
-                    defaultValue: () => this.createId({ prefix: 'U', length: 30 })
+                    defaultValue: () => this.createId({ prefix: 'U', length: 16 })
                 },
                 username: {
                     type: DataTypes.STRING(64),
@@ -261,15 +261,6 @@ export class User
                         fields: [{ name: 'username' }],
                     },
                 ],
-                hooks: {
-                    beforeValidate: (user) => {
-
-                        if (user.password) {
-
-                            user.password = bcrypt.hashSync(user.password);
-                        }
-                    }
-                }
             }
         );
         return User;

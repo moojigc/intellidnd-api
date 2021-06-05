@@ -1,6 +1,7 @@
 import type { Sequelize } from 'sequelize/types';
 import type Redis from 'redis';
-import type { Service } from '../types';
+import type { ServiceData } from '../types';
+import type { Service } from '@utils/Service';
 
 import Twilio from 'twilio';
 import fs from 'fs';
@@ -18,7 +19,7 @@ const serviceFolder = __dirname.replace('utils', 'services');
 const prefix = '/' + (process.env.VERSION_PREFIX || 'v1');
 
 export default function(data: {
-    db: Service.ServiceData['db'],
+    db: ServiceData['db'],
     sql: Sequelize,
     redis: Redis.RedisClient
 }) {
@@ -42,7 +43,7 @@ export default function(data: {
                 continue;
             }
 
-            const service = require(serviceFolder + '/' + folder + '/' + file).default as Service.Params;
+            const service = require(serviceFolder + '/' + folder + '/' + file).default as Service<any, any>;
 
             const methodColor = (() => {
                 switch (service.method) {
@@ -55,7 +56,6 @@ export default function(data: {
                     case 'delete':
                         return colors.red;
                     case 'patch':
-                    case 'put':
                         return colors.yellow;
                 }
             })();
@@ -75,7 +75,7 @@ export default function(data: {
             );
 
             router[service.method](prefix + service.route,
-                verifyToken({ db: data.db, SError: ServerError, service }),
+                verifyToken({ db: data.db, err: ServerError, service }),
                 limiter(data.redis, service),
                 async (req, res, next) => {
 
@@ -91,6 +91,10 @@ export default function(data: {
                         ...data,
                         Op: Op,
                         headers: req.headers,
+                        cookies: {
+                            ...req.cookies,
+                            ...req.signedCookies
+                        },
                         method: req.method,
                         user: req.user || null,
                         ip: req.clientIp!,
@@ -101,18 +105,40 @@ export default function(data: {
                             twilio: twilio,
                             Open5e: Open5e
                         },
-                        SError: ServerError
+                        err: ServerError
                     });
-                    
-                    if (!response) {
 
-                        res.status(service.status || 200).end();
-                        return;
+                    const status = response ? 200 : 204;
+
+                    if (service.setInHeader) {
+
+                        if (service.setInHeader.cookie) {
+
+                            const value = typeof service.setInHeader.cookie === 'string'
+                                ? service.setInHeader.cookie
+                                : service.setInHeader.cookie.value;
+
+                            const maxAge = new Date(
+                                Date.now() + 
+                                    (typeof service.setInHeader.cookie === 'string'
+                                        ? 1000 * 60 * 60
+                                        : (service.setInHeader.cookie.maxAge || 1000 * 60 * 60))
+                            );
+
+                            res.cookie('refresh', value, {
+                                expires: maxAge,
+                                httpOnly: true,
+                                sameSite: 'strict',
+                                secure: process.env.NODE_ENV === 'PRODUCTION'
+                            });
+                        }
                     }
+                    
+                    res.status(status);
 
-                    res.status(service.status || 200)
-                        .send(response)
-                        .end();
+                    if (response) { res.send(response); }
+
+                    res.end();
 
                     if (process.env.LOG_RESPONSES) {
 

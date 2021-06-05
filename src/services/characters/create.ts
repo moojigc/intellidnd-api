@@ -1,7 +1,26 @@
 import { CharacterCreationAttributes } from '../../models/Character';
-import { Service } from '../../types/index';
+import { Service } from '@utils/Service';
 
-export default {
+export default new Service<{
+    name: string;
+}, {
+    guildId: string;
+    race: string;
+    class: string;
+    background: string;
+    experience: number;
+    maxHp: number;
+    hp: number;
+    level: number;
+    armorClass: number;
+    initiative: number;
+    strength: number;
+    dexterity: number;
+    constitution: number;
+    intelligence: number;
+    wisdom: number;
+    charisma: number;
+}>({
     route: '/characters',
     method: 'post',
     isPublic: false,
@@ -31,12 +50,12 @@ export default {
     rateLimit: {
         skipFailed: true
     },
-    callback: async ({
+    async callback({
         db,
         user,
         payload,
-        SError
-    }: Service.ServiceData<CharacterCreationAttributes>) => {
+        err
+    }) {
 
         const existingName = await db.Character.count({
             where: {
@@ -47,7 +66,7 @@ export default {
 
         if (existingName) {
 
-            throw new SError('character_create-01', 400, 'Character named ' + payload.name + ' already belongs to this user');
+            throw err('character_create-01', 400, 'Character named ' + payload.name + ' already belongs to this user');
         }
 
         const char = await db.Character.create({
@@ -73,4 +92,4 @@ export default {
             wallet: wallet.coins
         };
     }
-} as Service.Params;
+});

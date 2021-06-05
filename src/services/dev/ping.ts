@@ -1,25 +1,14 @@
-import { Service } from "../../types";
+import { Service } from '@utils/Service';
 
-export default {
+export default new Service({
     route: '/ping',
     method: 'all',
-    status: 200,
     isPublic: true,
-    payload: {
-        required: {},
-        optional: {
-            status: 'number'
-        }
-    },
-    callback: async (data) => {
-
-        if (data.payload.status) {
-
-            status = data.payload.status;
-        }
+    payload: {},
+    async callback(data) {
 
         return {
             time: new Date().toLocaleString()
         };
     }
-} as Service.Params;
+});

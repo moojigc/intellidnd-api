@@ -1,7 +1,7 @@
-import { Service } from "../../types";
+import { Service } from '@utils/Service';
 
-export default {
-    route: '/profile',
+export default new Service({
+    route: '/user/profile',
     method: 'get',
     isPublic: false,
     payload: {
@@ -12,4 +12,4 @@ export default {
 
         return user.getProfile();
     }
-} as Service.Params;
+});

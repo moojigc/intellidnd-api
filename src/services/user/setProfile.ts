@@ -1,6 +1,12 @@
-import { Service } from "../../types";
+import { Service } from '@utils/Service';
 
-export default {
+export default new Service<{}, {
+    email: string;
+    username: string;
+    name: string;
+    firstName: string;
+    lastName: string;
+}>({
     route: '/user/profile',
     method: 'patch',
     isPublic: false,
@@ -23,4 +29,4 @@ export default {
             ...payload
         }
     }
-} as Service.Params;
+});

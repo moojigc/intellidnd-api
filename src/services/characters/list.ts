@@ -1,16 +1,17 @@
 import { CharacterCreationAttributes } from '../../models/Character';
-import { Service } from '../../types';
+import { Service } from '@utils/Service';
 import list from './_list';
 
-export default {
+export default new Service<{}, {
+    name: string;
+}>({
     route: '/characters',
     method: 'get',
     isPublic: false,
     payload: {
-        required: null,
         optional: {
             name: 'string'
         }
     },
     callback: list
-} as Service.Params;
+});

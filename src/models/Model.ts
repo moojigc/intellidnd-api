@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize/types';
 import { Model as SqlModel, ValidationError, ValidationErrorItem } from 'sequelize';
-import { customAlphabet } from 'nanoid';
+import { customAlphabet, nanoid } from 'nanoid';
 
 export default class Model<
     TModelAttributes extends {} = any,
@@ -19,7 +19,11 @@ export default class Model<
 
         if (prefix) { ret += prefix; }
 
-        ret += customAlphabet(characters ?? '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', length || 30)();
+        const fn = characters
+            ? () => customAlphabet(characters, length || 16)
+            : () => nanoid(length || 16)
+
+        ret += fn();
 
         return ret;
     }

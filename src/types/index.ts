@@ -7,42 +7,21 @@ import type { initModels } from '../models';
 import type { User } from '../models/User';
 import type { Twilio } from 'twilio';
 
-type PayloadType = 'string' | 'number' | 'integer' | 'null' | 'email' | 'boolean';
-export namespace Service {
-    export interface Params {
-        route: string;
-        callback: (data: ServiceData) => any;
-        roles?: string[];
-        status?: number;
-        rateLimit?: {
-            skipFailed?: boolean;
-            skipSuccessful?: boolean;
-            window?: number;
-            message?: string;
-            max?: number;
-        };
-        payload: {
-            required: Record<string, PayloadType | PayloadType[]> | null;
-            optional: Record<string, PayloadType | PayloadType[]> | null;
-        }
-        method: 'get' | 'post' | 'delete' | 'put' | 'patch' | 'all';
-        isPublic: boolean;
-    }
-    export interface ServiceData<T = any> {
-        headers: Request['headers'];
-        ip: string;
-        Op: typeof Op;
-        method: Request['method'];
-        sql: Sequelize;
-        user: User;
-        param1: string;
-        param2: string;
-        payload: T;
-        db: ReturnType<typeof initModels>;
-        ext: {
-            twilio: Twilio;
-            Open5e: typeof Open5e
-        };
-        SError: typeof ServerError; 
-    }
+export interface ServiceData<T = any, U = User> {
+    headers: Request['headers'];
+    ip: string;
+    Op: typeof Op;
+    method: Request['method'];
+    cookies: any;
+    sql: Sequelize;
+    user: U;
+    param1: string;
+    param2: string;
+    payload: T;
+    db: ReturnType<typeof initModels>;
+    ext: {
+        twilio: Twilio;
+        Open5e: typeof Open5e
+    };
+    err: typeof ServerError; 
 }

@@ -1,20 +1,15 @@
-import { CharacterCreationAttributes } from '../../models/Character';
-import { Service } from '../../types';
+import { Service } from '@utils/Service';
 
-export default {
+export default new Service({
     route: '/characters/:param1',
     method: 'delete',
     isPublic: false,
-    status: 204,
-    payload: {
-        required: null,
-        optional: null
-    },
+    payload: {},
     callback: async ({
         db,
         user,
         param1,
-        SError
+        err
     }) => {
 
         const r = await db.Character.destroy({
@@ -26,9 +21,9 @@ export default {
 
         if (r === 0) {
 
-            throw new SError('character_delete-01', 404);
+            throw err('character_delete-01', 404);
         }
 
         return;
     }
-} as Service.Params;
+});

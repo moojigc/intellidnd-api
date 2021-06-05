@@ -1,11 +1,11 @@
 import { CharacterAttributes } from "../../models/Character";
-import { Service } from "../../types";
+import { ServiceData } from '@types';
 
 export default async function list({
     db,
     user,
     payload
-}: Service.ServiceData<Partial<CharacterAttributes>>) {
+}: ServiceData<Partial<CharacterAttributes>>) {
 
     const common = {
         userId: user.id

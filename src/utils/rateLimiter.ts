@@ -2,9 +2,9 @@ import type Redis from 'redis';
 
 import RateLimit from 'express-rate-limit';
 import RedisStore from 'rate-limit-redis';
-import { Service } from '../types';
+import { Service } from '@utils/Service';
 
-export default function limiter(redisClient: Redis.RedisClient, service: Service.Params) {
+export default function limiter(redisClient: Redis.RedisClient, service: Service) {
 
     if (!service.rateLimit) return (req, res, next) => next(); 
 

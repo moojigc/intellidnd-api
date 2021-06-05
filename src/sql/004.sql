@@ -28,5 +28,7 @@ CREATE TABLE email (
     COLLATE utf8mb4_unicode_ci;
 
 INSERT INTO `role` (`key`, `displayName`) VALUES ('unverified', 'Unverified User');
+INSERT INTO `role` (`key`, `displayName`) VALUES ('recovery', 'In Recovery');
 
 ALTER TABLE `token` ADD COLUMN `expiresAt` BIGINT UNSIGNED NULL;
+ALTER TABLE `userRole` DROP COLUMN `id`;
