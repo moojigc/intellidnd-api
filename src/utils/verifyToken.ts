@@ -80,7 +80,7 @@ export default function ({
 
             if (!permitted) {
 
-                throw err('auth_08', 401);
+                throw err('auth-08', 401);
             }
 
             next();

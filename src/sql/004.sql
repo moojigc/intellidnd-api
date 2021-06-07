@@ -32,3 +32,8 @@ INSERT INTO `role` (`key`, `displayName`) VALUES ('recovery', 'In Recovery');
 
 ALTER TABLE `token` ADD COLUMN `expiresAt` BIGINT UNSIGNED NULL;
 ALTER TABLE `userRole` DROP COLUMN `id`;
+
+ALTER TABLE `item`
+    ADD COLUMN `name` VARCHAR(255) NOT NULL AFTER `id`,
+    ADD COLUMN `value` INT UNSIGNED NULL AFTER `name`,
+    CHANGE COLUMN `inventoryId` `inventoryId` VARCHAR(40) NOT NULL AFTER `id`;

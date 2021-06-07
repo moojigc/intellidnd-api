@@ -43,13 +43,11 @@ export class Token
     public static async verifyRefresh(token: string) {
 
         try {
-            console.log(token, process.env.REFRESH_SECRET)
+
             const decoded = jwt.verify(token, process.env.REFRESH_SECRET!) as {
                 id: string;
                 userId: string;
             };
-
-            console.log(decoded)
 
             const saved = await this.findOne({
                 where: {
@@ -65,7 +63,10 @@ export class Token
                 return false;
             }
             
-            return decoded;
+            return {
+                ...decoded,
+                session: saved
+            };
         }
         catch (e) {
 
@@ -169,8 +170,8 @@ export class Token
             refreshToken: refreshToken,
             userId: userId,
             roles: roles,
-            expiresAt: expires ? this._expirationMap[expires].auth : null,
-            sessionExpiresAt: this._expirationMap[expires].refresh
+            expiresAt: expires ? Date.now() + this._expirationMap[expires].auth : null,
+            sessionExpiresAt: Date.now() + this._expirationMap[expires].refresh
         };
     }
 

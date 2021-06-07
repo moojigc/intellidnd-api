@@ -22,20 +22,20 @@ const app = express();
 	app.disable('x-powered-by')
 	.set('trust proxy', true)
 	.use(cors({
-		origin: '*',
+		origin: /localhost|intellidnd.com/,
 		credentials: true,
-		methods: ['GET', 'PATCH', 'POST', 'DELETE']
+		methods: ['GET', 'PATCH', 'POST', 'DELETE'],
 	}))
 	.use(cookieParser())
 	.use(express.urlencoded({ extended: true }))
 	.use(express.json())
 	.use(requestIp.mw())
+	.use(morgan('dev'))
 	.use(services({
 		db: models,
 		sql: sequelize,
 		redis: redisClient
 	}))
-	.use(morgan('dev'))
 	.all('*', (req, res) => {
 		res.status(404)
 			.json({

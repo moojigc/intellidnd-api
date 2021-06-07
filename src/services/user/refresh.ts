@@ -14,14 +14,14 @@ export default new Service({
 
         if (!cookies.refresh) {
 
-            err('refresh_01', 401);
+            err('refresh-01', 401);
         }
 
         const decoded = await db.Token.verifyRefresh(cookies.refresh);
 
         if (decoded === false) {
 
-            throw err('refresh_02', 401);
+            throw err('refresh-02', 401);
         }
 
         const roles = await db.UserRole.findAll({

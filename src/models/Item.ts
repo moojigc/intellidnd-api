@@ -13,9 +13,10 @@ export interface ItemAttributes {
     createdAt: number;
     modifiedAt: number;
 };
-
+export type ItemPk = 'id';
+export type ItemId = Item[ItemPk];
 export type ItemCreationAttributes = Optional<
-    ItemAttributes, 'createdAt' | 'modifiedAt'
+    ItemAttributes, ItemPk | 'createdAt' | 'modifiedAt'
 >;
 
 export class Item
@@ -37,7 +38,7 @@ export class Item
                     type: DataTypes.STRING(40),
                     allowNull: false,
                     primaryKey: true,
-                    defaultValue: () => this.createId({ length: 40 })
+                    defaultValue: () => this.createId({ prefix: 'ITEM', length: 21 })
                 },
                 name: {
                     type: DataTypes.STRING(255),

@@ -61,13 +61,13 @@ export default new Service<{
         this.setInHeader = {
             cookie: {
                 value: token.refreshToken,
-                maxAge: token.expiresAt
+                maxAge: token.sessionExpiresAt
             }
         };
         
         return {
 			token: token.authToken,
-			expiresAt: token.expiresAt ? Date.now() + token.expiresAt : null,
+			expiresAt: token.expiresAt ? token.expiresAt : null,
 			name: user.name,
 			email: user.email,
 		};

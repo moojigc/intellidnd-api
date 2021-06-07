@@ -123,7 +123,7 @@ export class Character
                     type: DataTypes.STRING(40),
                     allowNull: false,
                     primaryKey: true,
-                    defaultValue: () => this.createId({ prefix: 'C', length: 30 })
+                    defaultValue: () => this.createId({ prefix: 'C', length: 21 })
                 },
                 userId: {
                     type: DataTypes.STRING(40),

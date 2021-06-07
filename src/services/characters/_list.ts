@@ -11,8 +11,8 @@ export default async function list({
         userId: user.id
     };
 
-    const chars = await db.Character.findAll({
-        where: Object.keys(payload).length
+    const chars = await db.Character.lookupAll({
+        ...Object.keys(payload).length
             ? {
                 ...payload,
                 ...common

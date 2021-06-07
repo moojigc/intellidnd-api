@@ -118,17 +118,17 @@ export default function(data: {
                                 ? service.setInHeader.cookie
                                 : service.setInHeader.cookie.value;
 
+                            const defAge = Date.now () + 1000 * 60 * 60;
                             const maxAge = new Date(
-                                Date.now() + 
                                     (typeof service.setInHeader.cookie === 'string'
-                                        ? 1000 * 60 * 60
-                                        : (service.setInHeader.cookie.maxAge || 1000 * 60 * 60))
+                                        ? defAge
+                                        : (service.setInHeader.cookie.maxAge || defAge))
                             );
 
                             res.cookie('refresh', value, {
                                 expires: maxAge,
                                 httpOnly: true,
-                                sameSite: 'strict',
+                                sameSite: 'lax',
                                 secure: process.env.NODE_ENV === 'PRODUCTION'
                             });
                         }

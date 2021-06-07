@@ -21,7 +21,7 @@ export default new Service<{
     wisdom: number;
     charisma: number;
 }>({
-    route: '/characters',
+    route: '/character',
     method: 'post',
     isPublic: false,
     payload: {

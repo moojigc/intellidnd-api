@@ -13,7 +13,6 @@ export interface GuildUserAttributes {
 export type GuildUserCreationAttributes = Optional<
     GuildUserAttributes, 'createdAt'
 >;
-
 export default class GuildUser
     extends Model<GuildUserAttributes, GuildUserCreationAttributes>
     implements GuildUserAttributes {
