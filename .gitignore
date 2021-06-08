@@ -18,3 +18,4 @@ node_modules
 *.js
 workspace.code-workspace
 temp*
+dump.rdb
