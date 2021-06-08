@@ -37,3 +37,10 @@ ALTER TABLE `item`
     ADD COLUMN `name` VARCHAR(255) NOT NULL AFTER `id`,
     ADD COLUMN `value` INT UNSIGNED NULL AFTER `name`,
     CHANGE COLUMN `inventoryId` `inventoryId` VARCHAR(40) NOT NULL AFTER `id`;
+
+ALTER TABLE `intellidnd`.`wallet` 
+    CHANGE COLUMN `copper` `copper` BIGINT NOT NULL ,
+    CHANGE COLUMN `gold` `gold` BIGINT NOT NULL ,
+    CHANGE COLUMN `silver` `silver` BIGINT NOT NULL ,
+    CHANGE COLUMN `platinum` `platinum` BIGINT NOT NULL ,
+    CHANGE COLUMN `electrum` `electrum` BIGINT NOT NULL ;

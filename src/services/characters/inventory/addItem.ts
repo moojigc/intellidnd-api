@@ -1,4 +1,4 @@
-import { CharacterAttributes } from '../../models/Character';
+import { CharacterAttributes } from '../../../models/Character';
 import { Service } from '@utils/Service';
 import { ItemCreationAttributes, ItemAttributes } from '@models/Item';
 
