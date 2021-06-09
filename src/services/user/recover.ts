@@ -54,8 +54,8 @@ export default new Service<{
 
         await sendEmail({
             to: user.email,
-            body: `Recover your account at {host}/reset?token=${token.authToken}`,
-            host: headers.host
+            body: `Recover your account at {host}/password/recover?token=${token.authToken}`,
+            headers
         });
 
         this.setInHeader = {

@@ -8,6 +8,7 @@ export default new Service({
     async callback(data) {
 
         return {
+            headers: data.headers,
             time: new Date().toLocaleString()
         };
     }

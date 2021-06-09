@@ -1,7 +1,7 @@
 import { Service } from '@utils/Service';
 
 export default new Service({
-    route: '/user/verify',
+    route: '/user/verify/email',
     payload: {},
     method: 'patch',
     isPublic: false,
@@ -22,11 +22,14 @@ export default new Service({
         });
 
         this.setInHeader = {
-            cookie: token.refreshToken
+            cookie: {
+                maxAge: token.sessionExpiresAt,
+                value: token.refreshToken
+            }
         };
 
         return {
-            token: token.refreshToken,
+            token: token.authToken,
             expiresAt: token.expiresAt
         };
     }

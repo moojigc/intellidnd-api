@@ -56,16 +56,16 @@ export default function ({
             }
             
             req.user = user;
+            req.roles = {};
+
+            if (user.emailValidatedAt) {
+
+                req.roles['user'] = true;
+            }
 
             if (decoded.roles) {
 
-                req.roles = {};
                 decoded.roles.split(',').forEach(r => req.roles[r] = true);
-
-                if (user.emailValidatedAt) {
-
-                    req.roles['user'] = true;
-                }
             }
 
             let permitted = false;
@@ -80,7 +80,7 @@ export default function ({
 
             if (!permitted) {
 
-                throw err('auth-08', 401);
+                throw err('auth-08', 403);
             }
 
             next();

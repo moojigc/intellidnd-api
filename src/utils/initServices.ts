@@ -169,7 +169,7 @@ export default function(data: {
 
                     if (!err.status || err.status >= 500) {
 
-                        console.log(err.stack);
+                        console.log(err);
                     }
 
                     res.status(err.status || 500).json({

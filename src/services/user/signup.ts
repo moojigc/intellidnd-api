@@ -35,7 +35,7 @@ export default new Service<{
             throw data.err('signup-01', 400, 'Passwords must match');
         }
 
-        const existing = await db.User.count({
+        const existing = await db.User.findOne({
             where: {
                 [data.Op.or]: {
                     email: data.payload.email,
@@ -45,6 +45,22 @@ export default new Service<{
         });
 
         if (existing) {
+
+            if (!existing.emailValidatedAt) {
+
+                const token = await db.Token.generate({
+                    expires: 'verification',
+                    userId: existing.id,
+                    roles: ['unverified']
+                });
+                
+                await sendEmail({
+                    headers: data.headers,
+                    body: `Verify email address at {host}/signup/verify/email?token=${token.authToken}`,
+                    to: existing.email
+                });
+            }
+
             throw data.err('signup-02', 403);
         }
 
@@ -67,22 +83,14 @@ export default new Service<{
         await transaction.commit();
 
         await sendEmail({
-            body: `Verify email address at {host}/signup/verify?token=${token.refreshToken}`,
+            headers: data.headers,
+            body: `Verify email address at {host}/signup/verify/email?token=${token.authToken}`,
             to: user.email
         });
-
-        this.setInHeader = {
-            cookie: {
-                maxAge: token.expiresAt,
-                value: token.refreshToken
-            }
-        }
 
         return {
             name: user.name,
             username: user.username,
-            token: token.authToken,
-            expiresAt: token.expiresAt,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
