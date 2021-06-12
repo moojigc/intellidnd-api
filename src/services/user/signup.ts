@@ -44,7 +44,7 @@ export default new Service<{
             }
         });
 
-        if (existing) {
+        if (existing && existing.email) {
 
             if (!existing.emailValidatedAt) {
 
@@ -82,11 +82,14 @@ export default new Service<{
 
         await transaction.commit();
 
-        await sendEmail({
-            headers: data.headers,
-            body: `Verify email address at {host}/signup/verify/email?token=${token.authToken}`,
-            to: user.email
-        });
+        if (user.email) {
+
+            await sendEmail({
+                headers: data.headers,
+                body: `Verify email address at {host}/signup/verify/email?token=${token.authToken}`,
+                to: user.email
+            });
+        }
 
         return {
             name: user.name,

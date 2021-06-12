@@ -8,14 +8,14 @@ import fs from 'fs';
 import { Op } from 'sequelize';
 import { Router } from 'express';
 
-import verifyToken from './verifyToken';
+import verifyToken from '@utils/verifyToken';
 import Open5e from '../externalServices/Open5e';
-import { actions, backgrounds, colors, reset } from './print';
-import ServerError from './Error';
-import validate from './validate';
-import limiter from './rateLimiter';
+import { actions, backgrounds, colors, reset } from '@utils/print';
+import ServerError from '@utils/Error';
+import validate from '@utils/validate';
+import limiter from '@utils/rateLimiter';
 
-const serviceFolder = __dirname.replace('utils', 'services');
+const serviceFolder = __dirname.replace('routers', 'services');
 const prefix = '/' + (process.env.VERSION_PREFIX || 'v1');
 
 export default function(data: {

@@ -12,8 +12,8 @@ export interface UserAttributes {
     lastName?: string;
     phone?: string;
     phoneVerifiedAt?: number;
-    email: string;
-    password: string;
+    email?: string;
+    password?: string;
     emailValidatedAt?: number;
     lastLoginAt?: number;
     lastPasswordChangeAt?: number;
@@ -41,8 +41,8 @@ export class User
     lastName?: string;
     phone?: string;
     phoneVerifiedAt?: number;
-    email!: string;
-    password!: string;
+    email?: string;
+    password?: string;
     emailValidatedAt?: number;
     lastLoginAt?: number;
     lastPasswordChangeAt?: number;

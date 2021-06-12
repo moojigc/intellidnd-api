@@ -30,7 +30,7 @@ export default new Service<{
             
         const user = await db.User.lookup(where);
 
-        if (!user) {
+        if (!user || !user.email) {
 
             return;
         }

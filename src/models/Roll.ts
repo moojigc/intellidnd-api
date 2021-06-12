@@ -1,11 +1,13 @@
-import type { Optional } from 'sequelize';
 import type Sequelize from 'sequelize';
+import { Op, Optional, WhereOptions } from 'sequelize';
 import { DataTypes } from 'sequelize';
 import Model from './Model';
 
 export interface RollAttributes {
+    id: string;
     name: string;
-    userId: string;
+    discordUserId?: string;
+    userId?: string;
     guildId?: string;
     input: string;
     lastRolledAt: number;
@@ -14,42 +16,46 @@ export interface RollAttributes {
 };
 
 export type RollCreationAttributes = Optional<
-    RollAttributes, 'createdAt' | 'modifiedAt'
+    RollAttributes, 'id' | 'createdAt' | 'modifiedAt'
 >;
 
 export default class Roll
     extends Model<RollAttributes, RollCreationAttributes>
     implements RollAttributes {
 
+    id: string;
     name: string;
-    userId: string;
+    discordUserId?: string;
+    userId?: string;
     guildId?: string;
     input: string;
     lastRolledAt: number;
     createdAt: number;
     modifiedAt: number;
 
-    public static get(name: string, userId: string, guildId?: string) {
+    public static get(name: string, discordUserId: string, guildId?: string) {
 
         return this.findOne({
             where: {
                 name,
-                userId,
+                discordUserId,
                 guildId
             }
         });
     }
 
-    public static getAllByUserId(userId: string, guildId?: string) {
+    public static getAllByDiscordUserId(discordUserId: string, guildId?: string, input?: string | null) {
 
-        const where: {
-            userId: string;
-            guildId?: string;
-        } = {
-            userId
+        const where: WhereOptions<RollAttributes> = {
+            discordUserId
         };
 
         if (guildId) { where.guildId = guildId; }
+        if (input) {
+            where.name = {
+                [Op.like]: '%' + input + '%'
+            };
+        }
 
         return this.findAll({
             where: where
@@ -59,19 +65,28 @@ export default class Roll
     public static initModel(sequelize: Sequelize.Sequelize): typeof Roll {
         Roll.init(
             {
+                id: {
+                    type: DataTypes.STRING(21),
+                    allowNull: false,
+                    defaultValue: () => this.createId({ length: 21 }),
+                    primaryKey: true
+                },
                 name: {
                     type: DataTypes.STRING(128),
                     allowNull: false,
-                    primaryKey: true,
                 },
                 guildId: {
                     type: DataTypes.STRING(255),
                     allowNull: true,
                     defaultValue: 'global'
                 },
-                userId: {
+                discordUserId: {
                     type: DataTypes.STRING(255),
                     allowNull: false
+                },
+                userId: {
+                    type: DataTypes.STRING(64),
+                    allowNull: true
                 },
                 input: {
                     type: DataTypes.STRING(255),
@@ -103,7 +118,13 @@ export default class Roll
                         name: 'PRIMARY',
                         unique: true,
                         using: 'BTREE',
-                        fields: [{ name: 'name' }, { name: 'userId' }, { name: 'guildId' }],
+                        fields: [{ name: 'id' }],
+                    },
+                    {
+                        name: 'discordUserId',
+                        unique: true,
+                        using: 'BTREE',
+                        fields: [{ name: 'name' }, { name: 'discordUserId' }, { name: 'guildId' }],
                     },
                 ],
             }

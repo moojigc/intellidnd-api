@@ -1,0 +1,80 @@
+[
+    {
+        "name": "help",
+        "description": "See a list of available commands!"
+    },
+    {
+        "name": "ping",
+        "description": "Check if server is still up"
+    },
+    {
+        "name": "d",
+        "description": "Rollllll the dice!!!!!",
+        "options": [
+            {
+                "name": "die",
+                "description": "Dice you want to roll",
+                "type": 3,
+                "required": false
+            }
+        ]
+    },
+    {
+        "name": "dice",
+        "description": "Rollllll the dice!!!!!",
+        "options": [
+            {
+                "name": "die",
+                "description": "Dice you want to roll",
+                "type": 3,
+                "required": false
+            }
+        ]
+    },
+    {
+        "name": "hellothere",
+        "description": "memes"
+    },
+    {
+        "name": "x",
+        "description": "Experimental rolls!",
+        "options": [
+            {
+                "name": "dice",
+                "description": "Number of dice (default 1)",
+                "type": 4,
+                "required": false
+            },
+            {
+                "name": "sides",
+                "description": "Number of sides (default 20)",
+                "type": 4,
+                "required": false
+            },
+            {
+                "name": "modifier",
+                "description": "+3, -2, etc.",
+                "type": 3,
+                "required": false
+            },
+            {
+                "name": "name",
+                "description": "What are you rolling for? Initiative?",
+                "type": 3,
+                "required": false
+            }
+        ]
+    },
+    {
+        "name": "list",
+        "description": "See and search a list of all your dice.",
+        "options": [
+            {
+                "name": "Name",
+                "description": "Name of the roll",
+                "type": 3,
+                "required": false
+            }
+        ]
+    }
+]

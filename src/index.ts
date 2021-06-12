@@ -4,10 +4,11 @@ import morgan from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
-import services from './utils/initServices';
+import services from './routers/initServices';
 import requestIp from 'request-ip';
 import { initModels, initSequelize } from './models';
 import Redis from 'redis';
+import { interactionsDevWrapper, interactionsProdWrapper } from 'routers/discordInteractions';
 dotenv.config();
 
 const PROD = process.env.NODE_ENV !== 'development';
@@ -27,11 +28,13 @@ const app = express();
 		credentials: true,
 		methods: ['GET', 'PATCH', 'POST', 'DELETE'],
 	}))
+	.use(interactionsProdWrapper({ db: models, sql: sequelize }))
 	.use(cookieParser())
 	.use(express.urlencoded({ extended: true }))
 	.use(express.json())
 	.use(requestIp.mw())
 	.use(morgan('dev'))
+	.use(interactionsDevWrapper({ db: models, sql: sequelize }))
 	.use(services({
 		db: models,
 		sql: sequelize,
