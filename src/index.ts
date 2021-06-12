@@ -4,11 +4,12 @@ import morgan from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
-import services from './routers/initServices';
 import requestIp from 'request-ip';
-import { initModels, initSequelize } from './models';
 import Redis from 'redis';
-import { interactionsDevWrapper, interactionsProdWrapper } from 'routers/discordInteractions';
+
+import { initModels, initSequelize } from './models';
+import services from './routers/initServices';
+import { interactionsDevWrapper, interactionsProdWrapper } from './routers/discordInteractions';
 dotenv.config();
 
 const PROD = process.env.NODE_ENV !== 'development';
