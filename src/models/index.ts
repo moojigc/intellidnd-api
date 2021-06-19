@@ -119,7 +119,7 @@ export function initModels(sequelize: Sequelize) {
     for (const model of models) {
 
         if (
-            model === 'Model.ts' ||
+            /Model(.js|.ts)/.test(r(model)) ||
             r(model) === __filename
         ) {
             continue;
