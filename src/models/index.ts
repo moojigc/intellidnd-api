@@ -1,20 +1,35 @@
 export type { RollAttributes, RollCreationAttributes } from './Roll';
 export type { Roll };
 import type { Sequelize, Dialect } from 'sequelize';
+import type Roll from './Roll';
+import type { Token } from './Token';
+import type { User } from './User';
+import type { Role } from './Role';
+import type { UserRole } from './UserRole';
+import type { Character } from './Character';
+import type { Inventory } from './Inventory';
+import type Code from './Code';
+import type Wallet from './Wallet';
+import type { Item } from './Item';
+import type GuildUser from './GuildUser';
 
+import { readdirSync } from 'fs';
 import { Sequelize as SeqLibrary } from 'sequelize';
-import Roll from './Roll';
 import { actions, backgrounds, colors, reset } from '../utils/print';
-import { Token } from './Token';
-import { User } from './User';
-import { Role } from './Role';
-import { UserRole } from './UserRole';
-import { Character } from './Character';
-import { Inventory } from './Inventory';
-import Code from './Code';
-import Wallet from './Wallet';
-import { Item } from './Item';
-import GuildUser from './GuildUser';
+
+interface DB {
+    Roll: typeof Roll,
+    Token: typeof Token,
+    User: typeof User,
+    UserRole: typeof UserRole,
+    Role: typeof Role,
+    Code: typeof Code,
+    Character: typeof Character,
+    Inventory: typeof Inventory,
+    Wallet: typeof Wallet,
+    Item: typeof Item,
+    GuildUser: typeof GuildUser,
+};
 
 export function initSequelize({
     INTELLIDND_DB_HOST,
@@ -93,65 +108,79 @@ export function initSequelize({
 
     return sequelize;
 }
+// @ts-ignore
+const db: DB = {};
 
 export function initModels(sequelize: Sequelize) {
 
-    Roll.initModel(sequelize);
-    Token.initModel(sequelize);
-    User.initModel(sequelize);
-    Role.initModel(sequelize);
-    UserRole.initModel(sequelize);
-    Code.initModel(sequelize);
-    Character.initModel(sequelize);
-    Inventory.initModel(sequelize);
-    Wallet.initModel(sequelize);
-    Item.initModel(sequelize);
-    GuildUser.initModel(sequelize);
+    const models = readdirSync(__dirname);
+    const r = (s: string) => __dirname + '/' + s;
+    
+    for (const model of models) {
 
-    User.hasMany(UserRole, {
+        if (
+            model === 'Model.ts' ||
+            r(model) === __filename
+        ) {
+            continue;
+        }
+        try {
+
+            const initialized = require(r(model)).default.initModel(sequelize);
+            db[initialized.name] = initialized;
+        }
+        catch (e) {
+
+            console.log('File: ' + model);
+            console.log(e);
+            process.exit(1);
+        }
+    }
+
+    db.User.hasMany(db.UserRole, {
         foreignKey: 'userId',
         as: 'roles'
     });
-    User.hasMany(Token, {
+    db.User.hasMany(db.Token, {
         foreignKey: 'userId',
         as: 'tokens'
     });
-    User.hasMany(Code, {
+    db.User.hasMany(db.Code, {
         foreignKey: 'userId',
         as: 'codes'
     });
-    Token.belongsTo(User, {
-        foreignKey: 'userId',
-        as: 'user'
-    });
-    User.hasMany(Roll, {
+    db.User.hasMany(db.Roll, {
         foreignKey: 'userId',
         as: 'rolls'
     });
-    Roll.belongsTo(User, {
-        foreignKey: 'userId',
-        as: 'user'
-    });
-    Code.belongsTo(User, {
-        foreignKey: 'userId',
-        as: 'user'
-    });
-    User.hasMany(Character, {
+    db.User.hasMany(db.Character, {
         foreignKey: 'userId',
         as: 'characters'
     });
-    Character.hasOne(Inventory, {
+    db.Token.belongsTo(db.User, {
+        foreignKey: 'userId',
+        as: 'user'
+    });
+    db.Roll.belongsTo(db.User, {
+        foreignKey: 'userId',
+        as: 'user'
+    });
+    db.Code.belongsTo(db.User, {
+        foreignKey: 'userId',
+        as: 'user'
+    });
+    db.Character.hasOne(db.Inventory, {
         foreignKey: 'characterId',
         as: 'inventory'
     });
-    Inventory.hasMany(Item, {
+    db.Inventory.hasMany(db.Item, {
         foreignKey: 'inventoryId',
         as: 'items'
     });
-    Inventory.hasOne(Wallet, {
+    db.Inventory.hasOne(db.Wallet, {
         foreignKey: 'inventoryId',
         as: 'wallet'
-    })
+    });
 
-    return { Roll, Token, User, UserRole, Role, Code, Character, Inventory, Wallet, Item, GuildUser };
+    return db;
 }

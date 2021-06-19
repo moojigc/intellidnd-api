@@ -96,3 +96,4 @@ export class Item
         return Item;
     }
 }
+export default Item;

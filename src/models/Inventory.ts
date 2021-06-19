@@ -84,3 +84,4 @@ export class Inventory
         return Inventory;
     }
 }
+export default Inventory;

@@ -83,3 +83,5 @@ export class UserRole
         return UserRole;
     }
 }
+
+export default UserRole;

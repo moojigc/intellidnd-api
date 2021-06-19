@@ -66,3 +66,5 @@ export class Phone
         return Phone;
     }
 }
+
+export default Phone;

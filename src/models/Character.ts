@@ -248,3 +248,5 @@ export class Character
         return Character;
     }
 }
+
+export default Character;

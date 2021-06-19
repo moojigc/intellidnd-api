@@ -18,7 +18,6 @@ export type TokenCreationAttributes = Optional<
 	TokenPk | 'createdAt'
 >
 
-// @ts-ignore
 export class Token
     extends Model<TokenAttributes, TokenCreationAttributes>
     implements TokenAttributes {
@@ -245,3 +244,5 @@ export class Token
         return Token;
     }
 }
+
+export default Token;

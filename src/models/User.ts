@@ -1,9 +1,12 @@
-import type { Token, TokenId } from './Token';
 
 import Sequelize, { DataTypes, Optional, WhereOptions } from 'sequelize';
+import { Token, TokenId } from './Token';
 import Model from './Model';
 import bcrypt from 'bcryptjs';
 import { UserRole, UserRoleId } from './UserRole';
+import Code from './Code';
+import Roll from './Roll';
+import Character from './Character';
 
 export interface UserAttributes {
     id: string;
@@ -261,8 +264,11 @@ export class User
                         fields: [{ name: 'username' }],
                     },
                 ],
+                
             }
         );
         return User;
     }
 }
+
+export default User;

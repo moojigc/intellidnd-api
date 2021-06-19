@@ -66,3 +66,4 @@ export class Email
         return Email;
     }
 }
+export default Email;
