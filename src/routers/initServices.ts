@@ -8,13 +8,14 @@ import fs from 'fs';
 import { Op } from 'sequelize';
 import { Router } from 'express';
 
-import verifyToken from '@utils/verifyToken';
-import Open5e from '../externalServices/Open5e';
 import { actions, backgrounds, colors, reset } from '@utils/print';
+import verifyToken from '@utils/verifyToken';
 import ServerError from '@utils/Error';
 import validate from '@utils/validate';
 import limiter from '@utils/rateLimiter';
-import DiscordOAuth from 'externalServices/DiscordOAuth';
+
+import Open5e from '../externalServices/Open5e';
+import DiscordOAuth from '../externalServices/DiscordOAuth';
 
 const serviceFolder = __dirname.replace('routers', 'services');
 

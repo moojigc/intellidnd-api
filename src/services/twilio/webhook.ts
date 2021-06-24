@@ -58,6 +58,8 @@ export default new Service({
 
         // @ts-ignore
         const user = await data.db.User.lookup({ identifier: data.payload.From });
+        //@ts-ignore
+        console.log(data.payload.Body)
 
         twiml.message('Whatup, ' + (user ? user.username : 'dude?'));
         return twiml.toString();
