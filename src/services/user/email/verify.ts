@@ -8,10 +8,12 @@ export default new Service({
     roles: ['unverified'],
     async callback({ user, db }) {
 
-        if (!user.emailValidatedAt) {
+        user.email = await user.getEmail();
 
-            await user.update({
-                emailValidatedAt: Date.now()
+        if (!user.email.verifiedAt) {
+
+            await user.email.update({
+                verifiedAt: Date.now()
             });
         }
 

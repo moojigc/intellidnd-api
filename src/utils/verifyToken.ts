@@ -58,7 +58,7 @@ export default function ({
             req.user = user;
             req.roles = {};
 
-            if (user.emailValidatedAt) {
+            if (user.email?.verifiedAt || user.phone?.verifiedAt) {
 
                 req.roles['user'] = true;
             }

@@ -1,12 +1,14 @@
 import { Service } from '@utils/Service';
-import sendEmail from '../../utils/sendEmail';
 import bcrypt from 'bcryptjs';
+import sendVerificationEmail from './_sendVerificationEmail';
+import addPhone from './phone/add';
 
 export default new Service<{
-    email: string;
     password: string;
     verify: string;
 }, {
+    phone: string;
+    email: string;
     username: string;
     firstName: string;
     lastName: string;
@@ -16,11 +18,12 @@ export default new Service<{
     isPublic: true,
     payload: {
         required: {
-            email: 'email',
             password: 'string',
             verify: 'string'
         },
         optional: {
+            phone: 'phone',
+            email: 'email',
             username: 'string',
             firstName: 'string',
             lastName: 'string'
@@ -39,26 +42,17 @@ export default new Service<{
             where: {
                 [data.Op.or]: {
                     email: data.payload.email,
-                    username: data.payload.username || ''
+                    username: data.payload.username || '',
+                    phoneNumber: data.payload.phone
                 }
             }
         });
 
         if (existing && existing.email) {
 
-            if (!existing.emailValidatedAt) {
+            if (!existing.email.verifiedAt) {
 
-                const token = await db.Token.generate({
-                    expires: 'verification',
-                    userId: existing.id,
-                    roles: ['unverified']
-                });
-                
-                await sendEmail({
-                    headers: data.headers,
-                    body: `Verify email address at {host}/signup/verify/email?token=${token.authToken}`,
-                    to: existing.email
-                });
+                await sendVerificationEmail(data, existing);
             }
 
             throw data.err('signup-02', 403);
@@ -69,26 +63,36 @@ export default new Service<{
         const user = await db.User.create({
             username: data.payload.username,
             password: bcrypt.hashSync(data.payload.password),
-            email: data.payload.email,
             firstName: data.payload.firstName,
             lastName: data.payload.lastName
-        }, { transaction });
+        });
 
-        const token = await db.Token.generate({
-            expires: 'verification',
-            userId: user.id,
-            roles: ['unverified']
-        }, transaction);
+        if (data.payload.email) {
+
+            await db.Email.create({
+                address: data.payload.email,
+                userId: user.id
+            });
+
+            user.set({ emailAddress: data.payload.email });
+        }
+
+        if (data.payload.phone) {
+
+            await addPhone.callback({
+                ...data,
+                user,
+                payload: {
+                    phone: data.payload.phone
+                }
+            });
+        }
 
         await transaction.commit();
 
-        if (user.email) {
+        if (user.emailAddress) {
 
-            await sendEmail({
-                headers: data.headers,
-                body: `Verify email address at {host}/signup/verify/email?token=${token.authToken}`,
-                to: user.email
-            });
+            await sendVerificationEmail(data, user);
         }
 
         return {

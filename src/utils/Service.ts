@@ -7,7 +7,8 @@ type PayloadType =
 	| 'integer'
 	| 'null'
 	| 'email'
-	| 'boolean';
+	| 'boolean'
+	| 'phone';
 
 export class Service<R = null, O = {}, P = boolean> {
 	public route: string;

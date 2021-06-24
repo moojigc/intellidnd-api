@@ -17,6 +17,12 @@ export default function(rules: { types: string | string[], field: string; }, dat
 
                 ok = types.includes('email') && /^[^@\s]+@[^@\s\.]+\.[^@\.\s]+$/.test(data);
             }
+            if (!ok && types.includes('phone')) {
+
+                data = data.split('').filter(d => /\d/.test(d)).join('');
+
+                ok = /^\d{10}$|1(\d{10})/.test(data);
+            }
             if (!ok) {
 
                 ok = types.filter(t => new RegExp(t, 'i').test(data)).length > 0;

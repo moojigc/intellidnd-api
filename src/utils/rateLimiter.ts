@@ -11,7 +11,7 @@ export default function limiter(redisClient: Redis.RedisClient, service: Service
     return RateLimit({
         store: new RedisStore({
             client: redisClient,
-            expiry: service.rateLimit.window || 600000
+            expiry: service.rateLimit.window || 60
         }),
         headers: true,
         keyGenerator: (req) => {
@@ -32,6 +32,6 @@ export default function limiter(redisClient: Redis.RedisClient, service: Service
             }).end();
         },
         max: service.rateLimit.max || 5,
-        windowMs: service.rateLimit.window || 600000
+        windowMs: service.rateLimit.window || 60
     });
 }

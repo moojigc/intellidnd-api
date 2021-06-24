@@ -5,6 +5,7 @@ export interface EmailAttributes {
     address: string;
     userId: string;
     createdAt: number;
+    verifiedAt?: number | null;
 }
 
 export type EmailId = Email['userId'] & Email['address']
@@ -19,6 +20,7 @@ export class Email
     address!: string;
     userId!: string;
     createdAt!: number;
+    verifiedAt?: number;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof Email {
         Email.init(
@@ -42,6 +44,10 @@ export class Email
                     allowNull: false,
                     defaultValue: Date.now
                 },
+                verifiedAt: {
+                    type: DataTypes.BIGINT.UNSIGNED,
+                    allowNull: true
+                }
             },
             {
                 sequelize,

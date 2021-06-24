@@ -5,6 +5,7 @@ export interface PhoneAttributes {
     number: string;
     userId: string;
     createdAt: number;
+    verifiedAt?: number;
 }
 
 export type PhoneId = Phone['userId'] & Phone['number']
@@ -19,6 +20,7 @@ export class Phone
     number!: string;
     userId!: string;
     createdAt!: number;
+    verifiedAt?: number;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof Phone {
         Phone.init(
@@ -26,7 +28,19 @@ export class Phone
                 number: {
                     type: DataTypes.STRING(20),
                     allowNull: false,
-                    primaryKey: true
+                    primaryKey: true,
+                    set(p: string) {
+                        this.setDataValue(
+                            'number',
+                            p.split('')
+                            .filter((r) => /\d/.test(r))
+                            .join('')
+                            .padStart(12, '+1')
+                        )
+                    },
+                    get() {
+                        return this.getDataValue('number');
+                    }
                 },
                 userId: {
                     type: DataTypes.STRING(40),
@@ -42,6 +56,10 @@ export class Phone
                     allowNull: false,
                     defaultValue: Date.now
                 },
+                verifiedAt: {
+                    type: DataTypes.BIGINT.UNSIGNED,
+                    allowNull: true
+                }
             },
             {
                 sequelize,

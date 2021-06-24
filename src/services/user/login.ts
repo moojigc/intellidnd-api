@@ -1,5 +1,9 @@
 import Service from '@utils/Service';
 import bcrypt from 'bcryptjs';
+import logout from './logout';
+import setPhone from './phone/add';
+
+import sendVerificationEmail from './_sendVerificationEmail';
 
 export default new Service<{
     password: string;
@@ -18,33 +22,58 @@ export default new Service<{
     //     max: 5,
     //     skipFailed: false,
     //     skipSuccessful: true,
-    //     window: 1000 * 60 * 15
+    //     window: 60 * 15
     // },
-    async callback({ db, err, payload, Op }) {
-        
-        const where = /\d{10}/.test(payload.identifier)
-            ? { phone: payload.identifier }
-            : {
-                [Op.or]: {
-                    email: payload.identifier,
-                    username: payload.identifier,
-                }
-            }
+    async callback(data) {
 
-        const user = await db.User.lookup(where);
+        await logout.callback(data);
+
+        const { db, err, payload, Op, ext } = data;
+
+        const user = await db.User.lookup({ identifier: payload.identifier });
 
         const match = bcrypt.compareSync(
             payload.password, user?.password
             || (payload.password + Date.now()).split('').reverse().join('')
         );
 
+        if (user && !user.password) {
+
+            throw err('login-02', 403, 'No password set.');
+        }
+
         if (!user || !match) {
 
             throw err('login-01', 401);
         }
-        else if (!user.emailValidatedAt) {
 
-            throw err('login-02', 403);
+        const regex = new RegExp(payload.identifier);
+        let key: 'phoneNumber' | 'emailAddress' | 'username';
+        if (user.phoneNumber && regex.test(user.phoneNumber)) {
+            key = 'phoneNumber';
+        }
+        else if (user.emailAddress && regex.test(user.emailAddress)) {
+            key = 'emailAddress';
+        }
+        else {
+            key = 'username';
+        }
+
+        if (!user.phone?.verifiedAt || !user.email?.verifiedAt) {
+            
+            if (user.phone) {
+
+                setPhone.callback({ ...data, payload: { phone: user.phoneNumber! } });
+            }
+            if (user.email) {
+            
+                await sendVerificationEmail(data, user);
+            }
+
+            if (!user.phone?.verifiedAt && !user.email?.verifiedAt) {
+
+                throw err('login-04', 403, 'Please verify your account to proceed.');
+            }
         }
 
         const now = Date.now();

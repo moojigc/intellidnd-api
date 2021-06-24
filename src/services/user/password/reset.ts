@@ -20,12 +20,7 @@ export default new Service<{
             lastPasswordChangeAt: Date.now()
         });
 
-        await db.UserRole.destroy({
-            where: {
-                userId: user.id,
-                roleKey: 'recovery'
-            }
-        });
+        await user.removeRole('recovery');
 
         const session = await db.Token.generate({
             userId: user.id,

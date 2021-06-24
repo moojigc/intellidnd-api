@@ -6,6 +6,7 @@ import type ServerError from '../utils/Error';
 import type { initModels } from '../models';
 import type { User } from '../models/User';
 import type { Twilio } from 'twilio';
+import type DiscordOAuth from 'externalServices/DiscordOAuth';
 
 export interface ServiceData<T = any, U = User> {
     headers: Request['headers'];
@@ -21,7 +22,9 @@ export interface ServiceData<T = any, U = User> {
     db: ReturnType<typeof initModels>;
     ext: {
         twilio: Twilio;
-        Open5e: typeof Open5e
+        Open5e: typeof Open5e;
+        DiscordOAuth: typeof DiscordOAuth;
     };
-    err: typeof ServerError; 
+    env: NodeJS.ProcessEnv;
+    err: typeof ServerError;
 }

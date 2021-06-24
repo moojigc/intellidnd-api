@@ -16,19 +16,29 @@ export default new Service<{
     },
     callback: async ({ user, ext, payload, db, sql, err }) => {
 
-        payload.phone = payload.phone.split('').filter(r => /\d/.test(r)).join('').padStart(12, '+1');
+        payload.phone = payload.phone
+			.split('')
+			.filter((r) => /\d/.test(r))
+			.join('')
+			.padStart(12, '+1');
 
-        // if (user.phone === payload.phone) {
+        if (user.phoneNumber === payload.phone) {
 
-        //     return;
-        // }
+            return;
+        }
 
         const transaction = await sql.transaction();
         
         try {
 
-            await user.update({ phone: payload.phone, phoneVerifiedAt: null }, { transaction });
-    
+            await db.Phone.findOrCreate({
+                where: {
+                    userId: user.id,
+                    number: payload.phone,
+                },
+                transaction
+            });
+            
             await db.Code.destroy({
                 where: {
                     userId: user.id,

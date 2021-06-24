@@ -12,10 +12,12 @@ import type Code from './Code';
 import type Wallet from './Wallet';
 import type { Item } from './Item';
 import type GuildUser from './GuildUser';
+import type Email from './Email';
 
 import { readdirSync } from 'fs';
 import { Sequelize as SeqLibrary } from 'sequelize';
 import { actions, backgrounds, colors, reset } from '../utils/print';
+import Phone from './Phone';
 
 interface DB {
     Roll: typeof Roll,
@@ -29,6 +31,8 @@ interface DB {
     Wallet: typeof Wallet,
     Item: typeof Item,
     GuildUser: typeof GuildUser,
+    Email: typeof Email,
+    Phone: typeof Phone
 };
 
 export function initSequelize({
@@ -156,6 +160,22 @@ export function initModels(sequelize: Sequelize) {
     db.User.hasMany(db.Character, {
         foreignKey: 'userId',
         as: 'characters'
+    });
+    db.User.hasMany(db.Phone, {
+        foreignKey: 'userId',
+        as: 'phones'
+    });
+    db.User.belongsTo(db.Phone, {
+        foreignKey: 'phoneNumber',
+        as: 'phone'
+    });
+    db.User.hasMany(db.Email, {
+        foreignKey: 'userId',
+        as: 'emails'
+    });
+    db.User.belongsTo(db.Email, {
+        foreignKey: 'emailAddress',
+        as: 'email'
     });
     db.Token.belongsTo(db.User, {
         foreignKey: 'userId',

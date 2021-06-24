@@ -8,7 +8,7 @@ export default new Service<{
     method: 'post',
     isPublic: true,
     payload: {
-        optional: {
+        required: {
             identifier: 'string'
         },
     },
@@ -18,17 +18,8 @@ export default new Service<{
         headers,
         Op
     }) {
-
-        const where = /\d{10}/.test(payload.identifier)
-            ? { phone: payload.identifier }
-            : {
-                [Op.or]: {
-                    email: payload.identifier,
-                    username: payload.identifier,
-                }
-            }
             
-        const user = await db.User.lookup(where);
+        const user = await db.User.lookup(payload);
 
         if (!user || !user.email) {
 
@@ -52,11 +43,14 @@ export default new Service<{
             expires: 'verification',
         });
 
-        await sendEmail({
-            to: user.email,
-            body: `Recover your account at {host}/password/recover?token=${token.authToken}`,
-            headers
-        });
+        if (user.emailAddress) {
+
+            await sendEmail({
+                to: user.emailAddress,
+                body: `Recover your account at {host}/password/recover?token=${token.authToken}`,
+                headers
+            });
+        }
 
         this.setInHeader = {
             cookie: {

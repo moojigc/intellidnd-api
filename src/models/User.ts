@@ -1,23 +1,19 @@
 
-import Sequelize, { DataTypes, Optional, WhereOptions } from 'sequelize';
+import Sequelize, { DataTypes, Op, Optional, WhereOptions } from 'sequelize';
 import { Token, TokenId } from './Token';
 import Model from './Model';
-import bcrypt from 'bcryptjs';
 import { UserRole, UserRoleId } from './UserRole';
-import Code from './Code';
-import Roll from './Roll';
-import Character from './Character';
+import Email, { EmailId } from './Email';
+import Phone from './Phone';
 
 export interface UserAttributes {
     id: string;
     username?: string;
     firstName?: string;
     lastName?: string;
-    phone?: string;
-    phoneVerifiedAt?: number;
-    email?: string;
+    phoneNumber?: string;
+    emailAddress?: string;
     password?: string;
-    emailValidatedAt?: number;
     lastLoginAt?: number;
     lastPasswordChangeAt?: number;
     discordId?: string;
@@ -32,7 +28,7 @@ export interface UserAttributes {
 export type UserPk = 'id';
 export type UserId = User[UserPk];
 export type UserCreationAttributes = Optional<
-    UserAttributes, UserPk | 'createdAt' | 'deletedAt' | 'modifiedAt' | 'lastLoginAt' | 'emailValidatedAt'
+    UserAttributes, UserPk | 'createdAt' | 'deletedAt' | 'modifiedAt' | 'lastLoginAt'
 >;
 
 export class User
@@ -42,11 +38,9 @@ export class User
     username?: string;
     firstName?: string;
     lastName?: string;
-    phone?: string;
-    phoneVerifiedAt?: number;
-    email?: string;
+    phoneNumber?: string;
+    emailAddress?: string;
     password?: string;
-    emailValidatedAt?: number;
     lastLoginAt?: number;
     lastPasswordChangeAt?: number;
     discordId?: string;
@@ -76,10 +70,30 @@ export class User
     addRole!: Sequelize.HasManyAddAssociationMixin<UserRole, UserRoleId>;
     addRoles!: Sequelize.HasManyAddAssociationsMixin<UserRole, UserRoleId>;
     createRole!: Sequelize.HasManyCreateAssociationMixin<UserRole>;
-    removeRole!: Sequelize.HasManyRemoveAssociationMixin<
-        UserRole,
-        UserRoleId
-    >;
+
+    async removeRole(key: string) {
+
+        this.roles ??= await this.getRoles({
+            where: {
+                userId: this.id,
+                roleKey: key
+            }
+        });
+
+        for (const index in this.roles) {
+
+            const role = this.roles[index];
+
+            if (role.roleKey === key) {
+
+                await role.destroy();
+                this.roles.splice(Number(index));
+            }
+        }
+
+        return this;
+    }
+
     removeRoles!: Sequelize.HasManyRemoveAssociationsMixin<
         UserRole,
         UserRoleId
@@ -87,6 +101,19 @@ export class User
     hasRole!: Sequelize.HasManyHasAssociationMixin<UserRole, UserRoleId>;
     hasRoles!: Sequelize.HasManyHasAssociationsMixin<UserRole, UserRoleId>;
     countRoles!: Sequelize.HasManyCountAssociationsMixin;
+
+    email: Email;
+    getEmail: Sequelize.BelongsToGetAssociationMixin<Email>;
+
+    emails: Email[];
+    getEmails: Sequelize.HasManyGetAssociationsMixin<Email>;
+    addEmail: Sequelize.HasManyAddAssociationMixin<Email, EmailId>;
+
+    phone: Phone;
+    getPhone: Sequelize.BelongsToGetAssociationMixin<Phone>;
+
+    phones: Phone[];
+    getPhones: Sequelize.HasManyGetAssociationsMixin<Phone>;
 
     public async getRolesMap() {
 
@@ -105,7 +132,7 @@ export class User
 
         return {
             id: this.id,
-            email: this.email,
+            email: this.emailAddress,
             username: this.username,
             name: this.name,
             firstName: this.firstName,
@@ -131,23 +158,45 @@ export class User
         }
         else {
 
-            return this.email;
+            return this.emailAddress;
         }
     }
 
-    public static async lookup(lookup: string | WhereOptions<UserAttributes>) {
+    public static async lookup(lookup: string | WhereOptions<UserAttributes> & { identifier?: string; }) {
+
+        const include = [
+            {
+                model: UserRole,
+                as: 'roles'
+            },
+            {
+                model: Phone,
+                as: 'phone'
+            },
+            {
+                model: Email,
+                as: 'email'
+            }
+        ];
 
         if (typeof lookup === 'string') {
 
             lookup = { id: lookup };
         }
+        else if ('identifier' in lookup) {
+
+            lookup = {
+                [Op.or]: {
+                    phoneNumber: lookup.identifier,
+                    emailAddress: lookup.identifier,
+                    username: lookup.identifier
+                }
+            };
+        }
 
         return await this.findOne({
-            where: lookup,
-            include: {
-                model: UserRole,
-                as: 'roles'
-            }
+            include,
+            where: lookup
         });
     }
 
@@ -158,7 +207,7 @@ export class User
                     type: DataTypes.STRING(40),
                     allowNull: false,
                     primaryKey: true,
-                    defaultValue: () => this.createId({ prefix: 'U', length: 16 })
+                    defaultValue: () => this.createId({ prefix: 'U-', length: 16 })
                 },
                 username: {
                     type: DataTypes.STRING(64),
@@ -173,32 +222,42 @@ export class User
                     type: DataTypes.STRING(64),
                     allowNull: true,
                 },
-                email: {
+                emailAddress: {
                     type: DataTypes.STRING(64),
                     allowNull: false,
                     unique: 'email',
+                    references: {
+                        model: 'email',
+                        key: 'address'
+                    },
                     validate: {
                         isEmail: true
                     }
                 },
-                phone: {
+                phoneNumber: {
                     type: DataTypes.STRING(20),
                     allowNull: true,
-                    validate: {
-                        is: /\d{10}|\+(\d{11})/
+                    references: {
+                        model: 'phone',
+                        key: 'number'
+                    },
+                    get() {
+                        return this.getDataValue('phoneNumber');
+                    },
+                    set(p: string) {
+                        this.setDataValue(
+							'phoneNumber',
+							p
+								.split('')
+								.filter((r) => /\d/.test(r))
+								.join('')
+								.padStart(12, '+1')
+						);
                     }
-                },
-                phoneVerifiedAt: {
-                    type: DataTypes.BIGINT.UNSIGNED,
-                    allowNull: true,
                 },
                 password: {
                     type: DataTypes.TEXT({ length: 'medium' }),
                     allowNull: false,
-                },
-                emailValidatedAt: {
-                    type: DataTypes.BIGINT.UNSIGNED,
-                    allowNull: true,
                 },
                 lastLoginAt: {
                     type: DataTypes.BIGINT.UNSIGNED,

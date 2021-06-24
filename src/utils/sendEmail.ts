@@ -1,10 +1,12 @@
 import { ServiceData } from '@types';
 import nodemailer from 'nodemailer';
 import serverError from './Error';
+import templates from './messageTemplates.json';
+import { regexp } from 'sequelize/types/lib/operators';
 
 export default async function sendEmail(options: {
-    type?: string;
     body?: string;
+    template?: string;
     params?: Record<string, string>;
     to: string;
     subject?: string;
@@ -19,17 +21,27 @@ export default async function sendEmail(options: {
         }
     });
 
-    if (options.type) {
+    if (options.body) {
 
-        if (!options.params) {
+        if (!('params' in options)) {
 
             throw new TypeError('Missing options.params');
         }
     }
     else {
+        
+        if (options.template) {
 
+            options.body = templates[options.template]?.email;
+
+            if (!options.body) {
+
+                throw new Error(`Missing email template ${options.template}`);
+            }
+        }
+        
         if (!options.body) {
-
+            
             throw new TypeError('Missing options.body');
         }
 
@@ -37,7 +49,19 @@ export default async function sendEmail(options: {
             ? 'https://new.intellidnd.com'
             : 'http://localhost:5000';
 
-        options.body = options.body.replace(/{host}/g, host);
+        console.log(options.body)
+
+        options.body = options.body!.replace(/{host}/g, host);
+
+        if (options.params) {
+
+            for (const param in options.params) {
+    
+                const regex = new RegExp('{' + param + '}');
+                options.body = options.body!.replace(regex, options.params[param]);
+                options.subject = options.subject?.replace(regex, options.params[param]);
+            }
+        }
 
         try {
 

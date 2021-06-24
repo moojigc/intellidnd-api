@@ -14,6 +14,7 @@ import { actions, backgrounds, colors, reset } from '@utils/print';
 import ServerError from '@utils/Error';
 import validate from '@utils/validate';
 import limiter from '@utils/rateLimiter';
+import DiscordOAuth from 'externalServices/DiscordOAuth';
 
 const serviceFolder = __dirname.replace('routers', 'services');
 const prefix = '/' + (process.env.VERSION_PREFIX || 'v1');
@@ -103,8 +104,10 @@ export default function(data: {
                         payload: payload,
                         ext: {
                             twilio: twilio,
-                            Open5e: Open5e
+                            Open5e: Open5e,
+                            DiscordOAuth: DiscordOAuth
                         },
+                        env: process.env,
                         err: ServerError
                     });
 

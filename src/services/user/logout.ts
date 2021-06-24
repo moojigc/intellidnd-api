@@ -1,6 +1,6 @@
 import Service from "@utils/Service";
 
-export default new Service({
+export default new Service<{}>({
     route: '/user/logout',
     method: 'post',
     isPublic: false,

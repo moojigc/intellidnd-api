@@ -1,4 +1,4 @@
-require('module-alias/register');
+import './utils/alias';
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
@@ -21,6 +21,8 @@ const redisClient = Redis.createClient({
 	url: process.env.REDIS_URL,
 });
 
+
+
 const app = express();
 	app.disable('x-powered-by')
 	.set('trust proxy', true)
@@ -28,6 +30,7 @@ const app = express();
 		origin: /localhost|intellidnd.com/,
 		credentials: true,
 		methods: ['GET', 'PATCH', 'POST', 'DELETE'],
+		exposedHeaders: ['Limit', 'Remaining', 'Reset'].map(s => `X-RateLimit-${s}`)
 	}))
 	.use(interactionsProdWrapper({ db: models, sql: sequelize }))
 	.use(cookieParser())
