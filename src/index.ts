@@ -42,7 +42,8 @@ const app = express();
 	.use(services({
 		db: models,
 		sql: sequelize,
-		redis: redisClient
+		redis: redisClient,
+		env: process.env
 	}))
 	.all('*', (req, res) => {
 		res.status(404)

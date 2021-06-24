@@ -37,7 +37,7 @@ export default class Code
         try {
 
             return await this.create({
-                data: this.createId({ length: 7 }),
+                data: this.createId({ length: 5, characters: '0123456789' }),
                 type: 'verification',
                 userId: userId,
                 expiresAt: this._expirations.verification

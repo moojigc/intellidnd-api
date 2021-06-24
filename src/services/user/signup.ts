@@ -16,6 +16,12 @@ export default new Service<{
     route: '/user/signup',
     method: 'post',
     isPublic: true,
+    rateLimit: {
+        max: 10,
+        skipFailed: true,
+        skipSuccessful: false,
+        window: 60 * 60
+    },
     payload: {
         required: {
             password: 'string',
@@ -38,22 +44,29 @@ export default new Service<{
             throw data.err('signup-01', 400, 'Passwords must match');
         }
 
-        const existing = await db.User.findOne({
-            where: {
-                [data.Op.or]: {
-                    email: data.payload.email,
-                    username: data.payload.username || '',
-                    phoneNumber: data.payload.phone
+        const [existing, email, phone] = [
+            await db.User.findOne({
+                where: {
+                    [data.Op.or]: {
+                        emailAddress: data.payload.email,
+                        username: data.payload.username || '',
+                        phoneNumber: data.payload.phone
+                    }
                 }
-            }
-        });
+            }),
+            await db.Email.findOne({
+                where: {
+                    address: data.payload.email
+                }
+            }),
+            await db.Phone.findOne({
+                where: {
+                    number: data.payload.phone
+                }
+            })
+        ];
 
-        if (existing && existing.email) {
-
-            if (!existing.email.verifiedAt) {
-
-                await sendVerificationEmail(data, existing);
-            }
+        if (existing || email || phone) {
 
             throw data.err('signup-02', 403);
         }

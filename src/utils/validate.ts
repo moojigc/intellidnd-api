@@ -2,8 +2,8 @@ import serverError from "./Error";
 import validateType from "./validateType";
 
 export default function(service: {
-    required?: Record<string, string | string[]>;
-    optional?: Record<string, string | string[]>;
+    required?: Record<string, string | string[]> | null;
+    optional?: Record<string, string | string[]> | null;
 }, data: any) {
 
     const required = service.required || {};

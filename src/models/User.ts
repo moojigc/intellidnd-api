@@ -224,7 +224,7 @@ export class User
                 },
                 emailAddress: {
                     type: DataTypes.STRING(64),
-                    allowNull: false,
+                    allowNull: true,
                     unique: 'email',
                     references: {
                         model: 'email',
@@ -257,7 +257,7 @@ export class User
                 },
                 password: {
                     type: DataTypes.TEXT({ length: 'medium' }),
-                    allowNull: false,
+                    allowNull: true,
                 },
                 lastLoginAt: {
                     type: DataTypes.BIGINT.UNSIGNED,

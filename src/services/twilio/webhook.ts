@@ -1,8 +1,8 @@
 import { Service } from '@utils/Service';
 import { validateRequest } from 'twilio/lib/webhooks/webhooks';
-import { twiml as Twiml } from 'twilio';
+import twilio, { twiml as Twiml } from 'twilio';
 
-export default new Service<{}, {
+interface TwilioPayload {
     AccountSid: string;
     ApiVersion: string;
     Body: string;
@@ -22,18 +22,31 @@ export default new Service<{}, {
     ToCountry: string;
     ToState: string;
     ToZip: string;
-}>({
+};
+
+export default new Service({
     route: '/twilio/webhook',
     method: 'post',
     isPublic: true,
-    payload: {},
+    payload: {
+        optional: null
+    },
     async callback(data) {
 
-        const valid = validateRequest(
-            data.env.TWILIO_SECRET!,
+        const stuff = [
+            data.env.TWILIO_TOKEN!,
             data.headers['x-twilio-signature'] as string,
-            data.headers['host']! + data.env.PREFIX + this.route,
+            'https://' + data.headers['host']! + '/' + (data.env.PREFIX || 'v1') + this.route,
             data.payload
+        ];
+        console.log(stuff)
+
+        const valid = validateRequest(
+           stuff[0],
+           stuff[1],
+           stuff[2],
+           // @ts-ignore
+           stuff[3]
         );
 
         if (!valid) {
@@ -43,8 +56,10 @@ export default new Service<{}, {
 
         const twiml = new Twiml.MessagingResponse();
 
-        const user = await data.db.User.lookup({ identifier: data.payload.To });
+        // @ts-ignore
+        const user = await data.db.User.lookup({ identifier: data.payload.From });
 
-        twiml.message('Whatup, ' + (user ? user.id : 'dude?'));
+        twiml.message('Whatup, ' + (user ? user.username : 'dude?'));
+        return twiml.toString();
     }
 });

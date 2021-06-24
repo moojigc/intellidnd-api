@@ -17,15 +17,18 @@ import limiter from '@utils/rateLimiter';
 import DiscordOAuth from 'externalServices/DiscordOAuth';
 
 const serviceFolder = __dirname.replace('routers', 'services');
-const prefix = '/' + (process.env.VERSION_PREFIX || 'v1');
 
 export default function(data: {
     db: ServiceData['db'],
-    sql: Sequelize,
-    redis: Redis.RedisClient
+    sql: Sequelize;
+    redis: Redis.RedisClient;
+    env: NodeJS.ProcessEnv;
 }) {
+
+    console.log(data.env)
     
-    const twilio = Twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+    const prefix = '/' + (process.env.VERSION_PREFIX || 'v1');
+    const twilio = Twilio(data.env.TWILIO_SID, data.env.TWILIO_TOKEN);
     const router = Router();
 
     const folders = fs.readdirSync(serviceFolder);
@@ -75,9 +78,12 @@ export default function(data: {
                 + reset
             );
 
+            const customMiddleware = service.middleware || [];
+
             router[service.method](prefix + service.route,
                 verifyToken({ db: data.db, err: ServerError, service }),
                 limiter(data.redis, service),
+                ...customMiddleware,
                 async (req, res, next) => {
 
                 const payload = (req.method === 'GET' ? req.query : req.body) || {};
@@ -132,7 +138,7 @@ export default function(data: {
                                 expires: maxAge,
                                 httpOnly: true,
                                 sameSite: 'lax',
-                                secure: process.env.NODE_ENV === 'PRODUCTION'
+                                secure: data.env.NODE_ENV === 'PRODUCTION'
                             });
                         }
                     }
@@ -143,7 +149,7 @@ export default function(data: {
 
                     res.end();
 
-                    if (process.env.LOG_RESPONSES) {
+                    if (data.env.LOG_RESPONSES) {
 
                         if (typeof response === 'object' && response !== null) {
 

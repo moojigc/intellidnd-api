@@ -1,5 +1,6 @@
-import { User } from '@models/User';
+import type { User } from '@models/User';
 import type { ServiceData } from '@types';
+import type { NextFunction, Request, Response } from 'express';
 
 type PayloadType =
 	| 'string'
@@ -15,9 +16,10 @@ export class Service<R = null, O = {}, P = boolean> {
 	public method: 'get' | 'post' | 'delete' | 'patch' | 'all';
 	public isPublic: P;
 	public roles: string[];
+	public middleware?: Array<(req: Request, res: Response, next: NextFunction) => any>;
 	public payload: {
-		required?: Record<keyof R, PayloadType | PayloadType[]>;
-		optional?: Record<keyof O, PayloadType | PayloadType[]>;
+		required?: Record<keyof R, PayloadType | PayloadType[]> | null;
+		optional?: Record<keyof O, PayloadType | PayloadType[]> | null;
 	};
 	public callback: (data: ServiceData<R & Partial<O>, User>) => any;
 	public rateLimit?: {
