@@ -108,6 +108,7 @@ export class User
     emails: Email[];
     getEmails: Sequelize.HasManyGetAssociationsMixin<Email>;
     addEmail: Sequelize.HasManyAddAssociationMixin<Email, EmailId>;
+    createEmail: Sequelize.HasManyCreateAssociationMixin<Email>;
 
     phone: Phone;
     getPhone: Sequelize.BelongsToGetAssociationMixin<Phone>;
@@ -140,8 +141,10 @@ export class User
             roles: this.roles?.map(r => r.roleKey) || null,
             createdAt: this.createdAt,
             modifiedAt: this.modifiedAt,
-            lastLoginAt: this.lastLoginAt
-        }
+            lastLoginAt: this.lastLoginAt,
+            emails: this.emails,
+            phones: this.phones
+        };
     }
 
     get name() {

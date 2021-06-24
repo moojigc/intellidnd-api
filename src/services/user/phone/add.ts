@@ -1,3 +1,4 @@
+import sendSms from '@utils/sendSms';
 import Service from '@utils/Service';
 
 export default new Service<{
@@ -19,10 +20,9 @@ export default new Service<{
         payload.phone = payload.phone
 			.split('')
 			.filter((r) => /\d/.test(r))
-			.join('')
-			.padStart(12, '+1');
+			.join('');
 
-        if (user.phoneNumber === payload.phone) {
+        if (user.phones.filter(p => p.number === payload.phone).length) {
 
             return;
         }
@@ -31,28 +31,26 @@ export default new Service<{
         
         try {
 
-            await db.Phone.findOrCreate({
-                where: {
-                    userId: user.id,
-                    number: payload.phone,
-                },
-                transaction
-            });
-            
-            await db.Code.destroy({
-                where: {
-                    userId: user.id,
-                    type: 'phone-verification'
-                },
+            const phone = await db.Phone.create({
+                userId: user.id,
+                number: payload.phone,
+            }, {
                 transaction
             });
     
-            const code = await db.Code.createVerificationCode(user.id, transaction);
+            const code = await db.Code.createVerificationCode(user.id, {
+                transaction,
+                parentEntity: 'phone',
+                parentId: phone.number
+            });
     
-            await ext.twilio.messages.create({
-                body: `Your IntelliDnD verification code is ${code.data}`,
-                from: '+' + process.env.TWILIO_FROM,
-                to: payload.phone
+            await sendSms({
+                twilio: ext.twilio,
+                user,
+                template: 'verification',
+                params: {
+                    code: code.data
+                }
             });
         }
         catch (e) {

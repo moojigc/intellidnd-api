@@ -35,7 +35,6 @@ export class Phone
                             p.split('')
                             .filter((r) => /\d/.test(r))
                             .join('')
-                            .padStart(12, '+1')
                         )
                     },
                     get() {

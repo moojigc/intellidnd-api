@@ -26,8 +26,6 @@ export default function(data: {
     env: NodeJS.ProcessEnv;
 }) {
 
-    console.log(data.env)
-    
     const prefix = '/' + (process.env.VERSION_PREFIX || 'v1');
     const twilio = Twilio(data.env.TWILIO_SID, data.env.TWILIO_TOKEN);
     const router = Router();
@@ -180,6 +178,15 @@ export default function(data: {
                     if (!err.status || err.status >= 500) {
 
                         console.log(err);
+                    }
+
+                    if (req.cookies.refresh) {
+
+                        res.clearCookie('refresh', {
+                            httpOnly: true,
+                            sameSite: 'lax',
+                            secure: data.env.NODE_ENV === 'PRODUCTION'
+                        });
                     }
 
                     res.status(err.status || 500).json({

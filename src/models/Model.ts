@@ -20,7 +20,7 @@ export default class Model<
         if (prefix) { ret += prefix; }
 
         const fn = characters
-            ? () => customAlphabet(characters, length || 16)
+            ? customAlphabet(characters, length || 16)
             : () => nanoid(length || 16)
 
         ret += fn();

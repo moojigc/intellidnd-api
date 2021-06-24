@@ -44,14 +44,10 @@ export default new Service<{
             throw data.err('signup-01', 400, 'Passwords must match');
         }
 
-        const [existing, email, phone] = [
+        const existingItems = [
             await db.User.findOne({
                 where: {
-                    [data.Op.or]: {
-                        emailAddress: data.payload.email,
-                        username: data.payload.username || '',
-                        phoneNumber: data.payload.phone
-                    }
+                    username: data.payload.username
                 }
             }),
             await db.Email.findOne({
@@ -64,11 +60,21 @@ export default new Service<{
                     number: data.payload.phone
                 }
             })
-        ];
+        ] as const;
 
-        if (existing || email || phone) {
+        if (existingItems.filter(n => !!n).length) {
 
-            throw data.err('signup-02', 403);
+            const existing = ['username', 'address', 'number']
+                .filter(
+                    p => existingItems.filter(i => i && p in i).length
+                )
+                .map(p => ({
+                    username: 'username',
+                    address: 'email',
+                    number: 'phone'
+                })[p]);
+
+            throw data.err('signup-02', 403, existing.join(','));
         }
 
         const transaction = await data.sql.transaction();
@@ -101,14 +107,34 @@ export default new Service<{
             });
         }
 
+        await user.createRole({
+            userId: user.id,
+            roleKey: 'unverified'
+        }, { transaction });
+
         await transaction.commit();
 
         if (user.emailAddress) {
 
-            await sendVerificationEmail(data, user);
+            await sendVerificationEmail(data, user, user.emailAddress);
         }
 
+        const token = await db.Token.generate({
+            userId: user.id,
+            roles: ['unverified'],
+            expires: 'session',
+        });
+
+        this.setInHeader = {
+            cookie: {
+                maxAge: token.sessionExpiresAt,
+                value: token.refreshToken
+            }
+        };
+
         return {
+            token: token.authToken,
+            expiresAt: token.expiresAt,
             name: user.name,
             username: user.username,
             firstName: user.firstName,

@@ -5,7 +5,8 @@ import sendEmail from '@utils/sendEmail';
 
 export default async function sendVerificationEmail(
 	{ db, headers, err }: ServiceData,
-	user: User
+	user: User,
+	email: string
 ) {
 
     if (!user.emailAddress) {
@@ -13,10 +14,9 @@ export default async function sendVerificationEmail(
         throw err('verification-01', 403);
     }
 
-	const token = await db.Token.generate({
-		expires: 'verification',
-		userId: user.id,
-		roles: ['unverified'],
+	const code = await db.Code.createVerificationCode(user.id, {
+		parentId: email,
+		parentEntity: 'email'
 	});
 
 	await sendEmail({
@@ -24,7 +24,7 @@ export default async function sendVerificationEmail(
 		template: 'verification',
 		to: user.emailAddress!,
         params: {
-            token: token.authToken
+            token: code.data
         }
 	});
 }

@@ -1,3 +1,4 @@
+import type User from './User';
 import Sequelize, { DataTypes, Optional } from 'sequelize';
 import Model from './Model';
 
@@ -21,6 +22,8 @@ export class Email
     userId!: string;
     createdAt!: number;
     verifiedAt?: number;
+
+    getUser: Sequelize.BelongsToGetAssociationMixin<User>;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof Email {
         Email.init(

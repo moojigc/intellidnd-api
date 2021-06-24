@@ -1,4 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 interface TokenResponse {
     access_token: string;
@@ -79,6 +81,7 @@ export default class DiscordOAuth implements TokenResponse, DiscordUser {
 		}
         catch (e) {
 
+            console.log(e.response);
             if (e.response && e.response === 401) {
 
 
@@ -100,11 +103,11 @@ export default class DiscordOAuth implements TokenResponse, DiscordUser {
             : 'https://new.intellidnd.com';
             
         const creds = this._formURLEncode({
-            'client_id': process.env.DISCORD_CLIENT_ID!,
-            'client_secret': process.env.DISCORD_CLIENT_SECRET!,
+            'client_id': process.env.INTELLIDND_DISCORD_CLIENT_ID!,
+            'client_secret': process.env.INTELLIDND_DISCORD_CLIENT_SECRET!,
             'grant_type': 'authorization_code',
             'code': code,
-            'redirect_uri': ui + process.env.DISCORD_REDIRECT || '/oauth/discord'
+            'redirect_uri': ui + (process.env.DISCORD_REDIRECT || '/oauth/discord')
         })
 
 		const res = await this._request<TokenResponse>('/oauth2/token', 'POST', {
@@ -124,7 +127,11 @@ export default class DiscordOAuth implements TokenResponse, DiscordUser {
 
     public async getProfile() {
 
-        const res = await this._request<DiscordUser>('/users/@me');
+        const res = await this._request<DiscordUser>('/users/@me', 'GET', {
+            headers: {
+                Authorization: `Bearer ${this.access_token}`
+            }
+        });
 
         for (const k in res) {
 

@@ -33,11 +33,11 @@ export default function(service: {
 
         if (k in required) {
 
-            validateType({ types: required[k], field: k }, data[k]);
+            data[k] = validateType({ types: required[k], field: k }, data[k]);
         }
         else if (k in optional) {
 
-            validateType({ types: optional[k], field: k }, data[k]);
+            data[k] = validateType({ types: optional[k], field: k }, data[k]);
         }
     }
 }

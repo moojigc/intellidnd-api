@@ -78,6 +78,11 @@ export default function ({
                 }
             }
 
+            if (!req.roles.user || req.roles.unverified) {
+
+                permitted = false;
+            }
+
             if (!permitted) {
 
                 throw err('auth-08', 403);

@@ -3,7 +3,7 @@ import Service from '@utils/Service';
 export default new Service<{
     email: string;
 }>({
-    route: '/user/phone',
+    route: '/user/email',
     method: 'post',
     isPublic: false,
     rateLimit: {
@@ -16,7 +16,7 @@ export default new Service<{
     },
     callback: async ({ user, ext, payload, db, sql, err }) => {
 
-        if (user.emailAddress === payload.email) {
+        if (user.emails.filter(e => e.address === payload.email).length) {
 
             return;
         }
@@ -34,7 +34,7 @@ export default new Service<{
 
             await transaction.rollback();
 
-            throw err('set_phone-01', 500, e.message, e);
+            throw err('add_email-01', 500, e.message, e);
         }
 
         await transaction.commit();

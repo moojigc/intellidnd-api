@@ -65,7 +65,7 @@ export default new Service<{
         }
         if (user.email && !user.email.verifiedAt) {
         
-            await sendVerificationEmail(data, user);
+            await sendVerificationEmail(data, user, user.email.address);
         }
         if (!user.phone?.verifiedAt && !user.email?.verifiedAt) {
 

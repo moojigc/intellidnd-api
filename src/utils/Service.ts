@@ -42,7 +42,8 @@ export class Service<R = null, O = {}, P = boolean> {
 			this[k] = options[k];
 		}
 
-		this.roles ??= ['user'];
+		this.roles ??= [];
+		this.roles.push('user');
 	}
 }
 export default Service;

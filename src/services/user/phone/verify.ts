@@ -3,7 +3,7 @@ import { Service } from '@utils/Service';
 export default new Service<{
     phone: string;
 }>({
-    route: '/user/phone/verify',
+    route: '/user/phone/:param1/verify',
     method: 'patch',
     isPublic: false,
     payload: {
@@ -15,11 +15,7 @@ export default new Service<{
 
         await db.Code.verify(user.id, param1);
 
-        const phone = await user.getPhone({
-            where: {
-                number: payload.phone
-            }
-        });
+        const [phone] = user.phones.filter(p => p.number === param1);
 
         if (!phone) {
 
@@ -29,20 +25,5 @@ export default new Service<{
         await phone.update({
             verifiedAt: Date.now()
         });
-
-        await user.update({
-            phone: payload.phone
-        });
-
-        await db.Phone.destroy({
-            where: {
-                number: {
-                    [Op.not]: user.phoneNumber
-                },
-                userId: user.id
-            }
-        });
-
-        return;
     }
 });

@@ -2,6 +2,7 @@ import Sequelize, { DataTypes, Op, Optional } from 'sequelize';
 import Model from './Model';
 import jwt from 'jsonwebtoken';
 import type { User, UserId } from './User';
+import DiscordOAuth from 'externalServices/DiscordOAuth';
 export interface TokenAttributes {
     id: string;
     jwt: string;
@@ -76,9 +77,12 @@ export class Token
     private static _getJwt(payload: {
         id: string;
         userId: string;
+        discordAuth?: string;
+        discordRefresh?: string;
     } | {
         userId: string;
         roles: string;
+        discordAuth?: string;
     }, type: 'refresh' | 'auth', expiresIn: number | null) {
 
         const secret = {
@@ -98,6 +102,7 @@ export class Token
     };
 
     public static getAuthToken(payload: {
+        discordAuth?: string;
         userId: string;
         roles: string;
     }) {
@@ -116,11 +121,13 @@ export class Token
     public static async generate({
         userId,
         roles,
-        expires
+        expires,
+        discordOAuth
     }: {
         userId: string;
         roles: string[];
         expires: 'verification' | 'session';
+        discordOAuth?: DiscordOAuth;
     }, transaction?: Sequelize.Transaction) {
 
         await this.destroy({
@@ -134,14 +141,20 @@ export class Token
         });
 
         const id = this.createId();
+        const options: Parameters<typeof Token['_getJwt']>[0] = {
+            id,
+            userId: userId,
+        };
+        
+        if (discordOAuth) {
+            options.discordAuth = discordOAuth.access_token;
+            options.discordRefresh = discordOAuth.refresh_token;
+        }
 
         const refreshToken = this._getJwt(
-			{
-				id: id,
-				userId: userId,
-			},
+			options,
 			'refresh',
-			expires
+			discordOAuth?.expires_in || expires
 				? Math.ceil(this._expirationMap[expires].refresh / 1000)
 				: null
 		);
@@ -150,6 +163,7 @@ export class Token
 			{
 				userId: userId,
 				roles: roles.join(','),
+                discordAuth: discordOAuth ? discordOAuth.access_token : undefined
 			},
 			'auth',
 			Math.ceil(this._expirationMap[expires].auth / 1000)

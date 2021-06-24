@@ -201,6 +201,10 @@ export function initModels(sequelize: Sequelize) {
         foreignKey: 'inventoryId',
         as: 'wallet'
     });
+    db.Email.belongsTo(db.User, {
+        foreignKey: 'userId',
+        as: 'user'
+    });
 
     return db;
 }

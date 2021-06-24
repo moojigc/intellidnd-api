@@ -21,7 +21,7 @@ export default function(rules: { types: string | string[], field: string; }, dat
 
                 data = data.split('').filter(d => /\d/.test(d)).join('');
 
-                ok = /^\d{10}$|1(\d{10})/.test(data);
+                ok = /^\d{10}$/.test(data);
             }
             if (!ok) {
 
@@ -43,4 +43,6 @@ export default function(rules: { types: string | string[], field: string; }, dat
 
         throw serverError('validate_type-01', 400, `${rules.field} must be type ${types}`);
     }
+
+    return data;
 }

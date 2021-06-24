@@ -49,7 +49,7 @@ export default async function sendSms({
     try {
 
         await twilio.messages.create({
-            to: user.phoneNumber,
+            to: '+1' + user.phoneNumber,
             body: message,
             from: process.env.TWILIO_FROM
         });

@@ -8,6 +8,8 @@ import Model from './Model';
 export interface CodeAttributes {
     data: string;
     type: 'verification';
+    parentId?: string;
+    parentEntity?: 'phone' | 'email' | 'password';
     userId: string;
     expiresAt?: number;
     createdAt: number;
@@ -23,6 +25,8 @@ export default class Code
 
     data: string;
     type: 'verification';
+    parentId?: string;
+    parentEntity?: 'phone' | 'email' | 'password';
     userId: string;
     expiresAt?: number;
     createdAt: number;
@@ -32,16 +36,36 @@ export default class Code
         verification: 1000 * 60 * 5
     };
 
-    public static async createVerificationCode(userId: string, transaction?: Transaction): Promise<Code> {
+    public static async createVerificationCode(userId: string, options?: {
+        transaction?: Transaction;
+        parentId?: string;
+        parentEntity?: Code['parentEntity'];
+    }): Promise<Code> {
 
+        options ??= {};
         try {
 
+            if (options.parentId || options.parentEntity) {
+
+                await this.destroy({
+                    where: {
+                        userId: userId,
+                        type: 'verification',
+                        parentEntity: options.parentEntity,
+                        parentId: options.parentId
+                    },
+                    transaction: options.transaction
+                });
+            }
+
             return await this.create({
-                data: this.createId({ length: 5, characters: '0123456789' }),
+                data: this.createId({ length: 6, characters: '0123456789' }),
                 type: 'verification',
                 userId: userId,
+                parentId: options.parentId,
+                parentEntity: options.parentEntity,
                 expiresAt: this._expirations.verification
-            }, { transaction });
+            }, { transaction: options.transaction });
         }
         catch (e) {
 
@@ -88,6 +112,14 @@ export default class Code
                     type: DataTypes.STRING(20),
                     allowNull: false,
                     defaultValue: 'verification'
+                },
+                parentId: {
+                    type: DataTypes.STRING(64),
+                    allowNull: true
+                },
+                parentEntity: {
+                    type: DataTypes.STRING('64'),
+                    allowNull: true
                 },
                 userId: {
                     type: DataTypes.STRING(40),
