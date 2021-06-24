@@ -18,12 +18,12 @@ export default new Service<{
             identifier: 'string'
         },
     },
-    // rateLimit: {
-    //     max: 5,
-    //     skipFailed: false,
-    //     skipSuccessful: true,
-    //     window: 60 * 15
-    // },
+    rateLimit: {
+        max: 5,
+        skipFailed: false,
+        skipSuccessful: true,
+        window: 60 * 15
+    },
     async callback(data) {
 
         await logout.callback(data);
@@ -59,21 +59,17 @@ export default new Service<{
             key = 'username';
         }
 
-        if (!user.phone?.verifiedAt || !user.email?.verifiedAt) {
-            
-            if (user.phone) {
+        if (user.phone && !user.phone.verifiedAt) {
 
-                setPhone.callback({ ...data, payload: { phone: user.phoneNumber! } });
-            }
-            if (user.email) {
-            
-                await sendVerificationEmail(data, user);
-            }
+            setPhone.callback({ ...data, payload: { phone: user.phoneNumber! } });
+        }
+        if (user.email && !user.email.verifiedAt) {
+        
+            await sendVerificationEmail(data, user);
+        }
+        if (!user.phone?.verifiedAt && !user.email?.verifiedAt) {
 
-            if (!user.phone?.verifiedAt && !user.email?.verifiedAt) {
-
-                throw err('login-04', 403, 'Please verify your account to proceed.');
-            }
+            throw err('login-04', 403, 'Please verify your account to proceed.');
         }
 
         const now = Date.now();
