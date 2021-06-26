@@ -5,6 +5,7 @@ export default new Service({
     method: 'post',
     isPublic: true,
     payload: {},
+    roles: ['user', 'unverified'],
     // rateLimit: {
     //     max: 2,
     //     window: 1000 * 60 * 1,

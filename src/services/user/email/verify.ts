@@ -1,38 +1,31 @@
 import { Service } from '@utils/Service';
+import initSession from '../_initSession';
 
 export default new Service({
-    route: '/user/verify/email',
+    route: '/user/email/:param1/verify',
     payload: {},
     method: 'patch',
     isPublic: false,
     roles: ['unverified'],
-    async callback({ user, db }) {
+    async callback(data) {
 
-        user.email = await user.getEmail();
+        const { user, db, err, param1 } = data;
 
-        if (!user.email.verifiedAt) {
-
-            await user.email.update({
-                verifiedAt: Date.now()
-            });
+        const [email] = user.emails.filter(e => e.address === param1); 
+        
+        if (!email) {
+            err('email_verify-01', 403);
         }
 
-        const token = await db.Token.generate({
-            userId: user.id,
-            expires: 'session',
-            roles: (await user.getRoles()).map(r => r.roleKey)
-        });
+        if (!email.verifiedAt) {
 
-        this.setInHeader = {
-            cookie: {
-                maxAge: token.sessionExpiresAt,
-                value: token.refreshToken
-            }
-        };
+            await email.update({
+                verifiedAt: Date.now()
+            });
 
-        return {
-            token: token.authToken,
-            expiresAt: token.expiresAt
-        };
+            await user.removeRole('unverified');
+        }
+
+        return await initSession(data, user, this);
     }
 });;

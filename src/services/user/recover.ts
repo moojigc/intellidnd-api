@@ -1,5 +1,6 @@
 import { Service } from '@utils/Service';
 import sendEmail from '@utils/sendEmail';
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export default new Service<{
     identifier: string;
@@ -15,15 +16,32 @@ export default new Service<{
     async callback({
         db,
         payload,
-        headers,
-        Op
+        headers
     }) {
-            
-        const user = await db.User.lookup(payload);
+        let [user, phone, email] = [
+			await db.User.lookup(payload),
+			await db.Phone.findByPk(payload.identifier),
+			await db.Email.findByPk(payload.identifier),
+		];
 
-        if (!user || !user.email) {
-
+        if (!user || !phone || !email) {
+            console.log('nope')
+            await sleep(Math.floor(Math.random() * 1000));
             return;
+        }
+        else if (!phone || !email) {
+
+            phone = user.phone;
+            email = user.email;
+        }
+        else if (!user) {
+
+            if (phone) {
+                user = await phone.getUser();
+            }
+            else {
+                user = await email.getUser();
+            }
         }
 
         const role = await db.UserRole.create({
@@ -31,11 +49,11 @@ export default new Service<{
             roleKey: 'recovery',
         });
 
-        await db.Token.destroy({
-            where: {
-                userId: user.id
-            }
-        });
+        // await db.Token.destroy({
+        //     where: {
+        //         userId: user.id
+        //     }
+        // });
 
         const token = await db.Token.generate({
             roles: [role.roleKey],

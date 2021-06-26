@@ -4,17 +4,33 @@ import messageTemplate from './messageTemplates.json';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+export default async function sendSms(options: {
+    twilio: Twilio;
+    template?: string;
+    message?: string;
+    user?: User;
+    params: Record<string, string>;
+}): Promise<void>;
+export default async function sendSms(options: {
+    twilio: Twilio;
+    template?: string;
+    message?: string;
+    to?: string;
+    params: Record<string, string>;
+}): Promise<void>;
 export default async function sendSms({
     twilio,
     template,
     user,
     message,
+    to,
     params
 }: {
     twilio: Twilio;
     template?: string;
     message?: string;
-    user: User;
+    to?: string;
+    user?: User;
     params: Record<string, string>;
 }) {
 
@@ -41,7 +57,7 @@ export default async function sendSms({
         }
     }
 
-    if (!user.phoneNumber) {
+    if (!user?.phoneNumber && !to) {
 
         throw new Error('SMS: No phone number found.');
     }
@@ -49,7 +65,7 @@ export default async function sendSms({
     try {
 
         await twilio.messages.create({
-            to: '+1' + user.phoneNumber,
+            to: '+1' + (to || user?.phoneNumber),
             body: message,
             from: process.env.TWILIO_FROM
         });

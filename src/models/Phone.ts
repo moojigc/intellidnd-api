@@ -1,5 +1,6 @@
 import Sequelize, { DataTypes, Optional } from 'sequelize';
 import Model from './Model';
+import User from './User';
 
 export interface PhoneAttributes {
     number: string;
@@ -21,6 +22,8 @@ export class Phone
     userId!: string;
     createdAt!: number;
     verifiedAt?: number;
+
+    getUser: Sequelize.BelongsToGetAssociationMixin<User>;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof Phone {
         Phone.init(

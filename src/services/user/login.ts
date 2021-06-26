@@ -1,7 +1,9 @@
+import { middleware } from '@utils/format';
 import Service from '@utils/Service';
 import bcrypt from 'bcryptjs';
 import logout from './logout';
 import setPhone from './phone/add';
+import initSession from './_initSession';
 
 import sendVerificationEmail from './_sendVerificationEmail';
 
@@ -18,19 +20,25 @@ export default new Service<{
             identifier: 'string'
         },
     },
-    rateLimit: {
-        max: 5,
-        skipFailed: false,
-        skipSuccessful: true,
-        window: 60 * 15
-    },
+    // rateLimit: {
+    //     max: 5,
+    //     skipFailed: false,
+    //     skipSuccessful: true,
+    //     window: 60 * 15
+    // },
     async callback(data) {
 
         await logout.callback(data);
 
         const { db, err, payload, Op, ext } = data;
 
-        const user = await db.User.lookup({ identifier: payload.identifier });
+        let user = await db.User.lookup({ identifier: payload.identifier });
+        user ??= await (
+                await db.Phone.findByPk(payload.identifier)
+            )?.getUser() || null;
+        user ??= await (
+                await db.Email.findByPk(payload.identifier)
+            )?.getUser() || null;
 
         const match = bcrypt.compareSync(
             payload.password, user?.password
@@ -46,6 +54,8 @@ export default new Service<{
 
             throw err('login-01', 401);
         }
+
+        await user.populate();
 
         const regex = new RegExp(payload.identifier);
         let key: 'phoneNumber' | 'emailAddress' | 'username';
@@ -77,24 +87,6 @@ export default new Service<{
             lastLoginAt: now
         });
 
-        const token = await db.Token.generate({
-            expires: 'session',
-            userId: user.id,
-            roles: (await user.getRoles()).map(r => r.roleKey),
-        });
-
-        this.setInHeader = {
-            cookie: {
-                value: token.refreshToken,
-                maxAge: token.sessionExpiresAt
-            }
-        };
-        
-        return {
-			token: token.authToken,
-			expiresAt: token.expiresAt ? token.expiresAt : null,
-			name: user.name,
-			email: user.email,
-		};
+        return await initSession(data, user, this);
     },
 })

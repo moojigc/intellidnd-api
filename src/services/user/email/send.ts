@@ -1,10 +1,8 @@
 import { Service } from '@utils/Service';
 import sendVerificationEmail from '../_sendVerificationEmail';
 
-export default new Service<{
-    email: string;
-}>({
-    route: '/user/email/:param1/resend',
+export default new Service({
+    route: '/user/email/:param1/send',
     payload: {},
     method: 'post',
     isPublic: false,

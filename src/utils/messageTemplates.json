@@ -1,6 +1,6 @@
 {
     "verification": {
-        "email": "Thank you for signing up to IntelliDnD.\n\nPlease verify your email address at the following link: {host}/verify/email?token={token}",
+        "email": "Thank you for signing up to IntelliDnD.\n\nYour code is {token}.\n\nOr you can click the following link: {host}/verify?email={email}&code={token}",
         "phone": "Thanks for signing up to IntelliDnD!\n\nRespond YES to this number, or enter this code online: {code} to verify your phone number."
     }
 }

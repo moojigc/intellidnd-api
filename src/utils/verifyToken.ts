@@ -47,7 +47,7 @@ export default function ({
         
                 throw err('auth-03', 401, 'Invalid token');
             }
-            
+        
             const user = await db.User.lookup(decoded.userId);
 
             if (!user) {
@@ -69,18 +69,13 @@ export default function ({
             }
 
             let permitted = false;
-
+            
             for (const r of service.roles) {
 
                 if (r in req.roles) {
 
                     permitted = true;
                 }
-            }
-
-            if (!req.roles.user || req.roles.unverified) {
-
-                permitted = false;
             }
 
             if (!permitted) {

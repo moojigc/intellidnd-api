@@ -5,6 +5,7 @@ import Model from './Model';
 import { UserRole, UserRoleId } from './UserRole';
 import Email, { EmailId } from './Email';
 import Phone from './Phone';
+import { phone } from '@utils/format';
 
 export interface UserAttributes {
     id: string;
@@ -71,6 +72,17 @@ export class User
     addRoles!: Sequelize.HasManyAddAssociationsMixin<UserRole, UserRoleId>;
     createRole!: Sequelize.HasManyCreateAssociationMixin<UserRole>;
 
+    async populate() {
+
+        this.emails ??= await this.getEmails();
+        this.phones ??= await this.getPhones();
+
+        this.email ??= this.emails.filter(e => e.address === this.emailAddress)[0] || null;
+        this.phone ??= this.phones.filter(p => p.number === this.phoneNumber)[0] || null;
+        
+        return this;
+    }
+
     async removeRole(key: string) {
 
         this.roles ??= await this.getRoles({
@@ -134,6 +146,7 @@ export class User
         return {
             id: this.id,
             email: this.emailAddress,
+            phone: this.phoneNumber,
             username: this.username,
             name: this.name,
             firstName: this.firstName,
@@ -143,7 +156,8 @@ export class User
             modifiedAt: this.modifiedAt,
             lastLoginAt: this.lastLoginAt,
             emails: this.emails,
-            phones: this.phones
+            phones: this.phones,
+            verified: Boolean(this.email?.verifiedAt || this.phone?.verifiedAt)
         };
     }
 
@@ -179,6 +193,14 @@ export class User
             {
                 model: Email,
                 as: 'email'
+            },
+            {
+                model: Phone,
+                as: 'phones'
+            },
+            {
+                model: Email,
+                as: 'emails'
             }
         ];
 
@@ -244,19 +266,6 @@ export class User
                         model: 'phone',
                         key: 'number'
                     },
-                    get() {
-                        return this.getDataValue('phoneNumber');
-                    },
-                    set(p: string) {
-                        this.setDataValue(
-							'phoneNumber',
-							p
-								.split('')
-								.filter((r) => /\d/.test(r))
-								.join('')
-								.padStart(12, '+1')
-						);
-                    }
                 },
                 password: {
                     type: DataTypes.TEXT({ length: 'medium' }),

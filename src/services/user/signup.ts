@@ -2,14 +2,16 @@ import { Service } from '@utils/Service';
 import bcrypt from 'bcryptjs';
 import sendVerificationEmail from './_sendVerificationEmail';
 import addPhone from './phone/add';
+import initSession from './_initSession';
+import { middleware } from '@utils/format';
 
 export default new Service<{
     password: string;
     verify: string;
+    username: string;
 }, {
     phone: string;
     email: string;
-    username: string;
     firstName: string;
     lastName: string;
 }>({
@@ -24,17 +26,18 @@ export default new Service<{
     },
     payload: {
         required: {
+            username: 'string',
             password: 'string',
             verify: 'string'
         },
         optional: {
             phone: 'phone',
             email: 'email',
-            username: 'string',
             firstName: 'string',
             lastName: 'string'
         }
     },
+    middleware: [middleware.phone('phone')],
     async callback(data) {
 
         const db = data.db;
@@ -50,15 +53,11 @@ export default new Service<{
                     username: data.payload.username
                 }
             }),
-            await db.Email.findOne({
-                where: {
-                    address: data.payload.email
-                }
+            await db.Email.findUnknown({
+                address: data.payload.email
             }),
-            await db.Phone.findOne({
-                where: {
-                    number: data.payload.phone
-                }
+            await db.Phone.findUnknown({
+                number: data.payload.phone
             })
         ] as const;
 
@@ -93,18 +92,7 @@ export default new Service<{
                 userId: user.id
             });
 
-            user.set({ emailAddress: data.payload.email });
-        }
-
-        if (data.payload.phone) {
-
-            await addPhone.callback({
-                ...data,
-                user,
-                payload: {
-                    phone: data.payload.phone
-                }
-            });
+            await user.update({ emailAddress: data.payload.email });
         }
 
         await user.createRole({
@@ -119,27 +107,18 @@ export default new Service<{
             await sendVerificationEmail(data, user, user.emailAddress);
         }
 
-        const token = await db.Token.generate({
-            userId: user.id,
-            roles: ['unverified'],
-            expires: 'session',
-        });
+        if (data.payload.phone) {
 
-        this.setInHeader = {
-            cookie: {
-                maxAge: token.sessionExpiresAt,
-                value: token.refreshToken
-            }
-        };
-
-        return {
-            token: token.authToken,
-            expiresAt: token.expiresAt,
-            name: user.name,
-            username: user.username,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-        };
+            await addPhone.callback({
+                ...data,
+                user,
+                payload: {
+                    phone: data.payload.phone
+                }
+            });
+        }
+        
+        await user.populate();
+        return await initSession(data, user, this);
     }
 });

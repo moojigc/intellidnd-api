@@ -24,7 +24,8 @@ export default async function sendVerificationEmail(
 		template: 'verification',
 		to: user.emailAddress!,
         params: {
-            token: code.data
+            token: code.data,
+			email: encodeURIComponent(email)
         }
 	});
 }

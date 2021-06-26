@@ -1,10 +1,8 @@
 import { Service } from '@utils/Service';
 import sendSms from '@utils/sendSms';
 
-export default new Service<{
-    phone: string;
-}>({
-    route: '/user/phone/:param1/resend',
+export default new Service({
+    route: '/user/phone/:param1/send',
     payload: {},
     method: 'post',
     isPublic: false,
@@ -14,9 +12,9 @@ export default new Service<{
     },
     async callback(data) {
 
-        const { db, user, payload } = data;
+        const { db, user } = data;
 
-        if (!user.phones.filter(p => p.number === payload.phone).length) {
+        if (!user.phones.filter(p => p.number === data.param1).length) {
 
             data.err('phone_resend-01', 404, 'Phone number not found.');
         }
@@ -28,7 +26,7 @@ export default new Service<{
 
         await sendSms({
             twilio: data.ext.twilio,
-            user,
+            to: data.param1,
             template: 'verification',
             params: {
                 'code': code.data

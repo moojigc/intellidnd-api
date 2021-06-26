@@ -44,7 +44,22 @@ export function initSequelize({
     DB_LOGGING
 }: NodeJS.ProcessEnv) {
 
-    const log = (str: string) => {
+    const log = (str: string, options) => {
+
+        if (options.type === 'SELECT') {
+            
+            console.log(
+                colors.green + 'SELECT' + reset,
+                colors.cyan + '*' + reset,
+                colors.black + backgrounds.bgWhite + ' FROM ' + reset,
+                colors.cyan + options.tableNames?.join(', ') + reset,
+                colors.black + backgrounds.bgWhite + ' WHERE ' + reset,
+                colors.cyan + options.where + reset,
+            );
+
+            return;
+        }
+
         str = str
             .replace(
                 /executing \(.*?\):/gi,
@@ -202,6 +217,10 @@ export function initModels(sequelize: Sequelize) {
         as: 'wallet'
     });
     db.Email.belongsTo(db.User, {
+        foreignKey: 'userId',
+        as: 'user'
+    });
+    db.Phone.belongsTo(db.Phone, {
         foreignKey: 'userId',
         as: 'user'
     });

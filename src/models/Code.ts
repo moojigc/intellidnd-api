@@ -93,7 +93,9 @@ export default class Code
         }
         else if (c.expiresAt && c.expiresAt <= Date.now()) {
 
-            throw err('code-02', 401, 'Code is expired');
+            c.destroy();
+
+            throw err('code-02', 403, 'Code is expired');
         }
 
         await c.destroy();

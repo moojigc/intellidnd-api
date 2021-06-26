@@ -26,6 +26,11 @@ export default function(service: {
 
     for (const k in data) {
 
+        if (k === 'identifier' && data[k].match(/\d{10,11}/)) {
+
+            data[k] = data[k].padStart(11, '1');
+        }
+
         if (!allFields.includes(k) && service.optional !== null) {
 
             throw serverError('validate-02', 400, `Invalid field: ${k}`);

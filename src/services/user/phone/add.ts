@@ -1,3 +1,4 @@
+import { middleware } from '@utils/format';
 import sendSms from '@utils/sendSms';
 import Service from '@utils/Service';
 
@@ -15,15 +16,12 @@ export default new Service<{
             phone: 'string'
         },
     },
+    middleware: [middleware.phone('phone')],
     callback: async ({ user, ext, payload, db, sql, err }) => {
 
-        payload.phone = payload.phone
-			.split('')
-			.filter((r) => /\d/.test(r))
-			.join('');
-
-        if (user.phones.filter(p => p.number === payload.phone).length) {
-
+        const phones = user.phones || await user.getPhones();
+        
+        if (phones.filter(p => p.number === payload.phone).length) {
             return;
         }
 
@@ -37,6 +35,14 @@ export default new Service<{
             }, {
                 transaction
             });
+
+            await user.populate();
+            if (!user.phone) {
+
+                await user.update({
+                    phoneNumber: phone.number
+                }, { transaction });
+            }
     
             const code = await db.Code.createVerificationCode(user.id, {
                 transaction,
@@ -46,7 +52,7 @@ export default new Service<{
     
             await sendSms({
                 twilio: ext.twilio,
-                user,
+                to: phone.number,
                 template: 'verification',
                 params: {
                     code: code.data

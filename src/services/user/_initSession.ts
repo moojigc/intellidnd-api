@@ -4,7 +4,7 @@ import type Service from '@utils/Service';
 import DiscordOAuth from 'externalServices/DiscordOAuth';
 
 export default async function initSession(
-	{ db }: ServiceData,
+	{ db }: { db: ServiceData['db'] },
 	user: User,
 	service: Omit<Service<any, any>, 'roles'>,
     discordOAuth?: DiscordOAuth
@@ -24,9 +24,11 @@ export default async function initSession(
 	};
 
 	return {
+		id: user.id,
 		token: token.authToken,
 		expiresAt: token.expiresAt ? token.expiresAt : null,
 		name: user.name,
-		email: user.email,
+		email: user.emailAddress,
+		verified: Boolean(user.email?.verifiedAt || user.phone?.verifiedAt)
 	};
 }

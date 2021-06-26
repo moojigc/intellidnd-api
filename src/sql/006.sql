@@ -27,3 +27,7 @@ ADD CONSTRAINT `user_ibfk_2`
   FOREIGN KEY (`emailAddress`)
   REFERENCES `email` (`address`)
   ON DELETE SET NULL;
+
+ALTER TABLE `code` 
+ADD COLUMN `parentId` VARCHAR(64) NULL AFTER `type`,
+ADD COLUMN `parentEntity` VARCHAR(64) NULL AFTER `parentId`;
