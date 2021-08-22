@@ -1,48 +1,46 @@
-import serverError from "./Error";
-import validateType from "./validateType";
+import Service from '@lib/Service';
+import serverError from './Error';
+import validateType from './validateType';
 
-export default function(service: {
-    required?: Record<string, string | string[]> | null;
-    optional?: Record<string, string | string[]> | null;
-}, data: any) {
+export default function(service: Service, payload: any) {
 
-    const required = service.required || {};
-    const optional = service.optional || {};
+    const required = service.payload?.required || {};
+    const optional = service.payload?.optional || {};
 
-    if (typeof data !== 'object') {
+    if (typeof payload !== 'object') {
 
         return;
     }
     
     for (const k in required) {
 
-        if (!(k in data)) {
+        if (!(k in payload)) {
 
-            throw serverError('validate-01', 400, `Required field: ${k}`);
+            throw new Service.ServiceError('validate-01', 400, `Required field: ${k}`);
         }
     }
 
     const allFields = Object.keys(required).concat(...Object.keys(optional));
 
-    for (const k in data) {
+    for (const k in payload) {
 
-        if (k === 'identifier' && data[k].match(/\d{10,11}/)) {
+        if (k === 'identifier' && payload[k].match(/\d{10,11}/)) {
 
-            data[k] = data[k].padStart(11, '1');
+            payload[k] = payload[k].padStart(11, '1');
         }
 
-        if (!allFields.includes(k) && service.optional !== null) {
+        if (!allFields.includes(k) && service.payload?.optional !== null) {
 
-            throw serverError('validate-02', 400, `Invalid field: ${k}`);
+            throw new Service.ServiceError('validate-02', 400, `Invalid field: ${k}`);
         }
 
         if (k in required) {
 
-            data[k] = validateType({ types: required[k], field: k }, data[k]);
+            payload[k] = validateType({ types: required[k], field: k }, payload[k]);
         }
         else if (k in optional) {
 
-            data[k] = validateType({ types: optional[k], field: k }, data[k]);
+            payload[k] = validateType({ types: optional[k], field: k }, payload[k]);
         }
     }
 }

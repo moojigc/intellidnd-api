@@ -1,4 +1,4 @@
-import './utils/alias';
+import '@utils/alias';
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
@@ -7,24 +7,24 @@ import * as dotenv from 'dotenv';
 import requestIp from 'request-ip';
 import Redis from 'redis';
 
-import { initModels, initSequelize } from './models';
-import services from './routers/initServices';
+import { initModels, initSequelize } from '@models';
 import { interactionsDevWrapper, interactionsProdWrapper } from './routers/discordInteractions';
+import core from 'routers/core';
+import Twilio from 'twilio';
 dotenv.config();
 
 const PROD = process.env.NODE_ENV !== 'development';
 const PORT = process.env.PORT;
 
 const sequelize = initSequelize(process.env);
-const models = initModels(sequelize);
+const db = initModels(sequelize);
 const redisClient = Redis.createClient({
 	url: process.env.REDIS_URL,
 });
 
-
-
 const app = express();
-	app.disable('x-powered-by')
+
+app.disable('x-powered-by')
 	.set('trust proxy', true)
 	.use(cors({
 		origin: /localhost|intellidnd.com/,
@@ -32,18 +32,20 @@ const app = express();
 		methods: ['GET', 'PATCH', 'POST', 'DELETE'],
 		exposedHeaders: ['Limit', 'Remaining', 'Reset'].map(s => `X-RateLimit-${s}`)
 	}))
-	.use(interactionsProdWrapper({ db: models, sql: sequelize }))
+	.use(interactionsProdWrapper({ db: db, sql: sequelize }))
 	.use(cookieParser())
 	.use(express.urlencoded({ extended: true }))
 	.use(express.json())
 	.use(requestIp.mw())
 	.use(morgan('dev'))
-	.use(interactionsDevWrapper({ db: models, sql: sequelize }))
-	.use(services({
-		db: models,
-		sql: sequelize,
+	.use(interactionsDevWrapper({ db: db, sql: sequelize }))
+	.use(core({
+		twilio: Twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN),
+		prefix: process.env.VERSION_PREFIX || '/v1',
+		env: process.env,
+		db: db,
 		redis: redisClient,
-		env: process.env
+		sql: sequelize
 	}))
 	.all('*', (req, res) => {
 		res.status(404)

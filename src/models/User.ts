@@ -5,7 +5,6 @@ import Model from './Model';
 import { UserRole, UserRoleId } from './UserRole';
 import Email, { EmailId } from './Email';
 import Phone from './Phone';
-import { phone } from '@utils/format';
 
 export interface UserAttributes {
     id: string;

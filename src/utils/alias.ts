@@ -11,5 +11,6 @@ moduleAlias.addAliases({
     '@root': _rootDir,
     '@types': _resolve('types'),
     '@models': _resolve('models'),
-    '@utils': _resolve('utils')
+    '@utils': _resolve('utils'),
+    '@lib': _resolve('lib')
 });

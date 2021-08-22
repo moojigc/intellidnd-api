@@ -25,6 +25,7 @@ export default function serverError(
 	}
 
 	const error = new Error(message);
+	error.name = 'Server Error';
 
 	return {
 		code,

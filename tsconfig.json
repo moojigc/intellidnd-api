@@ -6,6 +6,12 @@
     "compilerOptions": {
         "baseUrl": "./src",
         "paths": {
+            "@lib": [
+                "lib"
+            ],
+            "@lib/*": [
+                "lib/*"
+            ],
             "@types": [
                 "types"
             ],
