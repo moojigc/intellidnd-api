@@ -126,6 +126,7 @@ export default class DiscordOAuth implements TokenResponse, DiscordUser {
           params: {},
           to: process.env.DEV_PHONE
         })
+        throw e;
     }
 
         for (const k in res) {
