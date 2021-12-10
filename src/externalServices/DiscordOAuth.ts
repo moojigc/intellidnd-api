@@ -2,6 +2,8 @@ import axios, { AxiosRequestConfig } from 'axios';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+import sendSms from "../utils/sendSms";
+
 interface TokenResponse {
     access_token: string;
     expires_in: number;
@@ -110,12 +112,20 @@ export default class DiscordOAuth implements TokenResponse, DiscordUser {
             'redirect_uri': ui + (process.env.DISCORD_REDIRECT || '/oauth/discord')
         })
 
+        try {
 		const res = await this._request<TokenResponse>('/oauth2/token', 'POST', {
             data: creds,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         });
+    } catch (e) {
+        sendSms({
+          message: `error: ${e}`,
+          params: {},
+          to: process.env.DEV_PHONE
+        })
+    }
 
         for (const k in res) {
 

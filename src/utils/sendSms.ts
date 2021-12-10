@@ -2,31 +2,31 @@ import type User from '@models/User';
 import type { Twilio } from 'twilio';
 import messageTemplate from './messageTemplates.json';
 import * as dotenv from 'dotenv';
+import twilio from "../lib/twilio";
 dotenv.config();
 
 export default async function sendSms(options: {
-    twilio: Twilio;
+    twilio?: Twilio;
     template?: string;
     message?: string;
     user?: User;
     params: Record<string, string>;
 }): Promise<void>;
 export default async function sendSms(options: {
-    twilio: Twilio;
+    twilio?: Twilio;
     template?: string;
     message?: string;
     to?: string;
     params: Record<string, string>;
 }): Promise<void>;
 export default async function sendSms({
-    twilio,
     template,
     user,
     message,
     to,
     params
 }: {
-    twilio: Twilio;
+    twilio?: Twilio;
     template?: string;
     message?: string;
     to?: string;
