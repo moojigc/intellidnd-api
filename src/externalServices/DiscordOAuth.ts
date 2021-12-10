@@ -112,8 +112,9 @@ export default class DiscordOAuth implements TokenResponse, DiscordUser {
             'redirect_uri': ui + (process.env.DISCORD_REDIRECT || '/oauth/discord')
         })
 
+        let res: TokenResponse;
         try {
-		const res = await this._request<TokenResponse>('/oauth2/token', 'POST', {
+		res = await this._request<TokenResponse>('/oauth2/token', 'POST', {
             data: creds,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
