@@ -35,7 +35,7 @@
     "express-handlebars": "^4.0.4",
     "express-session": "^1.17.1",
     "lodash": "^4.17.19",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "mongoose": "^5.9.18",
     "morgan": "^1.10.0",
     "passport": "^0.4.1",
