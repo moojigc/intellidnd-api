@@ -1,0 +1,35 @@
+version: 2.1
+jobs:
+  build:
+    machine: true
+    resource_class: moojigc/rocks_ci
+    steps:
+      - checkout
+      - run:
+          name: Build Docker Image
+          command: |
+            echo 'Starting build...'
+            sudo docker login $DOCKERHUB_HOST -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
+            sudo docker build --pull --rm -f "Dockerfile" -t $DOCKERHUB_HOST/intellidnd-api:latest "."
+      - run:
+          name: Push Docker Image
+          command: |
+            echo 'Pushing to $DOCKERHUB_HOST...'
+            sudo docker push $DOCKERHUB_HOST/intellidnd-api:latest
+      - add_ssh_keys:
+          fingerprints:
+            - "f4:c7:12:d0:90:a1:22:93:85:26:9e:f8:91:4c:4b:f4"
+      - run:
+          name: Run ssh command
+          command: |
+            echo 'Connecting to $DOCKERHOST and running script...'
+            ssh -o "StrictHostKeyChecking=no" $DOCKERHOST $REMOTE_SCRIPT_PATH
+            echo 'All done! App now deployed!'
+workflows:
+  build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - api-only

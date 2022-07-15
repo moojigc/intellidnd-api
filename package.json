@@ -9,7 +9,7 @@
   },
   "scripts": {
     "server": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts -e ts,json",
-    "start": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts -e ts,json",
+    "start": "node build/index",
     "build": "tsc",
     "test": "echo \"No test\" && exit 1"
   },
