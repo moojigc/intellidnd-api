@@ -18,7 +18,9 @@ const PORT = process.env.PORT;
 const sequelize = initSequelize(process.env);
 const models = initModels(sequelize);
 const redisClient = Redis.createClient({
-	url: process.env.REDIS_URL,
+	// url: process.env.REDIS_URL,
+	host: process.env.REDIS_HOST,
+	port: parseInt(process.env.REDIS_PORT!),
 });
 
 
