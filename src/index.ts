@@ -23,8 +23,10 @@ const redisClient = Redis.createClient({
 	port: parseInt(process.env.REDIS_PORT!),
 	password: process.env.REDIS_PASS
 });
-
-
+redisClient.PING((e, r) => console.log(r))
+sequelize.authenticate()
+	.then(res => console.log('connected to db'))
+	.catch(e => console.error(e))
 
 const app = express();
 	app.disable('x-powered-by')

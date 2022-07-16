@@ -2,7 +2,6 @@ import { ServiceData } from '@types';
 import nodemailer from 'nodemailer';
 import serverError from './Error';
 import templates from './messageTemplates.json';
-import { regexp } from 'sequelize/types/lib/operators';
 
 export default async function sendEmail(options: {
     body?: string;

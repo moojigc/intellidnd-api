@@ -28,51 +28,6 @@ export default class Model<
         return ret;
     }
 
-    public static async create<M extends Model<any, any>>(
-        this: Sequelize.ModelStatic<M>,
-        values?: M['_creationAttributes'],
-        options?: Sequelize.CreateOptions<M['_attributes']>
-    ): Promise<M> {
-
-        // @ts-ignore
-        const build = this.build(values);
-
-        try {
-            
-            const res = await build.save(options);
-
-            return res;
-        }
-        catch (e) {
-
-            console.log(e);
-            
-            if (options?.transaction) {
-
-                await options?.transaction.rollback();
-            }
-
-            if (e instanceof ValidationError || e instanceof ValidationErrorItem) {
-
-                const msg = e instanceof ValidationError ? e.errors[0].message : e.message;
-
-                throw {
-                    code: 'validation-01',
-                    status: 400,
-                    message: msg
-                };
-            }
-            else {
-
-                throw {
-                    code: 'db-01',
-                    status: 500,
-                    message: e.message || e
-                };
-            }
-        }
-    }
-
     public static async findUnknown<M extends Model<any, any>>(where: WhereOptions<M['_attributes']>)  {
 
         return await this.unknownLookup('findOne', where) as Promise<M | null>;
