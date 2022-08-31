@@ -18,7 +18,7 @@ jobs:
             sudo docker push $DOCKERHUB_HOST/intellidnd-api:latest
       - add_ssh_keys:
           fingerprints:
-            - "f4:c7:12:d0:90:a1:22:93:85:26:9e:f8:91:4c:4b:f4"
+            - "e5:c7:32:3c:d2:5c:84:c0:44:7d:19:83:e8:21:67:64"
       - run:
           name: Run ssh command
           command: |
