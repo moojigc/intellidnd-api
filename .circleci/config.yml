@@ -29,6 +29,7 @@ workflows:
   build:
     jobs:
       - build:
+          context: elite
           filters:
             branches:
               only:
