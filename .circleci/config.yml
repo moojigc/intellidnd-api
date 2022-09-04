@@ -19,8 +19,8 @@ jobs:
       - run:
           name: Run webhook
           command: |
-            curl --location --request POST '$WEBHOOK_URL' \
-            --header 'X-Webhook-Password: $WEBHOOK_PASS' \
+            curl --location --request POST $WEBHOOK_URL \
+            --header 'X-Webhook-Password: '$WEBHOOK_PASS'' \
             --header 'Content-Type: application/json' \
             --data-raw '{
                 "cmd": "intellidnd-api"
