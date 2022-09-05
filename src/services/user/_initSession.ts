@@ -7,13 +7,13 @@ export default async function initSession(
 	{ db }: { db: ServiceData['db'] },
 	user: User,
 	service: Omit<Service<any, any>, 'roles'>,
-    discordOAuth?: DiscordOAuth
+	discordOAuth?: DiscordOAuth
 ) {
 	const token = await db.Token.generate({
 		expires: 'session',
 		userId: user.id,
 		roles: (await user.getRoles()).map((r) => r.roleKey),
-        discordOAuth
+		discordOAuth,
 	});
 
 	service.setInHeader = {
@@ -27,8 +27,12 @@ export default async function initSession(
 		id: user.id,
 		token: token.authToken,
 		expiresAt: token.expiresAt ? token.expiresAt : null,
+		refreshToken: {
+			value: token.refreshToken,
+			maxAge: token.sessionExpiresAt,
+		},
 		name: user.name,
 		email: user.emailAddress,
-		verified: Boolean(user.email?.verifiedAt || user.phone?.verifiedAt)
+		verified: Boolean(user.email?.verifiedAt || user.phone?.verifiedAt),
 	};
 }
