@@ -9,7 +9,10 @@ import Redis from 'redis';
 
 import { initModels, initSequelize } from './models';
 import services from './routers/initServices';
-import { interactionsDevWrapper, interactionsProdWrapper } from './routers/discordInteractions';
+import {
+	interactionsDevWrapper,
+	interactionsProdWrapper,
+} from './routers/discordInteractions';
 dotenv.config();
 
 const PROD = process.env.NODE_ENV !== 'development';
@@ -21,22 +24,27 @@ const redisClient = Redis.createClient({
 	// url: process.env.REDIS_URL,
 	host: process.env.REDIS_HOST,
 	port: parseInt(process.env.REDIS_PORT!),
-	password: process.env.REDIS_PASS
+	password: process.env.REDIS_PASS,
 });
-redisClient.PING((e, r) => console.log(r))
-sequelize.authenticate()
-	.then(res => console.log('connected to db'))
-	.catch(e => console.error(e))
+redisClient.PING((e, r) => console.log(r));
+sequelize
+	.authenticate()
+	.then((res) => console.log('connected to db'))
+	.catch((e) => console.error(e));
 
 const app = express();
-	app.disable('x-powered-by')
+app.disable('x-powered-by')
 	.set('trust proxy', true)
-	.use(cors({
-		origin: /localhost|intellidnd.com/,
-		credentials: true,
-		methods: ['GET', 'PATCH', 'POST', 'DELETE'],
-		exposedHeaders: ['Limit', 'Remaining', 'Reset'].map(s => `X-RateLimit-${s}`)
-	}))
+	.use(
+		cors({
+			origin: /localhost|intellidnd.com|chimid.rocks/,
+			credentials: true,
+			methods: ['GET', 'PATCH', 'POST', 'DELETE'],
+			exposedHeaders: ['Limit', 'Remaining', 'Reset'].map(
+				(s) => `X-RateLimit-${s}`
+			),
+		})
+	)
 	.use(interactionsProdWrapper({ db: models, sql: sequelize }))
 	.use(cookieParser())
 	.use(express.urlencoded({ extended: true }))
@@ -44,26 +52,26 @@ const app = express();
 	.use(requestIp.mw())
 	.use(morgan('dev'))
 	.use(interactionsDevWrapper({ db: models, sql: sequelize }))
-	.use(services({
-		db: models,
-		sql: sequelize,
-		redis: redisClient,
-		env: process.env
-	}))
+	.use(
+		services({
+			db: models,
+			sql: sequelize,
+			redis: redisClient,
+			env: process.env,
+		})
+	)
 	.all('*', (req, res) => {
 		res.status(404)
 			.json({
 				message: `${req.method} ${req.path} not found`,
-				code: 'server-01'
+				code: 'server-01',
 			})
 			.end();
 	})
 	.listen(PORT, () => {
 		console.log(
 			`Online at ${
-				PROD
-					? 'https://api.intellidnd.com'
-					: `http://localhost:${PORT}`
+				PROD ? 'https://api.intellidnd.com' : `http://localhost:${PORT}`
 			}`
 		);
 	});
