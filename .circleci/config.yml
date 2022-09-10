@@ -32,3 +32,4 @@ workflows:
             branches:
               only:
                 - api-only
+                - master
