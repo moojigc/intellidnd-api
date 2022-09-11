@@ -32,7 +32,7 @@ app.use(express.static("public"))
 	.use(express.json())
 	.use(morgan("dev"))
 	// handlebars stuff
-	.engine("handlebars", exphbs({ defaultLayout: "main" }))
+	.engine("handlebars", exphbs.engine({ defaultLayout: "main" }))
 	.set("view engine", "handlebars")
 	// Session middleware
 	.use(
